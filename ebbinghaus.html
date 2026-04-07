@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<!-- saved from url=(0113)file:///D:/86180/Documents/%E9%9B%85%E6%80%9D%E5%A4%A7%E4%BD%9C%E6%96%87%E6%8B%BC%E5%86%99%E8%AE%AD%E7%BB%83.html -->
+<html lang="zh-CN"><style data-id="samantha-vocabruary-style">doubao-vocabulary-highlight {
+  background-color: rgba(251, 255, 20, 0.44);
+  visibility: visible !important;
+}
+doubao-vocabulary-highlight:hover {
+  background-color: rgba(251, 255, 30, 0.44);
+}
+</style><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雅思词汇拼写训练 · 艾宾浩斯宇宙版</title>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        body {
+            background: #0a1028;
+            background-image: radial-gradient(circle at 50% 50%, #1a2345 0%, #050714 100%);
+            color: #e6edf7;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 880px;
+            margin: 40px auto;
+            background: rgba(18, 28, 58, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(100, 120, 255, 0.2);
+            padding: 40px;
+            border: 1px solid rgba(130, 150, 255, 0.2);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #c7d1ff;
+            text-shadow: 0 0 15px rgba(130, 150, 255, 0.5);
+        }
+
+        /* 全局进度 */
+        .global-progress {
+            margin: 10px auto 25px;
+            max-width: 600px;
+        }
+        .global-progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #aabbff;
+            margin-bottom: 6px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(26,35,69,0.6);
+            border-radius: 4px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7289ff, #a2b4ff);
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 4px;
+        }
+
+        /* 分类进度 */
+        .category-progress {
+            text-align: center;
+            font-size: 14px;
+            color: #c7d1ff;
+            margin: -10px 0 20px;
+        }
+
+        /* 学习统计 */
+        .stats-panel {
+            background: rgba(26,35,69,0.4);
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin: 0 auto 22px;
+            max-width: 600px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-around;
+            color: #c7d1ff;
+        }
+        .stats-item {
+            text-align: center;
+        }
+        .stats-num {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .config {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .config-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .config label {
+            color: #c7d1ff;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .config select,
+        .config input {
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(130, 150, 255, 0.3);
+            background: rgba(26, 35, 69, 0.7);
+            color: #e6edf7;
+            font-size: 15px;
+            outline: none;
+            min-width: 140px;
+            transition: 0.3s;
+        }
+        .config button {
+            padding: 12px 28px;
+            background: linear-gradient(90deg, #6a85ff, #4a6cff);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        /* 美观小按钮 */
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 4px;
+        }
+        .pause-btn { background: #ffb957; color: #222; }
+        .skip-mem-btn { background: #5fff97; color: #111; }
+        .back-btn { background: #8899ff; color: #fff; }
+        .sound-btn { background: rgba(114,137,255,0.2); color: #fff; }
+        .loop-btn { background: #ff7272; color: #fff; }
+        .loop-btn.active { background: #ff4444; }
+
+        .stage {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .stage.active {
+            display: block;
+        }
+
+        .countdown {
+            font-size: 48px;
+            color: #ff7272;
+            margin: 20px 0;
+            font-weight: bold;
+            text-shadow: 0 0 12px rgba(255, 114, 114, 0.4);
+        }
+
+        .vocab-list {
+            height: 340px;
+            overflow-y: auto;
+            background: rgba(26, 35, 69, 0.5);
+            border: 1px solid rgba(130, 150, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            line-height: 2;
+            text-align: left;
+        }
+        .vocab-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px dashed rgba(130, 150, 255, 0.15);
+        }
+        .vocab-item.mastered {
+            opacity: 0.6;
+        }
+        .vocab-item.mastered span:first-child::after {
+            content: " ✅";
+            color: #5fff97;
+            font-size: 12px;
+        }
+
+        .answer-show {
+            color: #5fff97;
+            font-size: 18px;
+            margin: 10px 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .answer-show.active { display: flex; }
+
+        .q-box { margin: 35px 0; }
+        .q-chinese {
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: #d6e0ff;
+        }
+        .q-input {
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 400px;
+            border: 1px solid rgba(130, 150, 255, 0.3);
+            background: rgba(26, 35, 69, 0.7);
+            color: #e6edf7;
+            text-align: center;
+            outline: none;
+        }
+        .q-input.error { border-color: #ff5757; }
+        .q-tip {
+            color: #ff7272;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+        .q-tip.active { display: block; }
+
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .btn-group button {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-submit {
+            background: linear-gradient(90deg, #5fff97, #3bff7f);
+            color: #0e2212;
+        }
+        .btn-skip {
+            background: linear-gradient(90deg, #ffb957, #ff9f4a);
+            color: #221604;
+        }
+
+        .result { line-height: 1.9; }
+        .error-vocab {
+            background: rgba(26, 35, 69, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            margin-top: 15px;
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(114, 137, 255, 0.4);
+            border-radius: 3px;
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 24px;
+            background: rgba(114, 137, 255, 0.2);
+            color: #c7d1ff;
+            border: 1px solid rgba(130, 150, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(114, 137, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body samantha-ext-loaded="1">
+    <script>applyConfig();</script>
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='index.html'">返回学习中心</button>
+        <h1 class="title">🌌 雅思词汇拼写训练 · 艾宾浩斯宇宙版</h1>
+
+        <!-- 全局总进度 -->
+        <div class="global-progress">
+            <div class="global-progress-text">
+                <span>全局总进度</span>
+                <span id="globalProgressText">10 / 475</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="globalProgressBar" style="width: 2.10526%;"></div></div>
+        </div>
+
+        <!-- 分类进度 -->
+        <div class="category-progress" id="categoryProgress">当前分类：已掌握 10 · 学习中 5 · 未学新词 460 · 总数 475</div>
+
+        <!-- 学习统计 -->
+        <div class="stats-panel">
+            <div class="stats-item">最近一次错题<br><span class="stats-num" id="statCurError">0</span></div>
+            <div class="stats-item">历史总错题<br><span class="stats-num" id="statTotalError">0</span></div>
+            <div class="stats-item">累计掌握<br><span class="stats-num" id="statTotalMaster">11</span></div>
+        </div>
+
+        <div class="config" id="configPanel">
+            <div class="config-item">
+                <label>词汇主题：</label>
+                <select id="vocabType">
+                    <option value="mixed">⭐ 混合类（全部词汇）</option>
+                    <option value="tech">科技类</option>
+                    <option value="culture">文化类</option>
+                    <option value="work">工作类</option>
+                    <option value="traffic">交通类</option>
+                    <option value="media">媒体类</option>
+                    <option value="society">社会类</option>
+                    <option value="animal">动物保护类</option>
+                    <option value="spellError">易拼错高频词</option>
+                </select>
+                <span id="vocabCount" style="color: #8899ff; font-size: 13px; margin-left: 8px;">(10/475)</span>
+            </div>
+            <div class="config-item">
+                <label>考试形式：</label>
+                <select id="examType">
+                    <option value="spelling">拼写题</option>
+                    <option value="blank">填空题</option>
+                    <option value="mixed">混合题</option>
+                </select>
+            </div>
+            <div class="config-item">
+                <label>记忆时间：</label>
+                <input type="number" id="memTime" value="120">
+                <label>秒</label>
+            </div>
+            <div class="config-item">
+                <label>出题数量：</label>
+                <input type="number" id="qNum" value="10" min="1" max="465">
+                <label>题</label>
+                <span id="qNumHint" style="color: #ff7272; font-size: 12px; margin-left: 8px; display: none;"></span>
+            </div>
+            <button id="startBtn">开始训练</button>
+            <button id="reviewBtn">复习错题</button>
+        </div>
+
+        <!-- 记忆阶段 -->
+        <div class="stage" id="memStage">
+            <h2>📚 记忆阶段
+                <button class="icon-btn pause-btn" id="pauseBtn">⏸️</button>
+                <button class="icon-btn skip-mem-btn" id="skipMemBtn">🚀</button>
+                <button class="icon-btn back-btn" id="backToConfigFromMem">⬅️</button>
+            </h2>
+            <div class="progress-bar"><div class="progress-fill" id="memProgress"></div></div>
+            <div class="countdown" id="memCountdown">120</div>
+            <div class="vocab-list" id="vocabList"></div>
+        </div>
+
+        <!-- 答题阶段 -->
+        <div class="stage" id="ansStage">
+            <h2>🚀 答题阶段
+                <button class="icon-btn back-btn" id="backToMemFromAns">⬅️</button>
+            </h2>
+            <div class="progress-bar"><div class="progress-fill" id="ansProgress"></div></div>
+            <div style="margin:10px 0;">第<span id="qIndex">1</span>题 / 共<span id="qTotal">10</span>题</div>
+            <div class="q-box">
+                <div class="q-chinese" id="qChinese">请拼写英文</div>
+                <div class="answer-show" id="answerShow">
+                    <span></span>
+                    <button class="icon-btn sound-btn" id="ansPlayBtn">🔊</button>
+                    <button class="icon-btn loop-btn" id="loopBtn">🔁</button>
+                </div>
+                <input type="text" class="q-input" id="qInput" placeholder="输入答案后按回车或提交">
+                <div class="q-tip" id="qTip">❌ 拼写错误，请重试</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-submit" id="submitBtn">提交答案</button>
+                <button class="btn-skip" id="skipBtn">跳过本题</button>
+            </div>
+        </div>
+
+        <!-- 结果阶段 -->
+        <div class="stage" id="resStage">
+            <div class="result">
+                <h3>✅ 训练完成！</h3>
+                <div class="result-data">
+                    总题数：<span id="resTotal">10</span> &nbsp;&nbsp;
+                    正确数：<span id="resRight">0</span> &nbsp;&nbsp;
+                    正确率：<span id="resRate">0%</span>
+                </div>
+                <div class="error-vocab">
+                    <h4>📌 需巩固单词</h4>
+                    <div id="errorList">暂无错题</div>
+                </div>
+                <div class="btn-group" style="margin-top:30px;">
+                    <button class="btn-submit" id="restartBtn">继续训练</button>
+                    <button class="btn-skip" id="changeTypeBtn">更换主题</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vocabLib = {
+            tech: [
+                {cn:"尖端科学",en:"advanced science"},{cn:"科学发明",en:"scientific invention"},
+                {cn:"对 … 产生一种深远的影响",en:"exert a far-reaching impact on …"},{cn:"双刃剑",en:"double-edged sword"},
+                {cn:"翻天覆地的改变",en:"earth-shaking changes"},{cn:"为未来的发展铺平道路",en:"pave the way for the future development"},
+                {cn:"能源危机",en:"energy crisis"},{cn:"能源消耗",en:"depletion of resources"},
+                {cn:"里程碑",en:"milestone"},{cn:"尖端设备",en:"sophisticated equipment"},
+                {cn:"科技创新",en:"technical innovation"},{cn:"权宜之计",en:"expediency"},
+                {cn:"与    背道而驰的",en:"antithetical"},{cn:"过渡商业化的",en:"over-commercialized"},
+                {cn:"热烈的讨论",en:"a heated discussion"},{cn:"废气",en:"exhaust gas"},
+                {cn:"灾难性的",en:"disastrous"},{cn:"使    相形见绌",en:"overshadow"},
+                {cn:"取代",en:"substitute"},{cn:"引领",en:"usher in"},
+                {cn:"既快捷又舒适",en:"speedy and comfortable"},{cn:"负面影响",en:"opposite forces"},
+                {cn:"致命故障",en:"a fatal breakdown"},{cn:"潜在危险",en:"potential hazards"},
+                {cn:"对    有一种威胁",en:"pose a threat to    "},{cn:"促进相关产业发展",en:"promote related industries"},
+                {cn:"加速    ",en:"accelerate"},{cn:"交通方式",en:"means of transportation"},
+                {cn:"交通工具",en:"transportation tools"},{cn:"社会地位",en:"social status"},
+                {cn:"环保的能源",en:"environmentally-friendly resources"},{cn:"与 …相比",en:"compared to/with …"},
+                {cn:"可替代燃料",en:"alternative fuel"},{cn:"可持续性发展",en:"sustainable development"},
+                {cn:"科学探索",en:"scientific exploration"},{cn:"航空旅行",en:"air travel"},
+                {cn:"可笑的",en:"ridiculous"},{cn:"荒唐的",en:"absurd"},
+                {cn:"万能良药",en:"cure-all solution"},{cn:"克服困难",en:"overcome difficulties"},
+                {cn:"取得进步",en:"make progress"},{cn:"民族自豪感",en:"a sense of national pride"},
+                {cn:"前所未有的",en:"unprecedented"},{cn:"不断上升的",en:"soaring"},
+                {cn:"极大地推动了经济发展",en:"give a great push to the economic growth"},{cn:"使恶化",en:"aggravate"},
+                {cn:"优化",en:"optimize"},{cn:"取得突破性进展",en:"see dramatic breakthroughs"},{cn:"科技发展",en:"scientific and technological development"},{cn:"创新能力",en:"innovation capability"}
+            ],
+            culture: [
+                {cn:"文化视角",en:"cultural insights"},{cn:"了解世界",en:"learn about the would"},
+                {cn:"一种令人激动的经历",en:"a thrilling experience"},{cn:"抽象的",en:"abstract"},
+                {cn:"具体的",en:"concrete"},{cn:"使    感动落泪",en:"move somebody to tears"},
+                {cn:"得到放松和娱乐",en:"get relaxed and entertained"},{cn:"场所",en:"venue"},
+                {cn:"有其自己价值",en:"has its value"},{cn:"灵感",en:"inspiration"},
+                {cn:"知识面",en:"scope of knowledge"},{cn:"传播知识",en:"spread knowledge"},
+                {cn:"永恒的艺术作品",en:"lasting artistic works"},{cn:"深奥的",en:"abstruse"},
+                {cn:"抛弃传统",en:"break with old customs"},{cn:"代代相传",en:"carry down from generation to generation"},
+                {cn:"倡导新的生活方式",en:"advocate the new lifestyle."},{cn:"娱乐",en:"entertainment"},
+                {cn:"与    不同",en:"be different from    "},{cn:"直接经验",en:"direct experience"},
+                {cn:"共识",en:"echo"},{cn:"满足心理需求",en:"satiate people’s psychological demands"},
+                {cn:"更重视    ",en:"attach more importance to    "},{cn:"精神升华",en:"spiritual enhancement"},
+                {cn:"是    的一面镜子",en:"a mirror of    "},{cn:"决定性因素",en:"determinant"},
+                {cn:"使    相形见绌",en:"eclipse"},{cn:"有助于    ",en:"contribute to    "},
+                {cn:"一种惬意的感觉",en:"a sense of cool and satisfaction"},{cn:"消遣方式",en:"pastimes"},
+                {cn:"培养想象力",en:"nurture imagination"},{cn:"沉思",en:"meditation"},
+                {cn:"永恒的精髓",en:"an essence of immortality"},{cn:"有启发性的",en:"instructive"},
+                {cn:"熏陶",en:"edification"},{cn:"引发某人对某事的好奇心",en:"arouse one’s curiosity about something"},
+                {cn:"丰富某人知识",en:"enrich one’s knowledge"},{cn:"知识的价值",en:"value of knowledge"},
+                {cn:"文化差异性",en:"cultural differences"},{cn:"时光飞逝 ，艺术永恒",en:"time is fleeting and art is long"},
+                {cn:"文化多元化",en:"cultural diversity"},{cn:"文化宝藏",en:"cultural treasures"},
+                {cn:"跨文化交流",en:"cross-cultural communication"},{cn:"文化重建",en:"cultural reconstruction"},
+                {cn:"精神文明",en:"spiritual civilization"},{cn:"遗产",en:"heritage"},
+                {cn:"艺术成就",en:"achievements of art"},{cn:"拆除",en:"tear down"},
+                {cn:"人文历史遗址",en:"humane historical sites"},{cn:"保护文化遗产",en:"preserve the cultural relics"},
+                {cn:"蓝图",en:"blueprint"},{cn:"摩天大楼",en:"skyscraper"},
+                {cn:"高层写字楼",en:"high-rise office buildings"},{cn:"城市建设",en:"city construction"},
+                {cn:"结构良好的",en:"well-structured"},{cn:"结晶",en:"crystallization"},
+                {cn:"视觉享受",en:"visual enjoyment"},{cn:"驱动力",en:"driving force"},
+                {cn:"重建",en:"reconstruct"},{cn:"破坏",en:"destruct"},
+                {cn:"建筑工业",en:"architectural industry"},{cn:"制定出",en:"map out"},
+                {cn:"城市设计",en:"city designing"},{cn:"美化我们的生活",en:"beautify our life"},
+                {cn:"人类文明",en:"human civilization"},{cn:"文化摇篮",en:"cradle of culture"},
+                {cn:"主流文化",en:"mainstream culture"},{cn:"文化传统",en:"cultural traditions"},
+                {cn:"民族自豪",en:"national pride"},{cn:"风土人情",en:"local customs and practices"},
+                {cn:"吸引人们的眼球",en:"attract people’s eyes"},{cn:"艺术品味",en:"artistic taste"},
+                {cn:"基石",en:"cornerstone"},{cn:"与 …有密切关系",en:"be closely interrelated with …"},
+                {cn:"坚持传统",en:"adhere to the tradition"},{cn:"破坏建筑行为",en:"architectural vandalism"},
+                {cn:"弘扬    ",en:"carry forward    "},{cn:"文化需求",en:"cultural needs"},
+                {cn:"声望",en:"reputation"},{cn:"维护世界和平",en:"maintain the world peace"},
+                {cn:"艺术反映",en:"artistic reflection"},{cn:"宣传    ",en:"give publicity to    "},
+                {cn:"负担",en:"burden"},{cn:"造成不可逆转的损失",en:"cause irreversible damage"},
+                {cn:"民族特性和价值观",en:"national identity and value"},{cn:"消除偏见和误解",en:"remove prejudice and misunderstanding"},
+                {cn:"象征",en:"symbol"},{cn:"艺术水准",en:"artistic standards"},
+                {cn:"广受欢迎",en:"enjoy great popularity"},{cn:"文化退化",en:"cultural devolution"}
+            ],
+            work: [
+                {cn:"雄心壮志的 、野心勃勃的",en:"ambitious"},{cn:"适应性",en:"adaptability"},
+                {cn:"使自己适应 …",en:"adapt oneself to …"},{cn:"繁荣",en:"prosperity"},
+                {cn:"对    不利",en:"be disadvantageous to     "},{cn:"人才流动",en:"flow of personnel"},
+                {cn:"人才流动机制",en:"mechanism of personnel flow"},{cn:"适者生存",en:"survival of the fittest"},
+                {cn:"成就感",en:"a sense of accomplishment"},{cn:"潜能",en:"potentiality"},
+                {cn:"学习合作和妥协",en:"learn to cooperate and compromise"},{cn:"对 … 印象很深",en:"be deeply impressed with …"},
+                {cn:"企业文化",en:"company philosophy"},{cn:"灵活性",en:"flexibility"},
+                {cn:"竞争激烈的",en:"competitive"},{cn:"舞台",en:"arena"},
+                {cn:"团队合作精神",en:"team-work spirit"},{cn:"珍惜机会",en:"treasure opportunity"},
+                {cn:"收入颇丰",en:"a fat salary"},{cn:"和谐的人际关系",en:"a harmonious interpersonal relationship"},
+                {cn:"责任感",en:"a sense of responsibility"},{cn:"物质待遇",en:"material gains"},
+                {cn:"光明的前途",en:"promising future"},{cn:"光明的前景",en:"bright prospect"},
+                {cn:"一份具有挑战性的工作",en:"a challenging job"},{cn:"转折点",en:"turning point"},
+                {cn:"与    息息相关",en:"be closely related to    "},{cn:"出人头地",en:"get advanced in the society"},
+                {cn:"一份体面的工作",en:"a decent job"},{cn:"升迁机会",en:"chance of promotion"},
+                {cn:"稳定感和满足感",en:"stability and satisfaction"},{cn:"使技能可以不断更新",en:"keep skills fresh and up-to-date"},
+                {cn:"开阔视野",en:"expand one’s horizon"},{cn:"平衡工作和生活",en:"balance work and life"},
+                {cn:"朝九晚五一族",en:"from-nine-to-five"},{cn:"承担起自己的责任",en:"shoulder/undertake one’s responsibility"},
+                {cn:"提升自我",en:"upgrade oneself"},{cn:"高收入工作",en:"a well-paid job"},
+                {cn:"创造性工作",en:"creative work"},{cn:"迎接挑战",en:"stand up to / meet the challenge"},
+                {cn:"实现人生价值",en:"realize the value of life"},{cn:"丰富一个人的社会阅历",en:"enrich one’s social experience"},
+                {cn:"培养自己的独立性和坚韧性",en:"cultivate one’s independence and toughness"},{cn:"追求个人发展",en:"seek for personal development"},
+                {cn:"展示才能",en:"display one’s talent"},{cn:"自我实现感",en:"a sense of self-fulfillment"},
+                {cn:"提升机会",en:"promotion opportunity"},{cn:"满足某人个性化需求",en:"meet one’s personalized needs"},
+                {cn:"确定自己的角色",en:"define one’s role"},{cn:"社会认可",en:"social recognition"},
+                {cn:"获取经验",en:"accumulate experience"},{cn:"鼓舞人心的",en:"inspiring"},
+                {cn:"动机",en:"motivation"},{cn:"工作狂",en:"workaholic"},
+                {cn:"工作环境",en:"working environment"},{cn:"加班",en:"work overtime"},
+                {cn:"提高某人能力",en:"improve one’s capabilities"},{cn:"培养才智",en:"develop one’s talents"},
+                {cn:"理想工作场所",en:"ideal workplace"},{cn:"掌握人际交往技能",en:"master interpersonal skills"}
+            ],
+            traffic: [
+                {cn:"汽车工业",en:"automobile industry"},{cn:"促进经济发展",en:"boost the economic development"},
+                {cn:"征税",en:"levy the tax"},{cn:"现代化",en:"modernization"},
+                {cn:"被视为是    ",en:"be viewed as    "},{cn:"对    担忧/关注    ",en:"be concerned about    "},
+                {cn:"无污染燃料",en:"pollution-free fuel"},{cn:"奢侈品",en:"luxury"},
+                {cn:"慢性铅中毒",en:"chronic lead poisoning"},{cn:"使    充斥着",en:"fill    with    "},
+                {cn:"汽车普及",en:"popularization of cars"},{cn:"把重心放在 …",en:"lay more emphasis on …"},
+                {cn:"遵守交通规则",en:"observe traffic regulations"},{cn:"违反交通规则",en:"break traffic regulations"},
+                {cn:"遇上堵车",en:"get stuck in traffic"},{cn:"上下班高峰时间",en:"rush hour"},
+                {cn:"缓解交通压力",en:"ease the traffic pressure"},{cn:"行人",en:"pedestrian"},
+                {cn:"人行道",en:"pavement"},{cn:"斑马线",en:"zebra crossing"},
+                {cn:"超速行驶",en:"overspeed"},{cn:"交通堵塞地区",en:"bottleneck"},
+                {cn:"制定出积极有效的法律",en:"settle down effective laws"},{cn:"对 … 实施限制",en:"impose restrictions on …"},
+                {cn:"目光短浅的",en:"short-sighted"},{cn:"不可再生资源",en:"non-renewable resources"},
+                {cn:"二氧化碳",en:"carbon dioxide"},{cn:"支柱产业",en:"a pillar industry"},
+                {cn:"充分利用",en:"make full use of    "},{cn:"公路网",en:"road networks"},
+                {cn:"限速",en:"speed limits"},{cn:"提高生活质量",en:"enhance the quality of life"},
+                {cn:"付出惨痛的代价",en:"pay a heavy price"},{cn:"促进相关产业发展",en:"promote the development of relative industries"},
+                {cn:"交通运输工程",en:"traffic engineering"},{cn:"汽车拥有量",en:"the number of car ownership"},
+                {cn:"需要    ",en:"call for    "},{cn:"过度拥挤的",en:"overcrowded"},
+                {cn:"违规者",en:"violator"},{cn:"令人头痛的事",en:"headache"},
+                {cn:"交通事故",en:"traffic accidents"},{cn:"进展",en:"head-way"},
+                {cn:"与    相冲突",en:"conflict with    "},{cn:"主要原因",en:"major cause"},
+                {cn:"被    所取代",en:"be replaced by    "},{cn:"为    提供便利",en:"provide convenience for    "},
+                {cn:"限制    ",en:"curb    "},{cn:"进退两难",en:"dilemma"},
+                {cn:"鼓励某人去做某事",en:"encourage  somebody to do something"},{cn:"节能的",en:"energy-saving"}
+            ],
+            media: [
+                {cn:"狗仔队",en:"paparazzi"},{cn:"大众媒体",en:"mass media"},
+                {cn:"娱乐",en:"entertainment"},{cn:"新闻业",en:"journalism"},
+                {cn:"期刊",en:"journal"},{cn:"最新消息",en:"the latest news"},
+                {cn:"独家新闻",en:"exclusive news"},{cn:"新闻社",en:"news agency"},
+                {cn:"新闻封锁",en:"news blockout"},{cn:"新闻审查",en:"news censorship"},
+                {cn:"新闻自由",en:"freedom of the press"},{cn:"新闻报道",en:"coverage"},
+                {cn:"报导    ",en:"do reportage on    "},{cn:"上头条",en:"hit the headlines"},
+                {cn:"出版 、发行",en:"issue"},{cn:"报摊",en:"newsstand"},
+                {cn:"自由撰稿人",en:"free-lancer writer"},{cn:"总编",en:"chief editor"},
+                {cn:"社论",en:"editorial"},{cn:"值得报道的",en:"newsworthy"},
+                {cn:"晴雨表",en:"barometer"},{cn:"舆论的晴雨表",en:"the barometer of public opinion"},
+                {cn:"直播",en:"live broadcast"},{cn:"智力竞争节目",en:"quiz show"},
+                {cn:"游戏节目",en:"game show"},{cn:"综合节目",en:"variety show"},
+                {cn:"脱口秀",en:"talk show"},{cn:"情景喜剧",en:"sitcom"},
+                {cn:"肥皂剧",en:"soap opera"},{cn:"电影明星",en:"movie star"},
+                {cn:"影帝",en:"movie king"},{cn:"影后",en:"movie queen"},
+                {cn:"绯闻",en:"affair"},{cn:"名人",en:"celebrity"},
+                {cn:"名声",en:"fame"},{cn:"声名鹊起",en:"rise to fame"},
+                {cn:"粉丝",en:"fan"},{cn:"侵扰了 … 的隐私",en:"invade one’s privacy"},
+                {cn:"误导性的",en:"misleading"},{cn:"欺骗性的",en:"cheating"},
+                {cn:"知名度",en:"popularity"},{cn:"丑闻",en:"scandal"},
+                {cn:"轰动的",en:"sensational"},{cn:"普遍的 、流行的",en:"prevalent"},
+                {cn:"重要的 、必要的",en:"imperative"},{cn:"收视率",en:"audience ratings"},
+                {cn:"宣传",en:"propaganda"},{cn:"受    诱导",en:"be influenced/swayed by"},
+                {cn:"净化心灵",en:"purify one’s soul"},{cn:"生活在一个虚拟世界中",en:"live in a virtual world"},
+                {cn:"对    来说是一个巨大安慰",en:"be a great comfort to somebody"},{cn:"满足不同口味",en:"meet different tastes"},
+                {cn:"给    提供    ",en:"provide somebody with something"},{cn:"盲目追逐时尚",en:"follow the fashion blindly"},
+                {cn:"犯罪",en:"commit crimes"},{cn:"对    来说是难以想象的",en:"be inconceivable to someone"},
+                {cn:"给人印象深刻的",en:"impressive"},{cn:"知情权",en:"right to know"},
+                {cn:"打着 … 的幌子",en:"in the disguise of …"},{cn:"危害社会稳定和安全",en:"endanger/threaten social stability and safety"},
+                {cn:"信息时代",en:"information era"},{cn:"使人们了解    ",en:"keep one informed about something"},
+                {cn:"观众",en:"audience/viewers"},{cn:"对 …有不良影响",en:"have unhealthy and harmful effects on …"},
+                {cn:"信息爆炸的社会",en:"information-explosion society"},{cn:"有影响的",en:"influential"},
+                {cn:"彻底改变了我们获取信息的方式",en:"revolutionize the way we acquire information"},{cn:"福",en:"blessing"},
+                {cn:"祸",en:"curse"},{cn:"各种各样激动人心的节目",en:"various thrilling programs"},
+                {cn:"低质量节目",en:"poor-quality programs"},{cn:"不断发展的",en:"ever-accelerated"},
+                {cn:"夸张",en:"exaggerate"},{cn:"令人享受的",en:"enjoyable"},
+                {cn:"时尚的",en:"fashionable"},{cn:"电磁辐射",en:"electromagnetic radiation"},
+                {cn:"心理疾病",en:"psychological illnesses"},{cn:"孤僻的",en:"isolated"},
+                {cn:"缺乏想象力的",en:"unimaginative"},{cn:"不好社交的",en:"unsociable"},
+                {cn:"使 … 丧失了想象力和创造力",en:"deprive somebody of one’s imagination and creativity"},{cn:"危害健康",en:"jeopardize one’s health"},
+                {cn:"了解到 … 接触到 …",en:"be exposed to …"},{cn:"进入千家万户",en:"find its way into every family"},
+                {cn:"地球村",en:"global village"},{cn:"沉溺于    ",en:"be indulged in    "},
+                {cn:"对    上瘾",en:"be addicted to    "},{cn:"被    所吸引",en:"be fascinated by    "},
+                {cn:"依赖 …",en:"be dependent on …"},{cn:"二手信息",en:"second-hand information"},
+                {cn:"误入歧途",en:"go astray"},{cn:"走上犯罪道路",en:"embark on the criminal road"},
+                {cn:"无法抵制的",en:"irresistible"},{cn:"标志",en:"hallmark"},
+                {cn:"制造交谈话题",en:"create topics of discussion"},{cn:"批判性思维",en:"critical thinking"},
+                {cn:"有力的交流工具",en:"powerful means of communication"},{cn:"主因",en:"main cause"},
+                {cn:"有诱惑力的",en:"tempting"},{cn:"可靠的",en:"reliable"},
+                {cn:"家庭归属感",en:"family attachment"},{cn:"相互了解",en:"mutual understanding"},
+                {cn:"感情疏远",en:"alienation of affection"},{cn:"对    厌倦",en:"be sick of    "},
+                {cn:"代沟",en:"generation gap"},{cn:"感情交流",en:"exchanges of feelings"},
+                {cn:"感情纽带",en:"emotional bond"},{cn:"加强家庭纽带关系",en:"strengthen family ties"},
+                {cn:"与现实隔绝",en:"be detached from reality"},{cn:"明辨是非",en:"distinguish right from wrong"},
+                {cn:"有教育意义的",en:"edifying"},{cn:"电视迷",en:"couch potato"},
+                {cn:"对    有害",en:"be harmful to    "},{cn:"模仿",en:"imitate"},
+                {cn:"难以形容的",en:"inexpressible"},{cn:"身心健康",en:"physical and mental health"},
+                {cn:"激发某人想象力和创造力",en:"stimulate one’s imagination and creativity"},{cn:"不健康的生活方式",en:"unwholesome lifestyle."},
+                {cn:"大量的信息",en:"a great deal of information"},{cn:"令人索然无味的",en:"disinteresting"}
+            ],
+            society: [
+                {cn:"城市化",en:"urbanization"},{cn:"集中化",en:"centralization"},
+                {cn:"不平衡",en:"imbalance"},{cn:"从长远角度而言",en:"in the long run"},
+                {cn:"基础设施",en:"infrastructure"},{cn:"繁荣发展的",en:"booming"},
+                {cn:"第三产业",en:"tertiary industry"},{cn:"宁静",en:"tranquility"},
+                {cn:"税收",en:"revenue"},{cn:"商业化",en:"commercialization"},
+                {cn:"交通拥挤",en:"traffic congestion"},{cn:"水短缺",en:"water scarcity"},
+                {cn:"环境污染",en:"the environmental pollution"},{cn:"过度工业化",en:"over-industrialization"},
+                {cn:"过度拥挤",en:"over-crowdedness"},{cn:"失业",en:"unemployment"},
+                {cn:"财富分配",en:"wealth distribution"},{cn:"社会动荡",en:"social instability"},
+                {cn:"城市建设",en:"urban construction"},{cn:"人口激增",en:"population explosion"},
+                {cn:"犯罪率上升",en:"a rising crime rate"},{cn:"能源和资源消耗",en:"drain of energy and resources"},
+                {cn:"提供更多的就业机会",en:"offer more job opportunities"},{cn:"快节奏生活",en:"a rapid pace of life"},
+                {cn:"与压力有关的疾病",en:"stress-related illnesses"},{cn:"高额生活费用",en:"high cost of living"},
+                {cn:"田园生活",en:"pastoral life"},{cn:"阶级两极分化",en:"class polarization"},
+                {cn:"社会福利",en:"social welfare"},{cn:"给予    特殊关照",en:"give special care to    "},
+                {cn:"城市扩张",en:"urban sprawl"},{cn:"便捷的交通工具",en:"convenient transportation means"},
+                {cn:"更好的医疗服务",en:"better medical services"},{cn:"城市生活压力",en:"pressure of modern life in city"},
+                {cn:"易于患上    ",en:"be vulnerable to    "},{cn:"熔炉",en:"melting pot"},
+                {cn:"处于    边缘",en:"on the brink of    "},{cn:"污染性物质",en:"pollutant"},
+                {cn:"废物处理",en:"waste disposal"},{cn:"归咎于 …",en:"put the blame on …"},
+                {cn:"归因为    ",en:"be attributable to    "},{cn:"消费方式",en:"ways of consumption"},
+                {cn:"遭受重大损失",en:"suffer heavy losses"},{cn:"居民",en:"citizen"},
+                {cn:"面临着    ",en:"be confronted with    "},{cn:"滋生犯罪",en:"breed crimes"},
+                {cn:"恶性循环",en:"vicious cycle"},{cn:"一种可行的措施",en:"a feasible measure"},
+                {cn:"优先考虑    ",en:"give priority to     "},{cn:"城市规划者",en:"city planners"}
+            ],
+            animal: [
+                {cn:"活体解剖",en:"vivisection"},{cn:"在动物身上做试验",en:"perform . experiments on animals"},
+                {cn:"用于实验的动物",en:"test animals"},{cn:"被迫接受试验",en:"be subjected to experiments"},
+                {cn:"动物权利",en:"animal rights"},{cn:"临床研究",en:"clinical research"},
+                {cn:"残忍的",en:"cruel"},{cn:"极端主义者",en:"extremist"},
+                {cn:"医学研究",en:"medical research"},{cn:"物种起源",en:"origin of species"},
+                {cn:"替代的方法",en:"alternative method"},{cn:"生物多样性",en:"biological diversity"},
+                {cn:"自然平衡",en:"natural balance"},{cn:"生态平衡",en:"equilibrium of ecosystem"},
+                {cn:"共存",en:"coexistence"},{cn:"濒危动物",en:"endangered animals"},
+                {cn:"物种多样性",en:"diversity of species"},{cn:"令人羞愧的",en:"shameless"},
+                {cn:"野蛮的",en:"barbaric"},{cn:"活着就是与万物共存",en:"live and let live"},
+                {cn:"没有意义的",en:"meaningless"},{cn:"优势物种",en:"dominant species"},
+                {cn:"实验室",en:"laboratory"},{cn:"疫苗",en:"vaccine"},
+                {cn:"践踏",en:"infringement"},{cn:"生存权",en:"right to live"},
+                {cn:"折磨",en:"torture"},{cn:"反科学的",en:"anti-science"},
+                {cn:"危及生命的疾病",en:"life-threatening diseases"},{cn:"科学成果",en:"scientific gains"},
+                {cn:"一个永恒的主题",en:"an ever-lasting theme"},{cn:"进化",en:"evolution"},
+                {cn:"电脑模拟",en:"computer simulation"},{cn:"没有理由的",en:"groundless"},
+                {cn:"人道的",en:"humane"},{cn:"医疗技术",en:"medical technology"},
+                {cn:"解剖",en:"anatomy"},{cn:"公平的",en:"equal"},
+                {cn:"不可信赖的",en:"unreliable"},{cn:"有效的 、正当的",en:"valid"}
+            ],
+            spellError: [
+                {cn:"分析",en:"analysis"},{cn:"道歉",en:"apologize"},{cn:"官僚主义",en:"bureaucracy"},
+                {cn:"日历",en:"calendar"},{cn:"决定",en:"decision"},{cn:"明确地",en:"definitely"},
+                {cn:"效率高的",en:"efficient"},{cn:"政府",en:"government"},{cn:"高度",en:"height"},
+                {cn:"知识",en:"knowledge"},{cn:"图书馆",en:"library"},{cn:"必要的",en:"necessary"},
+                {cn:"发音",en:"pronunciation"},{cn:"心理学",en:"psychology"},{cn:"接收",en:"receive"}
+            ]
+        };
+
+        // 存储结构
+        function getMasterMap() {
+            let d = localStorage.getItem('ebbinghaus_master');
+            return d ? JSON.parse(d) : {};
+        }
+        function setMasterMap(m) {
+            localStorage.setItem('ebbinghaus_master', JSON.stringify(m));
+        }
+        function getStats() {
+            let d = localStorage.getItem('ebbinghaus_stats');
+            return d ? JSON.parse(d) : {totalError:0, totalMaster:0};
+        }
+        function setStats(s) {
+            localStorage.setItem('ebbinghaus_stats', JSON.stringify(s));
+        }
+        function getErrorVocab() {
+            let d = localStorage.getItem('ebbinghaus_errors');
+            return d ? JSON.parse(d) : [];
+        }
+        function setErrorVocab(e) {
+            localStorage.setItem('ebbinghaus_errors', JSON.stringify(e));
+        }
+        function getMemoryData() {
+            let d = localStorage.getItem('ebbinghaus_memory');
+            return d ? JSON.parse(d) : {};
+        }
+        function setMemoryData(m) {
+            localStorage.setItem('ebbinghaus_memory', JSON.stringify(m));
+        }
+
+        // 语音（原版自然）
+        function speak(text) {
+            if('speechSynthesis' in window){
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang='en-US'; u.rate=0.9; u.pitch=1.0;
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        // 全局元素
+        const globalProgressBar = document.getElementById('globalProgressBar');
+        const globalProgressText = document.getElementById('globalProgressText');
+        const categoryProgress = document.getElementById('categoryProgress');
+        const statCurError = document.getElementById('statCurError');
+        const statTotalError = document.getElementById('statTotalError');
+        const statTotalMaster = document.getElementById('statTotalMaster');
+        const vocabType = document.getElementById('vocabType');
+        const startBtn = document.getElementById('startBtn');
+        const reviewBtn = document.getElementById('reviewBtn');
+        const memStage = document.getElementById('memStage');
+        const ansStage = document.getElementById('ansStage');
+        const resStage = document.getElementById('resStage');
+        const memCountdown = document.getElementById('memCountdown');
+        const vocabList = document.getElementById('vocabList');
+        const qInput = document.getElementById('qInput');
+        const answerShow = document.getElementById('answerShow');
+        const qTip = document.getElementById('qTip');
+        const backToConfigFromMem = document.getElementById('backToConfigFromMem');
+        const backToMemFromAns = document.getElementById('backToMemFromAns');
+
+        let masterMap = getMasterMap();
+        let stats = getStats();
+        let sessionErrors = [];
+        let currentList = [];
+        let testQueue = [];
+        let memTimer=null, loopTimer=null;
+        let paused=false, loopMode=false;
+        let currentQ=0, rightNum=0, totalQ=0;
+
+        // 刷新统计与进度
+        function refreshAllProgress() {
+            const master = getMasterMap();
+            const st = getStats();
+            const memoryData = getMemoryData();
+            let allWords = [], catWords = [];
+            Object.keys(vocabLib).forEach(t => vocabLib[t].forEach(w => allWords.push(w.cn+'_'+w.en)));
+            
+            const currentType = vocabType.value;
+            if(currentType === 'mixed') {
+                catWords = allWords;
+            } else if(vocabLib[currentType]) {
+                catWords = vocabLib[currentType].map(w => w.cn+'_'+w.en);
+            }
+            
+            const allDone = allWords.filter(k => master[k]===1).length;
+            const catDone = catWords.filter(k => master[k]===1).length;
+            
+            // 计算学习中的单词（已开始学习但未掌握）
+            const learningWords = catWords.filter(k => !master[k] && memoryData[k]);
+            const catLearning = learningWords.length;
+            const catNew = catWords.length - catDone - catLearning;
+            
+            const catTotal = catWords.length;
+            const catUndone = catTotal - catDone;
+            const allTotal = allWords.length;
+            const gPer = (allDone/allTotal)*100 || 0;
+            globalProgressBar.style.width = gPer + '%';
+            globalProgressText.textContent = `${allDone} / ${allTotal}`;
+            categoryProgress.textContent = `当前分类：已掌握 ${catDone} · 学习中 ${catLearning} · 未学新词 ${catNew} · 总数 ${catTotal}`;
+            statCurError.textContent = sessionErrors.length;
+            statTotalError.textContent = st.totalError;
+            statTotalMaster.textContent = st.totalMaster;
+            
+            // 更新词汇数量显示
+            const vocabCount = document.getElementById('vocabCount');
+            if(vocabCount) {
+                vocabCount.textContent = `(${catDone}/${catTotal})`;
+            }
+            
+            // 更新出题数量限制和提示
+            const qNumInput = document.getElementById('qNum');
+            const qNumHint = document.getElementById('qNumHint');
+            if(qNumInput && qNumHint) {
+                const maxAvailable = catUndone;
+                qNumInput.max = maxAvailable;
+                
+                if(maxAvailable === 0) {
+                    qNumHint.textContent = '该分类已全部掌握！';
+                    qNumHint.style.display = 'inline';
+                    qNumInput.disabled = true;
+                } else if(maxAvailable < 10) {
+                    qNumHint.textContent = `仅剩 ${maxAvailable} 个未掌握单词`;
+                    qNumHint.style.display = 'inline';
+                    qNumInput.disabled = false;
+                    if(parseInt(qNumInput.value) > maxAvailable) {
+                        qNumInput.value = maxAvailable;
+                    }
+                } else {
+                    qNumHint.style.display = 'none';
+                    qNumInput.disabled = false;
+                }
+            }
+        }
+
+        // 艾宾浩斯遗忘曲线复习间隔（天）
+        const ebbinghausIntervals = [1, 2, 4, 7, 15, 30];
+
+        // 获取需要复习的单词
+        function getReviewWords(list) {
+            const memoryData = getMemoryData();
+            const now = Date.now();
+            const reviewWords = [];
+            const newWords = [];
+            
+            list.forEach(w => {
+                const key = w.cn+'_'+w.en;
+                const memory = memoryData[key];
+                
+                if (!memory || memory.nextReview <= now) {
+                    // 错误次数越多，优先级越高
+                    const priority = memory ? (10 - memory.stage) : 5;
+                    reviewWords.push({...w, priority: priority, key: key});
+                } else {
+                    newWords.push(w);
+                }
+            });
+            
+            // 按优先级排序，优先级高的先复习
+            reviewWords.sort((a, b) => b.priority - a.priority);
+            return [...reviewWords, ...newWords];
+        }
+
+        // 渲染单词列表（标记已掌握）
+        function renderList(list) {
+            const m = getMasterMap();
+            vocabList.innerHTML = '';
+            list.forEach(item => {
+                const key = item.cn+'_'+item.en;
+                const div = document.createElement('div');
+                div.className = 'vocab-item ' + (m[key] ? 'mastered' : '');
+                div.innerHTML = `<span>${item.cn}</span><div><span>${item.en}</span><button class="icon-btn sound-btn">🔊</button></div>`;
+                vocabList.appendChild(div);
+            });
+            vocabList.querySelectorAll('.sound-btn').forEach((btn,i) => btn.onclick = () => speak(list[i].en));
+        }
+
+        // 倒计时
+        function startCountdown(sec) {
+            clearInterval(memTimer);
+            let r = sec;
+            memCountdown.textContent = r;
+            memProgress.style.width = '0%';
+            paused = false; pauseBtn.textContent='⏸️';
+            memTimer = setInterval(() => {
+                if(paused) return;
+                r--;
+                memCountdown.textContent = r;
+                memProgress.style.width = ((sec-r)/sec*100)+'%';
+                if(r<=0) { clearInterval(memTimer); memStage.classList.remove('active'); startAnswer(); }
+            },1000);
+        }
+
+        // 答题
+        function startAnswer() {
+            ansStage.classList.add('active');
+            qTotal.textContent = totalQ;
+            nextQ();
+        }
+        // 存储当前题目的blankIndex
+        let currentBlankIndex = 0;
+
+        function nextQ() {
+            stopLoop();
+            qInput.value=''; qInput.classList.remove('error'); qTip.classList.remove('active'); answerShow.classList.remove('active');
+            while(testQueue.length>0) {
+                const key = testQueue[0].cn+'_'+testQueue[0].en;
+                if(masterMap[key]) testQueue.shift(); else break;
+            }
+            if(testQueue.length===0) { ansStage.classList.remove('active'); showResult(); return; }
+            currentQ++; qIndex.textContent=currentQ;
+            
+            const cur = testQueue[0];
+            const examType = document.getElementById('examType').value;
+            
+            if(examType === 'spelling' || (examType === 'mixed' && Math.random() > 0.5)) {
+                // 拼写题
+                qChinese.textContent = cur.cn;
+                currentBlankIndex = -1;
+            } else {
+                // 填空题
+                const en = cur.en;
+                const words = en.split(' ');
+                currentBlankIndex = Math.floor(Math.random() * words.length);
+                const blanked = words.map((word, i) => i === currentBlankIndex ? '_____' : word).join(' ');
+                qChinese.textContent = `${cur.cn} → ${blanked}`;
+            }
+            
+            ansProgress.style.width = ((currentQ-1)/totalQ*100)+'%';
+        }
+
+        // 提交逻辑
+        function submitAnswer() {
+            if(testQueue.length === 0) {
+                console.log('testQueue is empty');
+                return;
+            }
+            
+            const cur = testQueue[0];
+            if(!cur || !cur.cn || !cur.en) {
+                console.log('Invalid testQueue item:', cur);
+                return;
+            }
+            
+            const key = cur.cn+'_'+cur.en;
+            const val = qInput.value.trim().toLowerCase();
+            const examType = document.getElementById('examType').value;
+            let target;
+            
+            if(examType === 'spelling' || currentBlankIndex === -1) {
+                // 拼写题：输入整个短语
+                target = cur.en.trim().toLowerCase();
+            } else {
+                // 填空题：输入被挖空的单词
+                const words = cur.en.split(' ');
+                target = words[currentBlankIndex].toLowerCase();
+            }
+            
+            if(val === target) {
+                rightNum++;
+                updateMemoryData(cur, true);
+                if(!masterMap[key]) {
+                    const memoryData = getMemoryData();
+                    const memory = memoryData[key] || {stage: 0, correctStreak: 0};
+                    if(memory.correctStreak >= 3) { // 连续答对3次以上才算掌握
+                        masterMap[key]=1;
+                        stats.totalMaster++;
+                        setMasterMap(masterMap);
+                    }
+                }
+                const errIdx = sessionErrors.findIndex(x => x.cn+'_'+x.en===key);
+                if(errIdx>-1) sessionErrors.splice(errIdx,1);
+                testQueue.shift();
+                refreshAllProgress();
+                nextQ();
+            } else {
+                updateMemoryData(cur, false);
+                qInput.classList.add('error'); qTip.classList.add('active');
+                answerShow.querySelector('span').textContent = `✅ ${cur.en}`;
+                answerShow.classList.add('active'); speak(cur.en);
+                ansPlayBtn.onclick=()=>speak(cur.en);
+                loopBtn.onclick=()=>loopMode?stopLoop():startLoop(cur.en);
+                if(!sessionErrors.some(x=>x.cn+'_'+x.en===key)) sessionErrors.push(cur);
+                refreshAllProgress();
+            }
+        }
+
+        // 循环播放
+        function startLoop(text) {
+            loopMode=true;
+            loopBtn.classList.add('active');
+            loopBtn.textContent='⏹️';
+            speak(text);
+            loopTimer = setInterval(() => speak(text), 2000);
+        }
+        function stopLoop() {
+            loopMode=false;
+            loopBtn.classList.remove('active');
+            loopBtn.textContent='🔁';
+            clearInterval(loopTimer);
+            window.speechSynthesis.cancel();
+        }
+
+        // 显示结果
+        function showResult() {
+            resStage.classList.add('active');
+            resTotal.textContent = totalQ;
+            resRight.textContent = rightNum;
+            resRate.textContent = totalQ>0 ? Math.round(rightNum/totalQ*100)+'%' : '0%';
+            
+            const errorList = document.getElementById('errorList');
+            if(sessionErrors.length>0) {
+                errorList.innerHTML = sessionErrors.map(w => `<div>${w.cn} → <b>${w.en}</b></div>`).join('');
+                // 保存错题
+                const oldErrors = getErrorVocab();
+                const newErrors = [...oldErrors, ...sessionErrors];
+                // 去重（保留最新的）
+                const uniqueErrors = [];
+                const seen = new Set();
+                newErrors.reverse().forEach(w => {
+                    const key = w.cn+'_'+w.en;
+                    if(!seen.has(key)) {
+                        seen.add(key);
+                        uniqueErrors.unshift(w);
+                    }
+                });
+                setErrorVocab(uniqueErrors);
+                stats.totalError += sessionErrors.length;
+                setStats(stats);
+            } else {
+                errorList.textContent = '暂无错题';
+            }
+        }
+
+        // 复习错题
+        function review() {
+            init();
+            const errors = getErrorVocab();
+            if(errors.length===0) {
+                alert('暂无错题可复习');
+                return;
+            }
+            const need = Math.min(Number(qNum.value)||10, errors.length);
+            currentList = errors.slice(0, need);
+            testQueue = [...currentList];
+            totalQ = testQueue.length;
+            renderList(currentList);
+            memStage.classList.add('active');
+            startCountdown(Number(memTime.value)||60);
+        }
+
+        // 开始
+        function start() {
+            init();
+            const type = vocabType.value;
+            let list;
+            
+            if(type === 'mixed') {
+                // 混合类：从所有类型中抽取单词
+                list = [];
+                Object.keys(vocabLib).forEach(t => {
+                    list = list.concat(vocabLib[t]);
+                });
+            } else {
+                list = vocabLib[type];
+            }
+            
+            const m = getMasterMap();
+            
+            // 背诵板块只显示未掌握的单词
+            const unmastered = list.filter(w => !m[w.cn+'_'+w.en]);
+            const reviewList = getReviewWords(unmastered);
+            const need = Math.min(Number(qNum.value)||10, reviewList.length);
+            const pick = reviewList.slice(0, need);
+            
+            currentList = pick;
+            testQueue = [...pick];
+            totalQ = testQueue.length;
+            renderList(pick);
+            memStage.classList.add('active');
+            startCountdown(Number(memTime.value)||120);
+        }
+
+        // 事件绑定
+        startBtn.onclick = start;
+        reviewBtn.onclick = review;
+        submitBtn.onclick = submitAnswer;
+        skipBtn.onclick = () => { testQueue.shift(); nextQ(); };
+        pauseBtn.onclick = function() {
+            paused = !paused;
+            this.textContent = paused ? '▶️' : '⏸️';
+        };
+        skipMemBtn.onclick = function() {
+            clearInterval(memTimer);
+            memStage.classList.remove('active');
+            startAnswer();
+        };
+        backToConfigFromMem.onclick = backToMemFromAns.onclick = init;
+        restartBtn.onclick = start;
+        changeTypeBtn.onclick = init;
+        qInput.addEventListener('keydown', e => {
+            if(e.key === 'Enter') submitAnswer();
+        });
+
+        // 更新记忆数据
+        function updateMemoryData(word, isCorrect) {
+            const memoryData = getMemoryData();
+            const key = word.cn+'_'+word.en;
+            const memory = memoryData[key] || {stage: 0, nextReview: 0, correctStreak: 0};
+            
+            if (isCorrect) {
+                memory.correctStreak = (memory.correctStreak || 0) + 1;
+                memory.stage = Math.min(memory.stage + 1, ebbinghausIntervals.length - 1);
+                const interval = ebbinghausIntervals[memory.stage] * 24 * 60 * 60 * 1000; // 转换为毫秒
+                memory.nextReview = Date.now() + interval;
+            } else {
+                memory.correctStreak = 0;
+                memory.stage = Math.max(memory.stage - 1, 0);
+                memory.nextReview = Date.now(); // 立即复习
+            }
+            
+            memoryData[key] = memory;
+            setMemoryData(memoryData);
+        }
+
+        // 初始化
+        function init() {
+            clearInterval(memTimer); stopLoop();
+            memStage.classList.remove('active'); ansStage.classList.remove('active'); resStage.classList.remove('active');
+            currentQ=rightNum=0; testQueue=[]; sessionErrors=[];
+            masterMap = getMasterMap(); stats=getStats();
+            memProgress.style.width='0%'; ansProgress.style.width='0%';
+        }
+
+        // 初始化
+        vocabType.onchange = refreshAllProgress;
+        startBtn.onclick = start;
+        reviewBtn.onclick = review;
+        qInput.addEventListener('keydown',e=>{if(e.key==='Enter')submitAnswer();});
+        
+        // 出题数量输入验证
+        qNum.addEventListener('input', function() {
+            const max = parseInt(this.max) || 10;
+            const val = parseInt(this.value) || 1;
+            if(val > max) {
+                this.value = max;
+            } else if(val < 1) {
+                this.value = 1;
+            }
+        });
+        
+        refreshAllProgress();
+    </script>
+</body>
+</html>

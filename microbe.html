@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微生物词汇</title>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        body {
+            background: #0a1028;
+            background-image: radial-gradient(circle at 50% 50%, #1a2345 0%, #050714 100%);
+            color: #e6edf7;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: rgba(18, 28, 58, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(100, 120, 255, 0.2);
+            padding: 40px;
+            border: 1px solid rgba(130, 150, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #c7d1ff;
+            text-shadow: 0 0 15px rgba(130, 150, 255, 0.5);
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #6a85ff, #4a6cff);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #5a75ff, #3a5cff);
+            transform: scale(1.05);
+        }
+
+        button.active {
+            background: linear-gradient(90deg, #5fff97, #3bff7f);
+            color: #0e2212;
+        }
+
+        .group {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(26, 35, 69, 0.5);
+            border: 1px solid rgba(130, 150, 255, 0.2);
+            border-radius: 12px;
+        }
+
+        .group h2 {
+            margin-top: 0;
+            color: #c7d1ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .word-count {
+            font-size: 14px;
+            color: #aabbff;
+            font-weight: normal;
+        }
+
+        .word-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .word-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(26, 35, 69, 0.3);
+            border: 1px solid rgba(130, 150, 255, 0.1);
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .word-item:hover {
+            background: rgba(26, 35, 69, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .word-item.starred {
+            background: rgba(255, 185, 87, 0.2);
+            border-color: rgba(255, 185, 87, 0.4);
+        }
+
+        .word-item.starred-double {
+            background: rgba(255, 128, 74, 0.2);
+            border-color: rgba(255, 128, 74, 0.4);
+        }
+
+        .word-en {
+            font-weight: bold;
+            color: #d6e0ff;
+        }
+
+        .word-cn {
+            color: #aabbff;
+        }
+
+        .word-cn.hidden {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .star-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #6677cc;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+        }
+
+        .star-btn.starred {
+            color: #ffb957;
+        }
+
+        .star-btn.starred-double {
+            color: #ff804a;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section label {
+            margin-right: 10px;
+            color: #aabbff;
+        }
+
+        .special-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(26, 35, 69, 0.5);
+            border: 1px solid rgba(130, 150, 255, 0.2);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .special-section h3 {
+            color: #c7d1ff;
+            margin-bottom: 15px;
+        }
+
+        .special-section button {
+            background: linear-gradient(90deg, #8899ff, #6677cc);
+            margin: 0 10px;
+        }
+
+        .special-section button:hover {
+            background: linear-gradient(90deg, #7788ee, #5566bb);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 24px;
+            background: rgba(114, 137, 255, 0.2);
+            color: #c7d1ff;
+            border: 1px solid rgba(130, 150, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(114, 137, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <script>applyConfig();</script>
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='index.html'">返回学习中心</button>
+        <h1>微生物词汇</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="mode">学习模式：</label>
+                <button id="mode-normal" class="active">正常模式</button>
+                <button id="mode-hide-cn">隐藏中文</button>
+            </div>
+            <div class="control-group">
+                <label for="filter">过滤：</label>
+                <button id="filter-all" class="active">全部</button>
+                <button id="filter-starred">带星词汇</button>
+            </div>
+            <div class="control-group">
+                <button id="reset-stars">重置星标</button>
+            </div>
+        </div>
+        
+        <div class="special-section">
+            <h3>返回主页面</h3>
+            <button onclick="window.location.href='index.html'">返回主页面</button>
+        </div>
+        
+        <div id="vocabulary-container"></div>
+    </div>
+    
+    <script>
+        // 微生物相关词汇
+        const synonymsGrouped = [
+  {
+    group: "微生物",
+    words: [
+      {en: "microbe", cn: "微生物"},
+      {en: "virus", cn: "病毒"},
+      {en: "germ", cn: "细菌"},
+      {en: "bacteria", cn: "细菌"},
+      {en: "bacterial", cn: "细菌的"},
+      {en: "virus", cn: "病毒"},
+      {en: "viral", cn: "病毒的"},
+      {en: "fungus", cn: "真菌"},
+      {en: "fungal", cn: "真菌的"},
+      {en: "parasite", cn: "寄生虫"},
+      {en: "parasitic", cn: "寄生的"},
+      {en: "microorganism", cn: "微生物"},
+      {en: "pathogen", cn: "病原体"},
+      {en: "pathogenic", cn: "致病的"},
+      {en: "infect", cn: "感染"},
+      {en: "infectious", cn: "传染性的"},
+      {en: "infection", cn: "感染"}
+    ]
+  },
+  {
+    group: "身体",
+    words: [
+      {en: "physical", cn: "身体的"},
+      {en: "body", cn: "身体"},
+      {en: "organ", cn: "器官"},
+      {en: "limb", cn: "肢体"}
+    ]
+  },
+  {
+    group: "治疗",
+    words: [
+      {en: "therapy", cn: "疗法"},
+      {en: "treatment", cn: "治疗"},
+      {en: "remedy", cn: " remedy"},
+      {en: "medicine", cn: "药物"},
+      {en: "medication", cn: "药物"},
+      {en: "drug", cn: "药物"},
+      {en: "cure", cn: "治愈"},
+      {en: "against disease", cn: "对抗疾病"}
+    ]
+  },
+  {
+    group: "物质",
+    words: [
+      {en: "compound", cn: "化合物"},
+      {en: "substance", cn: "物质"},
+      {en: "matter", cn: "物质"},
+      {en: "chemical", cn: "化学物质"},
+      {en: "toxic", cn: "有毒的"},
+      {en: "poison", cn: "毒药"},
+      {en: "drug", cn: "药物"}
+    ]
+  },
+  {
+    group: "免疫",
+    words: [
+      {en: "immunity", cn: "免疫力"},
+      {en: "immune", cn: "免疫的"},
+      {en: "resistance", cn: "抵抗力"}
+    ]
+  },
+  {
+    group: "心理",
+    words: [
+      {en: "mental", cn: "心理的"},
+      {en: "cognitive", cn: "认知的"},
+      {en: "mind", cn: "心灵"},
+      {en: "intellectual", cn: "智力的"},
+      {en: "intelligence", cn: "智力"},
+      {en: "intelligent", cn: "聪明的"}
+    ]
+  }
+];
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            renderVocabulary();
+            setupEventListeners();
+        });
+
+        // 渲染词汇
+        function renderVocabulary() {
+            const container = document.getElementById('vocabulary-container');
+            container.innerHTML = '';
+
+            synonymsGrouped.forEach(group => {
+                const groupElement = document.createElement('div');
+                groupElement.className = 'group';
+
+                const groupHeader = document.createElement('h2');
+                groupHeader.innerHTML = `${group.group} <span class="word-count">(${group.words.length}个词)</span>`;
+                groupElement.appendChild(groupHeader);
+
+                const wordList = document.createElement('div');
+                wordList.className = 'word-list';
+
+                group.words.forEach(word => {
+                    const wordItem = document.createElement('div');
+                    wordItem.className = 'word-item';
+                    wordItem.dataset.word = word.en;
+                    wordItem.dataset.cn = word.cn;
+
+                    const wordEn = document.createElement('span');
+                    wordEn.className = 'word-en';
+                    wordEn.textContent = word.en;
+
+                    const wordCn = document.createElement('span');
+                    wordCn.className = 'word-cn';
+                    wordCn.textContent = word.cn;
+
+                    const starBtn = document.createElement('button');
+                    starBtn.className = 'star-btn';
+                    starBtn.innerHTML = '☆';
+                    starBtn.addEventListener('click', function() {
+                        toggleStar(wordItem, starBtn);
+                    });
+
+                    wordItem.appendChild(wordEn);
+                    wordItem.appendChild(wordCn);
+                    wordItem.appendChild(starBtn);
+                    wordList.appendChild(wordItem);
+                });
+
+                groupElement.appendChild(wordList);
+                container.appendChild(groupElement);
+            });
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 模式切换
+            document.getElementById('mode-normal').addEventListener('click', function() {
+                setMode('normal');
+            });
+
+            document.getElementById('mode-hide-cn').addEventListener('click', function() {
+                setMode('hide-cn');
+            });
+
+            // 过滤切换
+            document.getElementById('filter-all').addEventListener('click', function() {
+                setFilter('all');
+            });
+
+            document.getElementById('filter-starred').addEventListener('click', function() {
+                setFilter('starred');
+            });
+
+            // 重置星标
+            document.getElementById('reset-stars').addEventListener('click', function() {
+                resetStars();
+            });
+        }
+
+        // 设置模式
+        function setMode(mode) {
+            // 更新按钮状态
+            document.getElementById('mode-normal').classList.remove('active');
+            document.getElementById('mode-hide-cn').classList.remove('active');
+            document.getElementById(`mode-${mode}`).classList.add('active');
+
+            // 更新显示
+            const wordCns = document.querySelectorAll('.word-cn');
+            wordCns.forEach(cn => {
+                if (mode === 'hide-cn') {
+                    cn.classList.add('hidden');
+                } else {
+                    cn.classList.remove('hidden');
+                }
+            });
+        }
+
+        // 设置过滤
+        function setFilter(filter) {
+            // 更新按钮状态
+            document.getElementById('filter-all').classList.remove('active');
+            document.getElementById('filter-starred').classList.remove('active');
+            document.getElementById(`filter-${filter}`).classList.add('active');
+
+            // 更新显示
+            const groups = document.querySelectorAll('.group');
+            groups.forEach(group => {
+                const wordItems = group.querySelectorAll('.word-item');
+                let hasVisibleItems = false;
+
+                wordItems.forEach(item => {
+                    if (filter === 'all') {
+                        item.style.display = 'flex';
+                        hasVisibleItems = true;
+                    } else if (filter === 'starred') {
+                        if (item.classList.contains('starred') || item.classList.contains('starred-double')) {
+                            item.style.display = 'flex';
+                            hasVisibleItems = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    }
+                });
+
+                // 隐藏没有可见项目的组
+                group.style.display = hasVisibleItems ? 'block' : 'none';
+            });
+        }
+
+        // 切换星标
+        function toggleStar(wordItem, starBtn) {
+            if (wordItem.classList.contains('starred-double')) {
+                // 移除所有星标
+                wordItem.classList.remove('starred-double');
+                wordItem.classList.remove('starred');
+                starBtn.className = 'star-btn';
+                starBtn.innerHTML = '☆';
+            } else if (wordItem.classList.contains('starred')) {
+                // 升级为双星
+                wordItem.classList.remove('starred');
+                wordItem.classList.add('starred-double');
+                starBtn.className = 'star-btn starred-double';
+                starBtn.innerHTML = '🌟🌟';
+            } else {
+                // 添加单星
+                wordItem.classList.add('starred');
+                starBtn.className = 'star-btn starred';
+                starBtn.innerHTML = '🌟';
+            }
+        }
+
+        // 重置星标
+        function resetStars() {
+            const wordItems = document.querySelectorAll('.word-item');
+            wordItems.forEach(item => {
+                item.classList.remove('starred');
+                item.classList.remove('starred-double');
+            });
+
+            const starBtns = document.querySelectorAll('.star-btn');
+            starBtns.forEach(btn => {
+                btn.className = 'star-btn';
+                btn.innerHTML = '☆';
+            });
+
+            // 确保显示所有项目
+            setFilter('all');
+        }
+    </script>
+</body>
+</html>

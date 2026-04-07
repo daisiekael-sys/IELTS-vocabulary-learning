@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雅思词汇学习中心</title>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        body {
+            background: #0a1028;
+            background-image: radial-gradient(circle at 50% 50%, #1a2345 0%, #050714 100%);
+            color: #e6edf7;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: rgba(18, 28, 58, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(100, 120, 255, 0.2);
+            padding: 40px;
+            border: 1px solid rgba(130, 150, 255, 0.2);
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            color: #c7d1ff;
+            text-shadow: 0 0 20px rgba(130, 150, 255, 0.5);
+            margin-bottom: 16px;
+        }
+
+        .hero h2 {
+            font-size: 1.3rem;
+            color: #aabbff;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .module-card {
+            background: rgba(26, 35, 69, 0.6);
+            border: 1px solid rgba(130, 150, 255, 0.2);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .module-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(100, 120, 255, 0.3);
+            border-color: rgba(130, 150, 255, 0.4);
+        }
+
+        .module-card .icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+
+        .module-card h3 {
+            margin: 8px 0 16px;
+            color: #c7d1ff;
+            font-size: 1.4rem;
+            text-shadow: 0 0 10px rgba(130, 150, 255, 0.3);
+        }
+
+        .module-card p {
+            color: #aabbff;
+            font-size: 1rem;
+            line-height: 1.6;
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+
+        .btn-start {
+            margin-top: 18px;
+            padding: 12px 32px;
+            background: linear-gradient(90deg, #6a85ff, #4a6cff);
+            color: #fff;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .module-card:hover .btn-start {
+            background: linear-gradient(90deg, #5a75ff, #3a5cff);
+            transform: scale(1.05);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 24px 0;
+            color: #8a94a6;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(130, 150, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>🌌 雅思词汇学习中心</h1>
+            <h2>选择适合你的词汇学习模式</h2>
+        </div>
+
+        <div class="module-grid">
+            <a href="ebbinghaus.html" class="module-card">
+                <div class="icon">📚</div>
+                <h3>艾宾浩斯宇宙版</h3>
+                <p>基于艾宾浩斯遗忘曲线的智能词汇记忆系统，包含科技、文化、工作等多个分类，帮助你高效记忆雅思词汇。</p>
+                <button class="btn-start">开始训练</button>
+            </a>
+
+            <a href="synonyms.html" class="module-card">
+                <div class="icon">🔄</div>
+                <h3>高频同义替换</h3>
+                <p>包含80多个词汇分组，提供高频同义替换和学术词汇，帮助你在写作中丰富表达，提升词汇多样性。</p>
+                <button class="btn-start">开始学习</button>
+            </a>
+
+            <a href="microbe.html" class="module-card">
+                <div class="icon">🦠</div>
+                <h3>微生物词汇</h3>
+                <p>专注于微生物相关的专业词汇，帮助你在雅思考试中应对相关话题，提升专业词汇储备。</p>
+                <button class="btn-start">开始学习</button>
+            </a>
+        </div>
+
+        <div class="footer">
+            © 2026 雅思词汇学习中心 | 架构设计：艾宾浩斯宇宙版
+        </div>
+    </div>
+</body>
+</html>
