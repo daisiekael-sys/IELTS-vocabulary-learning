@@ -236,6 +236,8 @@
                 <label for="filter">过滤：</label>
                 <button id="filter-all" class="active">全部</button>
                 <button id="filter-starred">带星词汇</button>
+                <button id="filter-starred-single">单星词汇</button>
+                <button id="filter-starred-double">双星词汇</button>
             </div>
             <div class="control-group">
                 <button id="reset-stars">重置星标</button>
@@ -1538,6 +1540,16 @@
   }
 ];
 
+        // 本地存储功能
+        function getStarredWords() {
+            const starred = localStorage.getItem('synonyms_starred');
+            return starred ? JSON.parse(starred) : {};
+        }
+
+        function saveStarredWords(starred) {
+            localStorage.setItem('synonyms_starred', JSON.stringify(starred));
+        }
+
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
             renderVocabulary();
@@ -1548,6 +1560,7 @@
         function renderVocabulary() {
             const container = document.getElementById('vocabulary-container');
             container.innerHTML = '';
+            const starredWords = getStarredWords();
 
             synonymsGrouped.forEach(group => {
                 const groupElement = document.createElement('div');
@@ -1576,7 +1589,21 @@
 
                     const starBtn = document.createElement('button');
                     starBtn.className = 'star-btn';
-                    starBtn.innerHTML = '☆';
+                    
+                    // 加载本地存储的标星状态
+                    const wordKey = word.en + '_' + word.cn;
+                    if (starredWords[wordKey] === 'starred') {
+                        wordItem.classList.add('starred');
+                        starBtn.className = 'star-btn starred';
+                        starBtn.innerHTML = '🌟';
+                    } else if (starredWords[wordKey] === 'starred-double') {
+                        wordItem.classList.add('starred-double');
+                        starBtn.className = 'star-btn starred-double';
+                        starBtn.innerHTML = '🌟🌟';
+                    } else {
+                        starBtn.innerHTML = '☆';
+                    }
+                    
                     starBtn.addEventListener('click', function() {
                         toggleStar(wordItem, starBtn);
                     });
@@ -1612,6 +1639,14 @@
                 setFilter('starred');
             });
 
+            document.getElementById('filter-starred-single').addEventListener('click', function() {
+                setFilter('starred-single');
+            });
+
+            document.getElementById('filter-starred-double').addEventListener('click', function() {
+                setFilter('starred-double');
+            });
+
             // 重置星标
             document.getElementById('reset-stars').addEventListener('click', function() {
                 resetStars();
@@ -1641,6 +1676,8 @@
             // 更新按钮状态
             document.getElementById('filter-all').classList.remove('active');
             document.getElementById('filter-starred').classList.remove('active');
+            document.getElementById('filter-starred-single').classList.remove('active');
+            document.getElementById('filter-starred-double').classList.remove('active');
             document.getElementById(`filter-${filter}`).classList.add('active');
 
             // 更新显示
@@ -1660,6 +1697,20 @@
                         } else {
                             item.style.display = 'none';
                         }
+                    } else if (filter === 'starred-single') {
+                        if (item.classList.contains('starred') && !item.classList.contains('starred-double')) {
+                            item.style.display = 'flex';
+                            hasVisibleItems = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    } else if (filter === 'starred-double') {
+                        if (item.classList.contains('starred-double')) {
+                            item.style.display = 'flex';
+                            hasVisibleItems = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
                     }
                 });
 
@@ -1670,24 +1721,35 @@
 
         // 切换星标
         function toggleStar(wordItem, starBtn) {
+            const wordEn = wordItem.dataset.word;
+            const wordCn = wordItem.dataset.cn;
+            const wordKey = wordEn + '_' + wordCn;
+            const starredWords = getStarredWords();
+            
             if (wordItem.classList.contains('starred-double')) {
                 // 移除所有星标
                 wordItem.classList.remove('starred-double');
                 wordItem.classList.remove('starred');
                 starBtn.className = 'star-btn';
                 starBtn.innerHTML = '☆';
+                delete starredWords[wordKey];
             } else if (wordItem.classList.contains('starred')) {
                 // 升级为双星
                 wordItem.classList.remove('starred');
                 wordItem.classList.add('starred-double');
                 starBtn.className = 'star-btn starred-double';
                 starBtn.innerHTML = '🌟🌟';
+                starredWords[wordKey] = 'starred-double';
             } else {
                 // 添加单星
                 wordItem.classList.add('starred');
                 starBtn.className = 'star-btn starred';
                 starBtn.innerHTML = '🌟';
+                starredWords[wordKey] = 'starred';
             }
+            
+            // 保存到本地存储
+            saveStarredWords(starredWords);
         }
 
         // 重置星标
@@ -1703,6 +1765,9 @@
                 btn.className = 'star-btn';
                 btn.innerHTML = '☆';
             });
+
+            // 清空本地存储
+            saveStarredWords({});
 
             // 确保显示所有项目
             setFilter('all');
