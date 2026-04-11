@@ -140,6 +140,46 @@ doubao-vocabulary-highlight:hover {
             outline: none;
             min-width: 140px;
             transition: 0.3s;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4"%3E%3Cpath fill="%23ffffff" d="M287 69.4a17.6 17.6 0 0 0-13-5.4H18.4c-5 0-9.3 1.8-12.9 5.4A17.6 17.6 0 0 0 0 82.2c0 5 1.8 9.3 5.4 12.9l128 127.9c3.6 3.6 7.8 5.4 12.8 5.4s9.2-1.8 12.8-5.4L287 95c3.5-3.5 5.4-7.8 5.4-12.8 0-5-1.9-9.2-5.5-12.8z"/%3E%3C/svg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 10px;
+            padding-right: 30px;
+        }
+
+        .config select option {
+            background-color: #1a2345 !important;
+            color: white !important;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .config select option:hover {
+            background-color: #3a5cff !important;
+            transform: scale(1.02);
+        }
+
+        /* 为下拉菜单添加圆角和过渡效果 */
+        .config select::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .config select::-webkit-scrollbar-track {
+            background: #1a2345;
+            border-radius: 4px;
+        }
+
+        .config select::-webkit-scrollbar-thumb {
+            background: #4a6cff;
+            border-radius: 4px;
+        }
+
+        .config select::-webkit-scrollbar-thumb:hover {
+            background: #6a85ff;
         }
         .config button {
             padding: 12px 28px;

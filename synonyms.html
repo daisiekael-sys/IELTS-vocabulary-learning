@@ -78,16 +78,20 @@
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
+            transition: all 0.3s ease;
         }
 
         select option {
             background-color: #1a2345 !important;
             color: white !important;
             padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
 
         select option:hover {
             background-color: #3a5cff !important;
+            transform: scale(1.02);
         }
 
         /* 针对Firefox的特殊处理 */
@@ -99,6 +103,31 @@
                 background-size: 10px;
                 padding-right: 30px;
             }
+        }
+
+        /* 美化下拉菜单样式 */
+        select {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* 为下拉菜单添加圆角和过渡效果 */
+        select::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        select::-webkit-scrollbar-track {
+            background: #1a2345;
+            border-radius: 4px;
+        }
+
+        select::-webkit-scrollbar-thumb {
+            background: #4a6cff;
+            border-radius: 4px;
+        }
+
+        select::-webkit-scrollbar-thumb:hover {
+            background: #6a85ff;
         }
 
         button.active {
