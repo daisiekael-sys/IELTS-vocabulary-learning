@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>雅思词汇学习中心</title>
     <script src="config.js"></script>
+    <script src="auth.js"></script>
     <style>
         * {
             margin: 0;
@@ -118,6 +119,29 @@
             transform: scale(1.05);
         }
 
+        .special-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(26, 35, 69, 0.5);
+            border: 1px solid rgba(130, 150, 255, 0.2);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .special-section h3 {
+            color: #c7d1ff;
+            margin-bottom: 15px;
+        }
+
+        .special-section button {
+            background: linear-gradient(90deg, #8899ff, #6677cc);
+            margin: 0 10px;
+        }
+
+        .special-section button:hover {
+            background: linear-gradient(90deg, #7788ee, #5566bb);
+        }
+
         .footer {
             text-align: center;
             margin-top: 60px;
@@ -131,6 +155,11 @@
 <body>
     <div class="container">
         <div class="hero">
+            <div class="user-auth" style="position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 10px;">
+                <span id="userInfo" style="display: none; color: #c7d1ff;"></span>
+                <button id="loginBtn" onclick="window.location.href='login.html'">登录/注册</button>
+                <button id="logoutBtn" style="display: none;" onclick="handleLogout()">登出</button>
+            </div>
             <h1>🌌 雅思词汇学习中心</h1>
             <h2>选择适合你的词汇学习模式</h2>
         </div>
@@ -158,9 +187,110 @@
             </a>
         </div>
 
+        <div class="special-section" style="margin-top: 40px;">
+            <h3>数据管理</h3>
+            <button onclick="exportData()">导出学习数据</button>
+            <button onclick="importData()">导入学习数据</button>
+            <button onclick="clearData()">清除所有数据</button>
+        </div>
+
         <div class="footer">
             © 2026 雅思词汇学习中心 | 架构设计：艾宾浩斯宇宙版
         </div>
+
+        <script>
+            // 数据管理功能
+            function exportData() {
+                try {
+                    const data = localStorage.getItem('ielts_learning_system');
+                    if (!data) {
+                        alert('暂无学习数据可导出');
+                        return;
+                    }
+                    
+                    const blob = new Blob([data], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'ielts_learning_data_' + new Date().toISOString().slice(0, 10) + '.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    alert('数据导出成功！');
+                } catch (error) {
+                    console.error('Error exporting data:', error);
+                    alert('数据导出失败，请重试');
+                }
+            }
+
+            function importData() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = e.target.result;
+                            localStorage.setItem('ielts_learning_system', data);
+                            alert('数据导入成功！请刷新页面以应用更改');
+                        } catch (error) {
+                            console.error('Error importing data:', error);
+                            alert('数据导入失败，请检查文件格式');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+
+            function clearData() {
+                if (confirm('确定要清除所有学习数据吗？此操作不可恢复！')) {
+                    try {
+                        localStorage.removeItem('ielts_learning_system');
+                        alert('数据已清除！请刷新页面');
+                    } catch (error) {
+                        console.error('Error clearing data:', error);
+                        alert('数据清除失败，请重试');
+                    }
+                }
+            }
+
+            // 处理登出
+            async function handleLogout() {
+                try {
+                    await logoutUser();
+                    alert('登出成功！');
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    alert('登出失败，请重试');
+                }
+            }
+
+            // 监听用户登录状态
+            document.addEventListener('userLoggedIn', function(e) {
+                const user = e.detail;
+                document.getElementById('userInfo').textContent = `欢迎，${user.email}`;
+                document.getElementById('userInfo').style.display = 'block';
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'block';
+            });
+
+            document.addEventListener('userLoggedOut', function() {
+                document.getElementById('userInfo').style.display = 'none';
+                document.getElementById('loginBtn').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'none';
+            });
+
+            // 页面加载时检查认证状态
+            window.addEventListener('load', function() {
+                // 认证状态会在auth.js中自动检查
+            });
+        </script>
     </div>
 </body>
 </html>

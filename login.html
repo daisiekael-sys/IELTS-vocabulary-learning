@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录 - 雅思词汇学习中心</title>
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        body {
+            background: #0a1028;
+            background-image: radial-gradient(circle at 50% 50%, #1a2345 0%, #050714 100%);
+            color: #e6edf7;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 80px auto;
+            background: rgba(18, 28, 58, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(100, 120, 255, 0.2);
+            padding: 40px;
+            border: 1px solid rgba(130, 150, 255, 0.2);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 24px;
+            color: #c7d1ff;
+            text-shadow: 0 0 15px rgba(130, 150, 255, 0.5);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aabbff;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(130, 150, 255, 0.3);
+            background: rgba(26, 35, 69, 0.7);
+            color: #e6edf7;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: rgba(130, 150, 255, 0.6);
+            background: rgba(26, 35, 69, 0.9);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #6a85ff, #4a6cff);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(90deg, #5a75ff, #3a5cff);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(90deg, #8899ff, #6677cc);
+            margin-top: 15px;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(90deg, #7788ee, #5566bb);
+        }
+
+        .error-message {
+            background: rgba(255, 114, 114, 0.2);
+            border: 1px solid rgba(255, 114, 114, 0.4);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            color: #ff7272;
+            font-size: 14px;
+            display: none;
+        }
+
+        .switch-form {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #aabbff;
+        }
+
+        .switch-form a {
+            color: #6a85ff;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .switch-form a:hover {
+            color: #4a6cff;
+            text-decoration: underline;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 24px;
+            background: rgba(114, 137, 255, 0.2);
+            color: #c7d1ff;
+            border: 1px solid rgba(130, 150, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(114, 137, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="window.location.href='index.html'">返回学习中心</button>
+    <div class="container">
+        <h1 class="title">🔐 用户登录</h1>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div id="loginForm">
+            <div class="form-group">
+                <label for="email">邮箱地址</label>
+                <input type="email" id="email" placeholder="请输入邮箱" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" placeholder="请输入密码" required>
+            </div>
+            <button class="btn" onclick="handleLogin()">登录</button>
+            <div class="switch-form">
+                还没有账号？<a href="#" onclick="switchToRegister()">立即注册</a>
+            </div>
+        </div>
+        
+        <div id="registerForm" style="display: none;">
+            <div class="form-group">
+                <label for="regEmail">邮箱地址</label>
+                <input type="email" id="regEmail" placeholder="请输入邮箱" required>
+            </div>
+            <div class="form-group">
+                <label for="regPassword">密码</label>
+                <input type="password" id="regPassword" placeholder="请输入密码（至少6位）" required>
+            </div>
+            <div class="form-group">
+                <label for="regConfirmPassword">确认密码</label>
+                <input type="password" id="regConfirmPassword" placeholder="请再次输入密码" required>
+            </div>
+            <button class="btn" onclick="handleRegister()">注册</button>
+            <div class="switch-form">
+                已有账号？<a href="#" onclick="switchToLogin()">立即登录</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 切换到注册表单
+        function switchToRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.querySelector('.title').textContent = '📝 用户注册';
+            clearError();
+        }
+
+        // 切换到登录表单
+        function switchToLogin() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.querySelector('.title').textContent = '🔐 用户登录';
+            clearError();
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        // 清除错误信息
+        function clearError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // 处理登录
+        async function handleLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showError('请填写所有必填字段');
+                return;
+            }
+            
+            try {
+                clearError();
+                const user = await loginUser(email, password);
+                // 登录成功后跳转到学习中心
+                window.location.href = 'index.html';
+            } catch (error) {
+                showError('登录失败：' + error.message);
+            }
+        }
+
+        // 处理注册
+        async function handleRegister() {
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            if (!email || !password || !confirmPassword) {
+                showError('请填写所有必填字段');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('密码长度至少为6位');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('两次输入的密码不一致');
+                return;
+            }
+            
+            try {
+                clearError();
+                const user = await registerUser(email, password);
+                // 注册成功后跳转到学习中心
+                window.location.href = 'index.html';
+            } catch (error) {
+                showError('注册失败：' + error.message);
+            }
+        }
+
+        // 监听认证状态变化
+        document.addEventListener('userLoggedIn', function() {
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

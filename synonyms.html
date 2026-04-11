@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>高频同义替换与学术词汇</title>
     <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="vocabulary_data.js"></script>
     <style>
         * {
             margin: 0;
@@ -55,7 +57,7 @@
             gap: 10px;
         }
 
-        button {
+        button, select {
             padding: 10px 20px;
             border: none;
             border-radius: 8px;
@@ -66,7 +68,7 @@
             transition: 0.3s;
         }
 
-        button:hover {
+        button:hover, select:hover {
             background: linear-gradient(90deg, #5a75ff, #3a5cff);
             transform: scale(1.05);
         }
@@ -74,6 +76,15 @@
         button.active {
             background: linear-gradient(90deg, #5fff97, #3bff7f);
             color: #0e2212;
+        }
+
+        select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4"%3E%3Cpath fill="%23ffffff" d="M287 69.4a17.6 17.6 0 0 0-13-5.4H18.4c-5 0-9.3 1.8-12.9 5.4A17.6 17.6 0 0 0 0 82.2c0 5 1.8 9.3 5.4 12.9l128 127.9c3.6 3.6 7.8 5.4 12.8 5.4s9.2-1.8 12.8-5.4L287 95c3.5-3.5 5.4-7.8 5.4-12.8 0-5-1.9-9.2-5.5-12.8z"/%3E%3C/svg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 10px;
+            padding-right: 30px;
         }
 
         .group {
@@ -228,6 +239,18 @@
         
         <div class="controls">
             <div class="control-group">
+                <label for="unit-select">单元选择：</label>
+                <select id="unit-select">
+                    <option value="all">全部单元</option>
+                    <option value="0">第一单元</option>
+                    <option value="1">第二单元</option>
+                    <option value="2">第三单元</option>
+                    <option value="3">第四单元</option>
+                    <option value="4">第五单元</option>
+                    <option value="5">第六单元</option>
+                </select>
+            </div>
+            <div class="control-group">
                 <label for="mode">学习模式：</label>
                 <button id="mode-normal" class="active">正常模式</button>
                 <button id="mode-hide-cn">隐藏中文</button>
@@ -253,8 +276,10 @@
     </div>
     
     <script>
-        // 高频同义替换与学术词汇分组
-        const synonymsGrouped = [
+        // 全局变量
+        let currentUnit = 'all';
+        let currentMode = 'normal';
+        let currentFilter = 'all';
   {
     group: "增加",
     words: [
@@ -1540,14 +1565,64 @@
   }
 ];
 
-        // 本地存储功能
+        // 本地存储功能 - 使用统一存储结构
+        const STORAGE_KEY = 'ielts_learning_system';
+        
+        function getStorageData() {
+            try {
+                let d = localStorage.getItem(STORAGE_KEY);
+                return d ? JSON.parse(d) : {
+                    ebbinghaus: {
+                        masterMap: {},
+                        stats: {totalError: 0, totalMaster: 0},
+                        errors: [],
+                        memory: {}
+                    },
+                    synonyms: {
+                        starred: {}
+                    },
+                    microbe: {
+                        starred: {}
+                    }
+                };
+            } catch (error) {
+                console.error('Error getting storage data:', error);
+                return {
+                    ebbinghaus: {
+                        masterMap: {},
+                        stats: {totalError: 0, totalMaster: 0},
+                        errors: [],
+                        memory: {}
+                    },
+                    synonyms: {
+                        starred: {}
+                    },
+                    microbe: {
+                        starred: {}
+                    }
+                };
+            }
+        }
+        
+        function setStorageData(data) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                return true;
+            } catch (error) {
+                console.error('Error setting storage data:', error);
+                return false;
+            }
+        }
+        
         function getStarredWords() {
-            const starred = localStorage.getItem('synonyms_starred');
-            return starred ? JSON.parse(starred) : {};
+            const data = getStorageData();
+            return data.synonyms.starred || {};
         }
 
         function saveStarredWords(starred) {
-            localStorage.setItem('synonyms_starred', JSON.stringify(starred));
+            const data = getStorageData();
+            data.synonyms.starred = starred;
+            return setStorageData(data);
         }
 
         // 初始化页面
@@ -1772,6 +1847,18 @@
             // 确保显示所有项目
             setFilter('all');
         }
+
+        // 监听数据同步事件
+        document.addEventListener('dataSynced', function() {
+            // 数据从云端同步后刷新页面
+            renderVocabulary();
+        });
+
+        // 监听用户登录事件
+        document.addEventListener('userLoggedIn', function() {
+            // 用户登录后从云端同步数据
+            syncDataFromCloud();
+        });
     </script>
 </body>
 </html>

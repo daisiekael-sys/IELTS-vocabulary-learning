@@ -7,11 +7,14 @@
 doubao-vocabulary-highlight:hover {
   background-color: rgba(251, 255, 30, 0.44);
 }
-</style><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
+</style>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>雅思词汇拼写训练 · 艾宾浩斯宇宙版</title>
     <script src="config.js"></script>
+    <script src="auth.js"></script>
     <style>
         * {
             margin: 0;
@@ -684,34 +687,98 @@ doubao-vocabulary-highlight:hover {
             ]
         };
 
-        // 存储结构
+        // 存储结构 - 优化存储结构
+        const STORAGE_KEY = 'ielts_learning_system';
+        
+        function getStorageData() {
+            try {
+                let d = localStorage.getItem(STORAGE_KEY);
+                return d ? JSON.parse(d) : {
+                    ebbinghaus: {
+                        masterMap: {},
+                        stats: {totalError: 0, totalMaster: 0},
+                        errors: [],
+                        memory: {}
+                    },
+                    synonyms: {
+                        starred: {}
+                    },
+                    microbe: {
+                        starred: {}
+                    }
+                };
+            } catch (error) {
+                console.error('Error getting storage data:', error);
+                return {
+                    ebbinghaus: {
+                        masterMap: {},
+                        stats: {totalError: 0, totalMaster: 0},
+                        errors: [],
+                        memory: {}
+                    },
+                    synonyms: {
+                        starred: {}
+                    },
+                    microbe: {
+                        starred: {}
+                    }
+                };
+            }
+        }
+        
+        function setStorageData(data) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                return true;
+            } catch (error) {
+                console.error('Error setting storage data:', error);
+                return false;
+            }
+        }
+        
+        // 艾宾浩斯存储操作
         function getMasterMap() {
-            let d = localStorage.getItem('ebbinghaus_master');
-            return d ? JSON.parse(d) : {};
+            const data = getStorageData();
+            return data.ebbinghaus.masterMap || {};
         }
+        
         function setMasterMap(m) {
-            localStorage.setItem('ebbinghaus_master', JSON.stringify(m));
+            const data = getStorageData();
+            data.ebbinghaus.masterMap = m;
+            return setStorageData(data);
         }
+        
         function getStats() {
-            let d = localStorage.getItem('ebbinghaus_stats');
-            return d ? JSON.parse(d) : {totalError:0, totalMaster:0};
+            const data = getStorageData();
+            return data.ebbinghaus.stats || {totalError: 0, totalMaster: 0};
         }
+        
         function setStats(s) {
-            localStorage.setItem('ebbinghaus_stats', JSON.stringify(s));
+            const data = getStorageData();
+            data.ebbinghaus.stats = s;
+            return setStorageData(data);
         }
+        
         function getErrorVocab() {
-            let d = localStorage.getItem('ebbinghaus_errors');
-            return d ? JSON.parse(d) : [];
+            const data = getStorageData();
+            return data.ebbinghaus.errors || [];
         }
+        
         function setErrorVocab(e) {
-            localStorage.setItem('ebbinghaus_errors', JSON.stringify(e));
+            const data = getStorageData();
+            data.ebbinghaus.errors = e;
+            return setStorageData(data);
         }
+        
         function getMemoryData() {
-            let d = localStorage.getItem('ebbinghaus_memory');
-            return d ? JSON.parse(d) : {};
+            const data = getStorageData();
+            return data.ebbinghaus.memory || {};
         }
+        
         function setMemoryData(m) {
-            localStorage.setItem('ebbinghaus_memory', JSON.stringify(m));
+            const data = getStorageData();
+            data.ebbinghaus.memory = m;
+            return setStorageData(data);
         }
 
         // 语音（原版自然）
@@ -1117,6 +1184,20 @@ doubao-vocabulary-highlight:hover {
             masterMap = getMasterMap(); stats=getStats();
             memProgress.style.width='0%'; ansProgress.style.width='0%';
         }
+
+        // 监听数据同步事件
+        document.addEventListener('dataSynced', function() {
+            // 数据从云端同步后刷新页面数据
+            masterMap = getMasterMap();
+            stats = getStats();
+            refreshAllProgress();
+        });
+
+        // 监听用户登录事件
+        document.addEventListener('userLoggedIn', function() {
+            // 用户登录后从云端同步数据
+            syncDataFromCloud();
+        });
 
         // 初始化
         vocabType.onchange = refreshAllProgress;

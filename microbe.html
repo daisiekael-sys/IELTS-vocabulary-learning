@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>微生物词汇</title>
     <script src="config.js"></script>
+    <script src="auth.js"></script>
     <style>
         * {
             margin: 0;
@@ -332,14 +333,64 @@
   }
 ];
 
-        // 本地存储功能
+        // 本地存储功能 - 使用统一存储结构
+        const STORAGE_KEY = 'ielts_learning_system';
+        
+        function getStorageData() {
+            try {
+                let d = localStorage.getItem(STORAGE_KEY);
+                return d ? JSON.parse(d) : {
+                    ebbinghaus: {
+                        masterMap: {},
+                        stats: {totalError: 0, totalMaster: 0},
+                        errors: [],
+                        memory: {}
+                    },
+                    synonyms: {
+                        starred: {}
+                    },
+                    microbe: {
+                        starred: {}
+                    }
+                };
+            } catch (error) {
+                console.error('Error getting storage data:', error);
+                return {
+                    ebbinghaus: {
+                        masterMap: {},
+                        stats: {totalError: 0, totalMaster: 0},
+                        errors: [],
+                        memory: {}
+                    },
+                    synonyms: {
+                        starred: {}
+                    },
+                    microbe: {
+                        starred: {}
+                    }
+                };
+            }
+        }
+        
+        function setStorageData(data) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                return true;
+            } catch (error) {
+                console.error('Error setting storage data:', error);
+                return false;
+            }
+        }
+        
         function getStarredWords() {
-            const starred = localStorage.getItem('microbe_starred');
-            return starred ? JSON.parse(starred) : {};
+            const data = getStorageData();
+            return data.microbe.starred || {};
         }
 
         function saveStarredWords(starred) {
-            localStorage.setItem('microbe_starred', JSON.stringify(starred));
+            const data = getStorageData();
+            data.microbe.starred = starred;
+            return setStorageData(data);
         }
 
         // 初始化页面
@@ -564,6 +615,18 @@
             // 确保显示所有项目
             setFilter('all');
         }
+
+        // 监听数据同步事件
+        document.addEventListener('dataSynced', function() {
+            // 数据从云端同步后刷新页面
+            renderVocabulary();
+        });
+
+        // 监听用户登录事件
+        document.addEventListener('userLoggedIn', function() {
+            // 用户登录后从云端同步数据
+            syncDataFromCloud();
+        });
     </script>
 </body>
 </html>
