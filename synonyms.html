@@ -58,7 +58,7 @@
             gap: 10px;
         }
 
-        button, select {
+        button {
             padding: 10px 20px;
             border: none;
             border-radius: 8px;
@@ -69,12 +69,21 @@
             transition: all 0.3s ease;
         }
 
-        button:hover, select:hover {
+        button:hover {
             background: linear-gradient(90deg, #5a75ff, #3a5cff);
             transform: scale(1.05);
         }
 
         select {
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(130, 150, 255, 0.3);
+            background: rgba(26, 35, 69, 0.7);
+            color: #e6edf7;
+            font-size: 15px;
+            outline: none;
+            min-width: 140px;
+            transition: 0.3s;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -83,7 +92,11 @@
             background-position: right 10px center;
             background-size: 10px;
             padding-right: 30px;
-            min-width: 120px;
+        }
+
+        select:hover {
+            border-color: rgba(130, 150, 255, 0.5);
+            transform: scale(1.02);
         }
 
         select:focus {
@@ -94,15 +107,14 @@
         select option {
             background-color: #1a2345 !important;
             color: white !important;
-            padding: 12px 16px;
+            padding: 10px;
             border-radius: 8px;
             transition: all 0.3s ease;
-            font-size: 14px;
         }
 
         select option:hover {
             background-color: #3a5cff !important;
-            transform: translateX(5px);
+            transform: scale(1.02);
         }
 
         select option:checked {
