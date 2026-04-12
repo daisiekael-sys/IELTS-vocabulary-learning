@@ -22,12 +22,12 @@ function loadFirebaseSDK() {
     console.log('Loading Firebase SDK...');
     
     // 检查是否在Trae IDE环境中运行
-    const isTraeIDE = window.location.href.includes('localhost:8000') && navigator.userAgent.includes('Mozilla');
-    console.log('Running in Trae IDE preview:', isTraeIDE);
+    const isTraeIDE = window.location.href.includes('localhost:8000') || window.location.href.includes('127.0.0.1');
+    console.log('Running in local development environment:', isTraeIDE);
     
-    // 在Trae IDE环境中，直接使用本地存储模式
+    // 在本地开发环境中，直接使用本地存储模式
     if (isTraeIDE) {
-        console.log('Trae IDE environment detected, using local storage mode');
+        console.log('Local development environment detected, using local storage mode');
         return;
     }
     
@@ -129,13 +129,13 @@ function loadScript(src) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded, checking Firebase...');
     
-    // 检查是否在Trae IDE环境中运行
-    const isTraeIDE = window.location.href.includes('localhost:8000') && navigator.userAgent.includes('Mozilla');
-    console.log('Running in Trae IDE preview:', isTraeIDE);
+    // 检查是否在本地开发环境中运行
+    const isLocalDev = window.location.href.includes('localhost:8000') || window.location.href.includes('127.0.0.1');
+    console.log('Running in local development environment:', isLocalDev);
     
-    // 在Trae IDE环境中，直接使用本地存储模式，不显示错误信息
-    if (isTraeIDE) {
-        console.log('Trae IDE environment detected, initializing local auth directly');
+    // 在本地开发环境中，直接使用本地存储模式，不显示错误信息
+    if (isLocalDev) {
+        console.log('Local development environment detected, initializing local auth directly');
         initializeLocalAuth();
         return;
     }
