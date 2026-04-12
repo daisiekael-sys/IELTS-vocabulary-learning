@@ -14,13 +14,22 @@ window.localAuthEnabled = true; // 启用本地认证
 console.log('Auth.js loaded, starting Firebase initialization');
 
 // 主动加载Firebase SDK
-window.addEventListener('load', function() {
-    loadFirebaseSDK();
-});
+console.log('Initiating Firebase SDK loading immediately');
+loadFirebaseSDK();
 
 // 加载Firebase SDK函数
 function loadFirebaseSDK() {
     console.log('Loading Firebase SDK...');
+    
+    // 检查是否在Trae IDE环境中运行
+    const isTraeIDE = window.location.href.includes('localhost:8000') && navigator.userAgent.includes('Mozilla');
+    console.log('Running in Trae IDE preview:', isTraeIDE);
+    
+    // 在Trae IDE环境中，直接使用本地存储模式
+    if (isTraeIDE) {
+        console.log('Trae IDE environment detected, using local storage mode');
+        return;
+    }
     
     // 检查网络连接
     const isOnline = navigator.onLine;
@@ -31,23 +40,33 @@ function loadFirebaseSDK() {
         return;
     }
     
-    // 并行加载所有Firebase SDK
-    const loadPromises = [
-        loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js'),
-        loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js'),
-        loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
-    ];
-    
-    Promise.allSettled(loadPromises)
+    console.log('Attempting to load Firebase SDK from primary CDN...');
+    // 先加载firebase-app.js，再加载其他模块
+    loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js')
+        .then(() => {
+            console.log('Firebase App loaded, loading additional modules...');
+            return Promise.allSettled([
+                loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js'),
+                loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
+            ]);
+        })
         .then(results => {
+            console.log('Primary CDN loading results:', results);
             const failed = results.filter(r => r.status === 'rejected');
             if (failed.length === 0) {
                 console.log('All Firebase SDKs loaded successfully from primary CDN');
             } else {
                 console.error(`${failed.length} Firebase SDKs failed to load from primary CDN`);
+                console.log('Failed results:', failed);
                 console.log('Trying alternative CDN...');
                 loadFirebaseSDKFromAlternativeCDN();
             }
+        })
+        .catch(error => {
+            console.error('Error loading Firebase App:', error);
+            console.log('Error stack:', error.stack);
+            console.log('Trying alternative CDN...');
+            loadFirebaseSDKFromAlternativeCDN();
         });
 }
 
@@ -55,21 +74,30 @@ function loadFirebaseSDK() {
 function loadFirebaseSDKFromAlternativeCDN() {
     console.log('Loading Firebase SDK from alternative CDN...');
     
-    const loadPromises = [
-        loadScript('https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-app.js'),
-        loadScript('https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-auth.js'),
-        loadScript('https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-firestore.js')
-    ];
-    
-    Promise.allSettled(loadPromises)
+    // 先加载firebase-app.js，再加载其他模块
+    loadScript('https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-app.js')
+        .then(() => {
+            console.log('Firebase App loaded from alternative CDN, loading additional modules...');
+            return Promise.allSettled([
+                loadScript('https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-auth.js'),
+                loadScript('https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-firestore.js')
+            ]);
+        })
         .then(results => {
+            console.log('Alternative CDN loading results:', results);
             const failed = results.filter(r => r.status === 'rejected');
             if (failed.length === 0) {
                 console.log('All Firebase SDKs loaded successfully from alternative CDN');
             } else {
                 console.error(`${failed.length} Firebase SDKs failed to load from alternative CDN`);
+                console.log('Failed results:', failed);
                 console.warn('Falling back to local storage mode');
             }
+        })
+        .catch(error => {
+            console.error('Error loading Firebase App from alternative CDN:', error);
+            console.log('Error stack:', error.stack);
+            console.warn('Falling back to local storage mode');
         });
 }
 
@@ -78,11 +106,18 @@ function loadScript(src) {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = src;
+        // 添加超时处理
+        const timeout = setTimeout(() => {
+            console.error(`Script load timeout: ${src}`);
+            reject(new Error(`Timeout loading ${src}`));
+        }, 10000); // 10秒超时
         script.onload = () => {
+            clearTimeout(timeout);
             console.log(`Script loaded: ${src}`);
             resolve(src);
         };
         script.onerror = () => {
+            clearTimeout(timeout);
             console.error(`Script failed to load: ${src}`);
             reject(new Error(`Failed to load ${src}`));
         };
@@ -94,33 +129,61 @@ function loadScript(src) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded, checking Firebase...');
     
-    // 检查Firebase是否已经加载
-    if (typeof firebase === 'undefined') {
-        console.error('Firebase SDK not loaded!');
-        
-        // 创建一个警告元素来显示问题，但不阻止用户使用系统
-        const warningElement = document.createElement('div');
-        warningElement.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: orange; color: white; padding: 10px; text-align: center; z-index: 10000; font-weight: 500;';
-        warningElement.textContent = 'Firebase SDK加载失败，请检查网络连接或防火墙设置。系统将使用本地存储模式，数据仅保存在当前设备。';
-        document.body.appendChild(warningElement);
-        
-        // 3秒后自动隐藏警告
-        setTimeout(function() {
-            warningElement.style.transition = 'opacity 0.5s ease';
-            warningElement.style.opacity = '0';
-            setTimeout(function() {
-                if (document.body.contains(warningElement)) {
-                    document.body.removeChild(warningElement);
-                }
-            }, 500);
-        }, 3000);
-        
-        // 初始化本地认证
+    // 检查是否在Trae IDE环境中运行
+    const isTraeIDE = window.location.href.includes('localhost:8000') && navigator.userAgent.includes('Mozilla');
+    console.log('Running in Trae IDE preview:', isTraeIDE);
+    
+    // 在Trae IDE环境中，直接使用本地存储模式，不显示错误信息
+    if (isTraeIDE) {
+        console.log('Trae IDE environment detected, initializing local auth directly');
         initializeLocalAuth();
-    } else {
-        console.log('Firebase SDK found, initializing...');
-        initializeFirebase();
+        return;
     }
+    
+    // 延迟检查Firebase加载状态，给SDK足够的加载时间
+    let checkAttempts = 0;
+    const maxCheckAttempts = 20; // 最多检查20次（约10秒）
+    
+    function checkFirebaseStatus() {
+        checkAttempts++;
+        console.log('Checking Firebase status, attempt:', checkAttempts);
+        console.log('Current firebase object:', typeof firebase);
+        
+        if (typeof firebase !== 'undefined') {
+            console.log('Firebase SDK found, initializing...');
+            initializeFirebase();
+        } else if (checkAttempts >= maxCheckAttempts) {
+            console.error('Firebase SDK not loaded after', maxCheckAttempts, 'attempts!');
+            console.error('Final check - firebase is:', typeof firebase);
+            
+            // 创建一个警告元素来显示问题，但不阻止用户使用系统
+            const warningElement = document.createElement('div');
+            warningElement.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: orange; color: white; padding: 10px; text-align: center; z-index: 10000; font-weight: 500;';
+            warningElement.textContent = 'Firebase SDK加载失败，请检查网络连接或防火墙设置。系统将使用本地存储模式，数据仅保存在当前设备。';
+            document.body.appendChild(warningElement);
+            
+            // 3秒后自动隐藏警告
+            setTimeout(function() {
+                warningElement.style.transition = 'opacity 0.5s ease';
+                warningElement.style.opacity = '0';
+                setTimeout(function() {
+                    if (document.body.contains(warningElement)) {
+                        document.body.removeChild(warningElement);
+                    }
+                }, 500);
+            }, 3000);
+            
+            // 初始化本地认证
+            initializeLocalAuth();
+        } else {
+            // 继续检查
+            console.log('Firebase not yet loaded, waiting...');
+            setTimeout(checkFirebaseStatus, 500); // 每500毫秒检查一次
+        }
+    }
+    
+    // 开始检查
+    checkFirebaseStatus();
 });
 
 function initializeFirebase() {
@@ -388,6 +451,35 @@ function syncDataFromCloud() {
 // 定期同步数据
 setInterval(syncDataWithCloud, 60000); // 每60秒同步一次
 
+// 测试Firebase SDK加载
+function testFirebaseLoad() {
+    console.log('=== Testing Firebase SDK Load ===');
+    console.log('Current network status:', navigator.onLine ? 'Online' : 'Offline');
+    console.log('Current firebase object:', typeof firebase);
+    
+    // 测试主CDN
+    console.log('Testing primary CDN...');
+    loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js')
+        .then(() => {
+            console.log('✓ Primary CDN works!');
+            console.log('Firebase object after load:', typeof firebase);
+        })
+        .catch(error => {
+            console.error('✗ Primary CDN failed:', error);
+            // 测试备用CDN
+            console.log('Testing alternative CDN...');
+            loadScript('https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-app.js')
+                .then(() => {
+                    console.log('✓ Alternative CDN works!');
+                    console.log('Firebase object after load:', typeof firebase);
+                })
+                .catch(error => {
+                    console.error('✗ Alternative CDN failed:', error);
+                    console.log('Both CDNs failed, using local storage mode');
+                });
+        });
+}
+
 // 暴露方法到全局
 if (typeof window !== 'undefined') {
     window.authConfig = authConfig;
@@ -396,4 +488,5 @@ if (typeof window !== 'undefined') {
     window.logoutUser = logoutUser;
     window.syncDataWithCloud = syncDataWithCloud;
     window.syncDataFromCloud = syncDataFromCloud;
+    window.testFirebaseLoad = testFirebaseLoad;
 }
