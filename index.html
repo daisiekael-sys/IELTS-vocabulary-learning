@@ -178,7 +178,6 @@
             color: #c7d1ff;
             font-size: 14px;
             font-weight: 500;
-            display: flex;
             align-items: center;
             gap: 10px;
         }
@@ -387,7 +386,21 @@
 
             // 页面加载时检查认证状态
             window.addEventListener('load', function() {
-                // 认证状态会在auth.js中自动检查
+                // 直接检查本地存储中的登录状态
+                const currentUser = localStorage.getItem('currentLocalUser');
+                if (currentUser) {
+                    const email = currentUser;
+                    const username = generateUsername(email);
+                    const initial = username.charAt(0).toUpperCase();
+                    
+                    document.getElementById('userInfo').innerHTML = `
+                        <div class="avatar">${initial}</div>
+                        <span>欢迎，${username}</span>
+                    `;
+                    document.getElementById('userInfo').style.display = 'flex';
+                    document.getElementById('loginBtn').style.display = 'none';
+                    document.getElementById('logoutBtn').style.display = 'block';
+                }
             });
         </script>
     </div>
