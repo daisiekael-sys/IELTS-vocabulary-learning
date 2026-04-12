@@ -8,6 +8,9 @@ const authConfig = {
     appId: "1:183899195249:web:3d2e2bb9590df74cbfd8d0"
 };
 
+// 初始化状态
+window.firebaseInitialized = false;
+
 // 初始化Firebase
 if (!window.firebase) {
     // 动态加载Firebase SDK
@@ -36,11 +39,35 @@ function initializeFirebase() {
         firebase.initializeApp(authConfig);
         window.auth = firebase.auth();
         window.db = firebase.firestore();
+        window.firebaseInitialized = true;
         console.log('Firebase initialized successfully');
         checkAuthState();
     } catch (error) {
         console.error('Error initializing Firebase:', error);
     }
+}
+
+// 等待Firebase初始化
+function waitForFirebase() {
+    return new Promise((resolve, reject) => {
+        if (window.firebaseInitialized) {
+            resolve();
+            return;
+        }
+        
+        let attempts = 0;
+        const maxAttempts = 30; // 最多等待30秒
+        const interval = setInterval(() => {
+            attempts++;
+            if (window.firebaseInitialized) {
+                clearInterval(interval);
+                resolve();
+            } else if (attempts >= maxAttempts) {
+                clearInterval(interval);
+                reject(new Error('Firebase initialization timeout'));
+            }
+        }, 1000);
+    });
 }
 
 // 检查认证状态
@@ -62,65 +89,59 @@ function checkAuthState() {
 }
 
 // 注册用户
-function registerUser(email, password) {
-    return new Promise((resolve, reject) => {
+async function registerUser(email, password) {
+    try {
+        await waitForFirebase();
+        
         if (!window.auth) {
-            reject(new Error('Firebase auth not initialized'));
-            return;
+            throw new Error('Firebase auth not initialized');
         }
         
-        window.auth.createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                console.log('User registered:', user.email);
-                resolve(user);
-            })
-            .catch((error) => {
-                console.error('Registration error:', error);
-                reject(error);
-            });
-    });
+        const userCredential = await window.auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        console.log('User registered:', user.email);
+        return user;
+    } catch (error) {
+        console.error('Registration error:', error);
+        throw error;
+    }
 }
 
 // 登录用户
-function loginUser(email, password) {
-    return new Promise((resolve, reject) => {
+async function loginUser(email, password) {
+    try {
+        await waitForFirebase();
+        
         if (!window.auth) {
-            reject(new Error('Firebase auth not initialized'));
-            return;
+            throw new Error('Firebase auth not initialized');
         }
         
-        window.auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                console.log('User logged in:', user.email);
-                resolve(user);
-            })
-            .catch((error) => {
-                console.error('Login error:', error);
-                reject(error);
-            });
-    });
+        const userCredential = await window.auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        console.log('User logged in:', user.email);
+        return user;
+    } catch (error) {
+        console.error('Login error:', error);
+        throw error;
+    }
 }
 
 // 登出用户
-function logoutUser() {
-    return new Promise((resolve, reject) => {
+async function logoutUser() {
+    try {
+        await waitForFirebase();
+        
         if (!window.auth) {
-            reject(new Error('Firebase auth not initialized'));
-            return;
+            throw new Error('Firebase auth not initialized');
         }
         
-        window.auth.signOut()
-            .then(() => {
-                console.log('User logged out');
-                resolve();
-            })
-            .catch((error) => {
-                console.error('Logout error:', error);
-                reject(error);
-            });
-    });
+        await window.auth.signOut();
+        console.log('User logged out');
+        return;
+    } catch (error) {
+        console.error('Logout error:', error);
+        throw error;
+    }
 }
 
 // 同步数据到云端
