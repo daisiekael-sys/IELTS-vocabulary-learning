@@ -1,11 +1,11 @@
 // 登录系统配置
 const authConfig = {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyA3zBg6XgHrFZgVfH86TxjnSlSzi44_Ekk",
+    authDomain: "synonymous-substitutions.firebaseapp.com",
+    projectId: "synonymous-substitutions",
+    storageBucket: "synonymous-substitutions.firebasestorage.app",
+    messagingSenderId: "183899195249",
+    appId: "1:183899195249:web:3d2e2bb9590df74cbfd8d0"
 };
 
 // 初始化Firebase
