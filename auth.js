@@ -20,11 +20,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // 检查Firebase是否已经加载
     if (typeof firebase === 'undefined') {
         console.error('Firebase SDK not loaded!');
+        // 检查网络连接状态
+        if (!navigator.onLine) {
+            console.error('Network connection not available');
+        }
         // 创建一个警告元素来显示问题，但不阻止用户使用系统
         const warningElement = document.createElement('div');
-        warningElement.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: orange; color: white; padding: 10px; text-align: center; z-index: 10000;';
-        warningElement.textContent = 'Firebase SDK加载失败，系统将使用本地存储模式，数据仅保存在当前设备';
+        warningElement.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: orange; color: white; padding: 10px; text-align: center; z-index: 10000; font-weight: 500;';
+        warningElement.textContent = 'Firebase SDK加载失败，请检查网络连接或防火墙设置。系统将使用本地存储模式，数据仅保存在当前设备。';
         document.body.appendChild(warningElement);
+        
+        // 3秒后自动隐藏警告
+        setTimeout(function() {
+            warningElement.style.transition = 'opacity 0.5s ease';
+            warningElement.style.opacity = '0';
+            setTimeout(function() {
+                if (document.body.contains(warningElement)) {
+                    document.body.removeChild(warningElement);
+                }
+            }, 500);
+        }, 3000);
         
         // 初始化本地认证
         initializeLocalAuth();
