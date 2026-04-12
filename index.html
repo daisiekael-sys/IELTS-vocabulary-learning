@@ -178,6 +178,22 @@
             color: #c7d1ff;
             font-size: 14px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #userInfo .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, #6a85ff, #4a6cff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
         }
 
         #loginBtn, #logoutBtn {
@@ -329,11 +345,36 @@
                 }
             }
 
+            // 生成随机用户名
+            function generateUsername(email) {
+                if (email) {
+                    const username = email.split('@')[0];
+                    return username.length > 0 ? username : generateRandomUsername();
+                }
+                return generateRandomUsername();
+            }
+
+            function generateRandomUsername() {
+                const adjectives = ['Happy', 'Clever', 'Brave', 'Smart', 'Friendly', 'Creative', 'Energetic', 'Wise'];
+                const nouns = ['Student', 'Learner', 'Explorer', 'Master', 'Scholar', 'Expert', 'Wizard', 'Ninja'];
+                const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+                const noun = nouns[Math.floor(Math.random() * nouns.length)];
+                const num = Math.floor(Math.random() * 1000);
+                return `${adj}${noun}${num}`;
+            }
+
             // 监听用户登录状态
             document.addEventListener('userLoggedIn', function(e) {
                 const user = e.detail;
-                document.getElementById('userInfo').textContent = `欢迎，${user.email}`;
-                document.getElementById('userInfo').style.display = 'block';
+                const email = user.email || user;
+                const username = generateUsername(email);
+                const initial = username.charAt(0).toUpperCase();
+                
+                document.getElementById('userInfo').innerHTML = `
+                    <div class="avatar">${initial}</div>
+                    <span>欢迎，${username}</span>
+                `;
+                document.getElementById('userInfo').style.display = 'flex';
                 document.getElementById('loginBtn').style.display = 'none';
                 document.getElementById('logoutBtn').style.display = 'block';
             });
