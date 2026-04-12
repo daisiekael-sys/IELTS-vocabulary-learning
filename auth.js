@@ -386,6 +386,8 @@ async function registerUser(email, password) {
             localStorage.setItem('currentLocalUser', email);
             
             console.log('Local user registered:', email);
+            // 触发登录成功事件
+            document.dispatchEvent(new CustomEvent('userLoggedIn', { detail: { email: email } }));
             return { email: email };
         }
         else {
@@ -424,6 +426,8 @@ async function loginUser(email, password) {
             localStorage.setItem('currentLocalUser', email);
             
             console.log('Local user logged in:', email);
+            // 触发登录成功事件
+            document.dispatchEvent(new CustomEvent('userLoggedIn', { detail: { email: email } }));
             return { email: email };
         }
         else {
