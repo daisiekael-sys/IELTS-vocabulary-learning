@@ -161,7 +161,12 @@
             </div>
             <div class="form-group">
                 <label for="password">密码</label>
-                <input type="password" id="password" placeholder="请输入密码" required>
+                <div style="position: relative;">
+                    <input type="password" id="password" placeholder="请输入密码" required style="width: 100%; padding-right: 40px;">
+                    <button type="button" onclick="togglePassword('password')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #aabbff;">
+                        👁️
+                    </button>
+                </div>
             </div>
             <button class="btn" onclick="handleLogin()">登录</button>
             <div class="switch-form">
@@ -176,11 +181,21 @@
             </div>
             <div class="form-group">
                 <label for="regPassword">密码</label>
-                <input type="password" id="regPassword" placeholder="请输入密码（至少6位）" required>
+                <div style="position: relative;">
+                    <input type="password" id="regPassword" placeholder="请输入密码（至少6位）" required style="width: 100%; padding-right: 40px;">
+                    <button type="button" onclick="togglePassword('regPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #aabbff;">
+                        👁️
+                    </button>
+                </div>
             </div>
             <div class="form-group">
                 <label for="regConfirmPassword">确认密码</label>
-                <input type="password" id="regConfirmPassword" placeholder="请再次输入密码" required>
+                <div style="position: relative;">
+                    <input type="password" id="regConfirmPassword" placeholder="请再次输入密码" required style="width: 100%; padding-right: 40px;">
+                    <button type="button" onclick="togglePassword('regConfirmPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #aabbff;">
+                        👁️
+                    </button>
+                </div>
             </div>
             <button class="btn" onclick="handleRegister()">注册</button>
             <div class="switch-form">
@@ -273,6 +288,19 @@
         document.addEventListener('userLoggedIn', function() {
             window.location.href = 'index.html';
         });
+
+        // 切换密码可见性
+        function togglePassword(id) {
+            const input = document.getElementById(id);
+            const button = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🔒';
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
     </script>
 </body>
 </html>
