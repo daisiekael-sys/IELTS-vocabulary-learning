@@ -333,32 +333,46 @@ doubao-vocabulary-highlight:hover {
             border-radius: 3px;
         }
 
-        /* 返回按钮 - 固定左侧小便签样式 */
+        /* 返回按钮 - 小巧精致的标签样式 */
         .back-btn {
             position: fixed;
-            top: 50%;
+            top: 20px;
             left: 20px;
-            transform: translateY(-50%);
-            padding: 15px 10px;
-            background: linear-gradient(135deg, rgba(114, 137, 255, 0.9), rgba(74, 108, 255, 0.9));
-            color: #ffffff;
-            border: 1px solid rgba(130, 150, 255, 0.5);
-            border-radius: 12px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333333;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
             z-index: 1000;
-            box-shadow: 0 4px 15px rgba(114, 137, 255, 0.4);
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
             font-weight: 500;
-            font-size: 14px;
-            letter-spacing: 2px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-btn::after {
+            content: '‹';
+            font-size: 16px;
+            font-weight: bold;
         }
 
         .back-btn:hover {
-            background: linear-gradient(135deg, rgba(94, 117, 255, 0.9), rgba(58, 92, 255, 0.9));
-            transform: translateY(-50%) translateX(5px);
-            box-shadow: 0 6px 20px rgba(114, 137, 255, 0.6);
+            background: linear-gradient(135deg, #ffed4e, #ffd700);
+            transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.6);
+        }
+
+        /* 滚动隐藏/显示效果 */
+        .back-btn.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-20px);
         }
     </style>
 </head>
@@ -366,7 +380,7 @@ doubao-vocabulary-highlight:hover {
 <body samantha-ext-loaded="1">
     <script>applyConfig();</script>
     <div class="container">
-        <button class="back-btn" onclick="window.location.href='index.html'">返回学习中心</button>
+        <button class="back-btn" onclick="window.location.href='index.html'">返回</button>
         <h1 class="title">🌌 雅思词汇拼写训练 · 艾宾浩斯宇宙版</h1>
 
         <!-- 全局总进度 -->
@@ -1264,6 +1278,24 @@ doubao-vocabulary-highlight:hover {
             } else if(val < 1) {
                 this.value = 1;
             }
+        });
+        
+        // 滚动隐藏/显示返回按钮
+        let lastScrollTop = 0;
+        const backBtn = document.querySelector('.back-btn');
+        
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // 向下滚动且滚动距离超过100px
+                backBtn.classList.add('hidden');
+            } else {
+                // 向上滚动或滚动距离小于100px
+                backBtn.classList.remove('hidden');
+            }
+            
+            lastScrollTop = scrollTop;
         });
         
         refreshAllProgress();
