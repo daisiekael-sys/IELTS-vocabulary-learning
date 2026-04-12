@@ -333,23 +333,32 @@ doubao-vocabulary-highlight:hover {
             border-radius: 3px;
         }
 
-        /* 返回按钮 */
+        /* 返回按钮 - 固定左侧小便签样式 */
         .back-btn {
-            position: absolute;
-            top: 20px;
+            position: fixed;
+            top: 50%;
             left: 20px;
-            padding: 10px 24px;
-            background: rgba(114, 137, 255, 0.2);
-            color: #c7d1ff;
-            border: 1px solid rgba(130, 150, 255, 0.3);
-            border-radius: 8px;
+            transform: translateY(-50%);
+            padding: 15px 10px;
+            background: linear-gradient(135deg, rgba(114, 137, 255, 0.9), rgba(74, 108, 255, 0.9));
+            color: #ffffff;
+            border: 1px solid rgba(130, 150, 255, 0.5);
+            border-radius: 12px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             z-index: 1000;
+            box-shadow: 0 4px 15px rgba(114, 137, 255, 0.4);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 2px;
         }
 
         .back-btn:hover {
-            background: rgba(114, 137, 255, 0.3);
+            background: linear-gradient(135deg, rgba(94, 117, 255, 0.9), rgba(58, 92, 255, 0.9));
+            transform: translateY(-50%) translateX(5px);
+            box-shadow: 0 6px 20px rgba(114, 137, 255, 0.6);
         }
     </style>
 </head>

@@ -122,25 +122,84 @@
 
         .special-section {
             margin: 30px 0;
-            padding: 20px;
+            padding: 30px 20px;
             background: rgba(26, 35, 69, 0.5);
             border: 1px solid rgba(130, 150, 255, 0.2);
-            border-radius: 12px;
+            border-radius: 16px;
             text-align: center;
+            box-shadow: 0 4px 15px rgba(100, 120, 255, 0.1);
         }
 
         .special-section h3 {
             color: #c7d1ff;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(130, 150, 255, 0.3);
+        }
+
+        .special-section .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .special-section button {
+            padding: 12px 24px;
             background: linear-gradient(90deg, #8899ff, #6677cc);
-            margin: 0 10px;
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(136, 153, 255, 0.3);
         }
 
         .special-section button:hover {
             background: linear-gradient(90deg, #7788ee, #5566bb);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(119, 136, 238, 0.4);
+        }
+
+        .user-auth {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #userInfo {
+            display: none;
+            color: #c7d1ff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        #loginBtn, #logoutBtn {
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #6a85ff, #4a6cff);
+            color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(106, 133, 255, 0.3);
+        }
+
+        #loginBtn:hover, #logoutBtn:hover {
+            background: linear-gradient(90deg, #5a75ff, #3a5cff);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(90, 117, 255, 0.4);
+        }
+
+        #logoutBtn {
+            display: none;
         }
 
         .footer {
@@ -156,10 +215,10 @@
 <body>
     <div class="container">
         <div class="hero">
-            <div class="user-auth" style="position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 10px;">
-                <span id="userInfo" style="display: none; color: #c7d1ff;"></span>
-                <button id="loginBtn" onclick="window.location.href='login.html'">登录/注册</button>
-                <button id="logoutBtn" style="display: none;" onclick="handleLogout()">登出</button>
+            <div class="user-auth">
+                <span id="userInfo"></span>
+                <button id="loginBtn" onclick="window.location.href='login.html'">🔐 登录/注册</button>
+                <button id="logoutBtn" onclick="handleLogout()">🚪 登出</button>
             </div>
             <h1>🌌 雅思词汇学习中心</h1>
             <h2>选择适合你的词汇学习模式</h2>
@@ -190,9 +249,11 @@
 
         <div class="special-section" style="margin-top: 40px;">
             <h3>数据管理</h3>
-            <button onclick="exportData()">导出学习数据</button>
-            <button onclick="importData()">导入学习数据</button>
-            <button onclick="clearData()">清除所有数据</button>
+            <div class="btn-group">
+                <button onclick="exportData()">📤 导出学习数据</button>
+                <button onclick="importData()">📥 导入学习数据</button>
+                <button onclick="clearData()">🗑️ 清除所有数据</button>
+            </div>
         </div>
 
         <div class="footer">
