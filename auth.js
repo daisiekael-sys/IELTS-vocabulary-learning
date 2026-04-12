@@ -18,6 +18,28 @@ console.log('Auth.js loaded, starting Firebase initialization');
 console.log('Initiating Firebase SDK loading immediately');
 loadFirebaseSDK();
 
+// Firebase SDK CDN配置
+const firebaseCDNs = [
+    {
+        name: 'Google CDN',
+        app: 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js',
+        auth: 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js',
+        firestore: 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js'
+    },
+    {
+        name: 'jsdelivr',
+        app: 'https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-app.js',
+        auth: 'https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-auth.js',
+        firestore: 'https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-firestore.js'
+    },
+    {
+        name: 'unpkg',
+        app: 'https://unpkg.com/firebase@9.22.2/dist/firebase-app.js',
+        auth: 'https://unpkg.com/firebase@9.22.2/dist/firebase-auth.js',
+        firestore: 'https://unpkg.com/firebase@9.22.2/dist/firebase-firestore.js'
+    }
+];
+
 // 加载Firebase SDK函数
 function loadFirebaseSDK() {
     console.log('Loading Firebase SDK...');
@@ -43,33 +65,46 @@ function loadFirebaseSDK() {
         return;
     }
     
-    console.log('Attempting to load Firebase SDK from primary CDN...');
+    // 尝试从多个CDN加载Firebase SDK
+    loadFirebaseSDKFromCDNs(0);
+}
+
+// 从多个CDN加载Firebase SDK
+function loadFirebaseSDKFromCDNs(cdnIndex) {
+    if (cdnIndex >= firebaseCDNs.length) {
+        console.error('All CDNs failed to load Firebase SDK');
+        window.useLocalStorageMode = true;
+        return;
+    }
+    
+    const cdn = firebaseCDNs[cdnIndex];
+    console.log(`Attempting to load Firebase SDK from ${cdn.name} CDN...`);
+    
     // 先加载firebase-app.js，再加载其他模块
-    loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js')
+    loadScriptWithRetry(cdn.app, 3)
         .then(() => {
-            console.log('Firebase App loaded, loading additional modules...');
+            console.log(`Firebase App loaded from ${cdn.name} CDN, loading additional modules...`);
             return Promise.allSettled([
-                loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js'),
-                loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
+                loadScriptWithRetry(cdn.auth, 3),
+                loadScriptWithRetry(cdn.firestore, 3)
             ]);
         })
         .then(results => {
-            console.log('Primary CDN loading results:', results);
+            console.log(`${cdn.name} CDN loading results:`, results);
             const failed = results.filter(r => r.status === 'rejected');
             if (failed.length === 0) {
-                console.log('All Firebase SDKs loaded successfully from primary CDN');
+                console.log(`All Firebase SDKs loaded successfully from ${cdn.name} CDN`);
             } else {
-                console.error(`${failed.length} Firebase SDKs failed to load from primary CDN`);
+                console.error(`${failed.length} Firebase SDKs failed to load from ${cdn.name} CDN`);
                 console.log('Failed results:', failed);
-                console.log('Trying alternative CDN...');
-                loadFirebaseSDKFromAlternativeCDN();
+                console.log(`Trying next CDN (${cdnIndex + 1}/${firebaseCDNs.length})...`);
+                loadFirebaseSDKFromCDNs(cdnIndex + 1);
             }
         })
         .catch(error => {
-            console.error('Error loading Firebase App:', error);
-            console.log('Error stack:', error.stack);
-            console.log('Trying alternative CDN...');
-            loadFirebaseSDKFromAlternativeCDN();
+            console.error(`Error loading Firebase App from ${cdn.name} CDN:`, error);
+            console.log(`Trying next CDN (${cdnIndex + 1}/${firebaseCDNs.length})...`);
+            loadFirebaseSDKFromCDNs(cdnIndex + 1);
         });
 }
 
@@ -106,28 +141,59 @@ function loadFirebaseSDKFromAlternativeCDN() {
         });
 }
 
-// 加载脚本的辅助函数
+// 加载脚本的辅助函数（带重试机制）
+function loadScriptWithRetry(src, maxRetries = 3, delay = 2000) {
+    let retries = 0;
+    
+    function attemptLoad() {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            
+            // 添加超时处理
+            const timeout = setTimeout(() => {
+                console.error(`Script load timeout: ${src}`);
+                if (retries < maxRetries) {
+                    retries++;
+                    console.log(`Retrying to load script (${retries}/${maxRetries}): ${src}`);
+                    setTimeout(() => {
+                        attemptLoad().then(resolve).catch(reject);
+                    }, delay);
+                } else {
+                    reject(new Error(`Timeout loading ${src} after ${maxRetries} attempts`));
+                }
+            }, 10000); // 10秒超时
+            
+            script.onload = () => {
+                clearTimeout(timeout);
+                console.log(`Script loaded: ${src}`);
+                resolve(src);
+            };
+            
+            script.onerror = () => {
+                clearTimeout(timeout);
+                console.error(`Script failed to load: ${src}`);
+                if (retries < maxRetries) {
+                    retries++;
+                    console.log(`Retrying to load script (${retries}/${maxRetries}): ${src}`);
+                    setTimeout(() => {
+                        attemptLoad().then(resolve).catch(reject);
+                    }, delay);
+                } else {
+                    reject(new Error(`Failed to load ${src} after ${maxRetries} attempts`));
+                }
+            };
+            
+            document.head.appendChild(script);
+        });
+    }
+    
+    return attemptLoad();
+}
+
+// 加载脚本的辅助函数（兼容旧代码）
 function loadScript(src) {
-    return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = src;
-        // 添加超时处理
-        const timeout = setTimeout(() => {
-            console.error(`Script load timeout: ${src}`);
-            reject(new Error(`Timeout loading ${src}`));
-        }, 10000); // 10秒超时
-        script.onload = () => {
-            clearTimeout(timeout);
-            console.log(`Script loaded: ${src}`);
-            resolve(src);
-        };
-        script.onerror = () => {
-            clearTimeout(timeout);
-            console.error(`Script failed to load: ${src}`);
-            reject(new Error(`Failed to load ${src}`));
-        };
-        document.head.appendChild(script);
-    });
+    return loadScriptWithRetry(src, 1);
 }
 
 // DOMContentLoaded事件处理
@@ -485,6 +551,38 @@ function testFirebaseLoad() {
         });
 }
 
+// 手动切换认证模式
+function switchAuthMode(mode) {
+    if (mode === 'firebase') {
+        console.log('Switching to Firebase mode');
+        window.useLocalStorageMode = false;
+        // 重新尝试加载Firebase SDK
+        loadFirebaseSDK();
+    } else if (mode === 'local') {
+        console.log('Switching to local storage mode');
+        window.useLocalStorageMode = true;
+        initializeLocalAuth();
+    }
+}
+
+// 测试Firebase连接
+async function testFirebaseConnection() {
+    try {
+        console.log('Testing Firebase connection...');
+        await waitForFirebase();
+        if (window.firebaseInitialized) {
+            console.log('Firebase connection successful');
+            return true;
+        } else {
+            console.log('Firebase connection failed');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error testing Firebase connection:', error);
+        return false;
+    }
+}
+
 // 暴露方法到全局
 if (typeof window !== 'undefined') {
     window.authConfig = authConfig;
@@ -494,4 +592,6 @@ if (typeof window !== 'undefined') {
     window.syncDataWithCloud = syncDataWithCloud;
     window.syncDataFromCloud = syncDataFromCloud;
     window.testFirebaseLoad = testFirebaseLoad;
+    window.switchAuthMode = switchAuthMode;
+    window.testFirebaseConnection = testFirebaseConnection;
 }
