@@ -13,17 +13,91 @@ window.firebaseInitialized = false;
 window.localAuthEnabled = true; // 启用本地认证
 console.log('Auth.js loaded, starting Firebase initialization');
 
-// 直接在HTML中添加Firebase SDK脚本，而不是动态加载
+// 主动加载Firebase SDK
+window.addEventListener('load', function() {
+    loadFirebaseSDK();
+});
+
+// 加载Firebase SDK函数
+function loadFirebaseSDK() {
+    console.log('Loading Firebase SDK...');
+    
+    // 检查网络连接
+    const isOnline = navigator.onLine;
+    console.log('Network status:', isOnline ? 'Online' : 'Offline');
+    
+    if (!isOnline) {
+        console.warn('Offline mode detected, will use local storage');
+        return;
+    }
+    
+    // 并行加载所有Firebase SDK
+    const loadPromises = [
+        loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js'),
+        loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js'),
+        loadScript('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
+    ];
+    
+    Promise.allSettled(loadPromises)
+        .then(results => {
+            const failed = results.filter(r => r.status === 'rejected');
+            if (failed.length === 0) {
+                console.log('All Firebase SDKs loaded successfully from primary CDN');
+            } else {
+                console.error(`${failed.length} Firebase SDKs failed to load from primary CDN`);
+                console.log('Trying alternative CDN...');
+                loadFirebaseSDKFromAlternativeCDN();
+            }
+        });
+}
+
+// 从备用CDN加载Firebase SDK
+function loadFirebaseSDKFromAlternativeCDN() {
+    console.log('Loading Firebase SDK from alternative CDN...');
+    
+    const loadPromises = [
+        loadScript('https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-app.js'),
+        loadScript('https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-auth.js'),
+        loadScript('https://cdn.jsdelivr.net/npm/firebase@9.22.2/dist/firebase-firestore.js')
+    ];
+    
+    Promise.allSettled(loadPromises)
+        .then(results => {
+            const failed = results.filter(r => r.status === 'rejected');
+            if (failed.length === 0) {
+                console.log('All Firebase SDKs loaded successfully from alternative CDN');
+            } else {
+                console.error(`${failed.length} Firebase SDKs failed to load from alternative CDN`);
+                console.warn('Falling back to local storage mode');
+            }
+        });
+}
+
+// 加载脚本的辅助函数
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => {
+            console.log(`Script loaded: ${src}`);
+            resolve(src);
+        };
+        script.onerror = () => {
+            console.error(`Script failed to load: ${src}`);
+            reject(new Error(`Failed to load ${src}`));
+        };
+        document.head.appendChild(script);
+    });
+}
+
+// DOMContentLoaded事件处理
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded, checking Firebase...');
     
     // 检查Firebase是否已经加载
     if (typeof firebase === 'undefined') {
         console.error('Firebase SDK not loaded!');
-        // 检查网络连接状态
-        if (!navigator.onLine) {
-            console.error('Network connection not available');
-        }
+        
         // 创建一个警告元素来显示问题，但不阻止用户使用系统
         const warningElement = document.createElement('div');
         warningElement.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: orange; color: white; padding: 10px; text-align: center; z-index: 10000; font-weight: 500;';
