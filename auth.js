@@ -10,6 +10,7 @@ const authConfig = {
 
 // 初始化状态
 window.firebaseInitialized = false;
+window.localAuthEnabled = true; // 启用本地认证
 console.log('Auth.js loaded, starting Firebase initialization');
 
 // 直接在HTML中添加Firebase SDK脚本，而不是动态加载
@@ -19,11 +20,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // 检查Firebase是否已经加载
     if (typeof firebase === 'undefined') {
         console.error('Firebase SDK not loaded!');
-        // 创建一个错误元素来显示问题
-        const errorElement = document.createElement('div');
-        errorElement.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: red; color: white; padding: 10px; text-align: center; z-index: 10000;';
-        errorElement.textContent = 'Firebase SDK加载失败，请检查网络连接或防火墙设置';
-        document.body.appendChild(errorElement);
+        // 创建一个警告元素来显示问题，但不阻止用户使用系统
+        const warningElement = document.createElement('div');
+        warningElement.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: orange; color: white; padding: 10px; text-align: center; z-index: 10000;';
+        warningElement.textContent = 'Firebase SDK加载失败，系统将使用本地存储模式，数据仅保存在当前设备';
+        document.body.appendChild(warningElement);
+        
+        // 初始化本地认证
+        initializeLocalAuth();
     } else {
         console.log('Firebase SDK found, initializing...');
         initializeFirebase();
@@ -45,15 +49,42 @@ function initializeFirebase() {
     } catch (error) {
         console.error('Error initializing Firebase:', error);
         console.error('Error details:', error.message);
+        // 初始化本地认证作为降级方案
+        initializeLocalAuth();
     }
 }
 
-// 等待Firebase初始化
+// 初始化本地认证
+function initializeLocalAuth() {
+    console.log('Initializing local auth...');
+    // 本地用户存储
+    if (!localStorage.getItem('localUsers')) {
+        localStorage.setItem('localUsers', JSON.stringify({}));
+    }
+    // 检查本地登录状态
+    const currentUser = localStorage.getItem('currentLocalUser');
+    if (currentUser) {
+        console.log('Local user found:', currentUser);
+        document.dispatchEvent(new CustomEvent('userLoggedIn', { detail: { email: currentUser } }));
+    } else {
+        console.log('No local user logged in');
+        document.dispatchEvent(new CustomEvent('userLoggedOut'));
+    }
+}
+
+// 等待Firebase初始化（如果可用）
 function waitForFirebase() {
     return new Promise((resolve, reject) => {
         console.log('Starting waitForFirebase, current state:', window.firebaseInitialized);
         if (window.firebaseInitialized) {
             console.log('Firebase already initialized, resolving immediately');
+            resolve();
+            return;
+        }
+        
+        // 如果本地认证已启用，直接resolve
+        if (window.localAuthEnabled) {
+            console.log('Local auth enabled, resolving immediately');
             resolve();
             return;
         }
@@ -71,7 +102,12 @@ function waitForFirebase() {
             } else if (attempts >= maxAttempts) {
                 console.log('Firebase initialization timeout after', maxAttempts, 'attempts');
                 clearInterval(interval);
-                reject(new Error('Firebase initialization timeout'));
+                // 如果Firebase初始化超时，但本地认证已启用，仍然resolve
+                if (window.localAuthEnabled) {
+                    resolve();
+                } else {
+                    reject(new Error('Firebase initialization timeout'));
+                }
             }
         }, 1000);
     });
@@ -101,16 +137,37 @@ async function registerUser(email, password) {
         console.log('Starting registerUser with email:', email);
         await waitForFirebase();
         
-        if (!window.auth) {
-            console.error('registerUser: Firebase auth not initialized');
-            throw new Error('Firebase auth not initialized');
+        // 如果Firebase可用，使用Firebase注册
+        if (window.firebaseInitialized && window.auth) {
+            console.log('registerUser: Firebase auth available, creating user');
+            const userCredential = await window.auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            console.log('User registered:', user.email);
+            return user;
         }
-        
-        console.log('registerUser: Firebase auth available, creating user');
-        const userCredential = await window.auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-        console.log('User registered:', user.email);
-        return user;
+        // 否则使用本地认证
+        else if (window.localAuthEnabled) {
+            console.log('registerUser: Using local auth');
+            const localUsers = JSON.parse(localStorage.getItem('localUsers') || '{}');
+            
+            // 检查邮箱是否已存在
+            if (localUsers[email]) {
+                throw new Error('该邮箱已被注册');
+            }
+            
+            // 注册新用户
+            localUsers[email] = password; // 实际应用中应该加密密码
+            localStorage.setItem('localUsers', JSON.stringify(localUsers));
+            
+            // 自动登录
+            localStorage.setItem('currentLocalUser', email);
+            
+            console.log('Local user registered:', email);
+            return { email: email };
+        }
+        else {
+            throw new Error('No authentication method available');
+        }
     } catch (error) {
         console.error('Registration error:', error);
         console.error('Error details:', error.message);
@@ -123,14 +180,32 @@ async function loginUser(email, password) {
     try {
         await waitForFirebase();
         
-        if (!window.auth) {
-            throw new Error('Firebase auth not initialized');
+        // 如果Firebase可用，使用Firebase登录
+        if (window.firebaseInitialized && window.auth) {
+            const userCredential = await window.auth.signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            console.log('User logged in:', user.email);
+            return user;
         }
-        
-        const userCredential = await window.auth.signInWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-        console.log('User logged in:', user.email);
-        return user;
+        // 否则使用本地认证
+        else if (window.localAuthEnabled) {
+            console.log('loginUser: Using local auth');
+            const localUsers = JSON.parse(localStorage.getItem('localUsers') || '{}');
+            
+            // 检查用户是否存在且密码正确
+            if (!localUsers[email] || localUsers[email] !== password) {
+                throw new Error('邮箱或密码错误');
+            }
+            
+            // 登录成功
+            localStorage.setItem('currentLocalUser', email);
+            
+            console.log('Local user logged in:', email);
+            return { email: email };
+        }
+        else {
+            throw new Error('No authentication method available');
+        }
     } catch (error) {
         console.error('Login error:', error);
         throw error;
@@ -142,12 +217,17 @@ async function logoutUser() {
     try {
         await waitForFirebase();
         
-        if (!window.auth) {
-            throw new Error('Firebase auth not initialized');
+        // 如果Firebase可用，使用Firebase登出
+        if (window.firebaseInitialized && window.auth) {
+            await window.auth.signOut();
+            console.log('User logged out from Firebase');
+        }
+        // 无论如何，清除本地登录状态
+        if (window.localAuthEnabled) {
+            localStorage.removeItem('currentLocalUser');
+            console.log('Local user logged out');
         }
         
-        await window.auth.signOut();
-        console.log('User logged out');
         return;
     } catch (error) {
         console.error('Logout error:', error);
@@ -157,8 +237,9 @@ async function logoutUser() {
 
 // 同步数据到云端
 function syncDataWithCloud() {
-    if (!window.auth || !window.auth.currentUser) {
-        console.log('No user logged in, skipping sync');
+    // 只有在Firebase可用且用户已登录时才同步
+    if (!window.firebaseInitialized || !window.auth || !window.auth.currentUser) {
+        console.log('No user logged in or Firebase not available, skipping sync');
         return;
     }
     
@@ -188,8 +269,9 @@ function syncDataWithCloud() {
 
 // 从云端同步数据
 function syncDataFromCloud() {
-    if (!window.auth || !window.auth.currentUser) {
-        console.log('No user logged in, skipping sync');
+    // 只有在Firebase可用且用户已登录时才同步
+    if (!window.firebaseInitialized || !window.auth || !window.auth.currentUser) {
+        console.log('No user logged in or Firebase not available, skipping sync');
         return;
     }
     
