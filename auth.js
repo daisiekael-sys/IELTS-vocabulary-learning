@@ -11,6 +11,7 @@ const authConfig = {
 // 初始化状态
 window.firebaseInitialized = false;
 window.localAuthEnabled = true; // 启用本地认证
+window.useLocalStorageMode = false; // 标记是否使用本地存储模式
 console.log('Auth.js loaded, starting Firebase initialization');
 
 // 主动加载Firebase SDK
@@ -28,6 +29,7 @@ function loadFirebaseSDK() {
     // 在本地开发环境中，直接使用本地存储模式
     if (isTraeIDE) {
         console.log('Local development environment detected, using local storage mode');
+        window.useLocalStorageMode = true;
         return;
     }
     
@@ -37,6 +39,7 @@ function loadFirebaseSDK() {
     
     if (!isOnline) {
         console.warn('Offline mode detected, will use local storage');
+        window.useLocalStorageMode = true;
         return;
     }
     
@@ -92,12 +95,14 @@ function loadFirebaseSDKFromAlternativeCDN() {
                 console.error(`${failed.length} Firebase SDKs failed to load from alternative CDN`);
                 console.log('Failed results:', failed);
                 console.warn('Falling back to local storage mode');
+                window.useLocalStorageMode = true;
             }
         })
         .catch(error => {
             console.error('Error loading Firebase App from alternative CDN:', error);
             console.log('Error stack:', error.stack);
             console.warn('Falling back to local storage mode');
+            window.useLocalStorageMode = true;
         });
 }
 
@@ -133,9 +138,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const isLocalDev = window.location.href.includes('localhost:8000') || window.location.href.includes('127.0.0.1');
     console.log('Running in local development environment:', isLocalDev);
     
-    // 在本地开发环境中，直接使用本地存储模式，不显示错误信息
-    if (isLocalDev) {
-        console.log('Local development environment detected, initializing local auth directly');
+    // 检查是否已经决定使用本地存储模式
+    if (isLocalDev || window.useLocalStorageMode) {
+        console.log('Local storage mode enabled, initializing local auth directly');
         initializeLocalAuth();
         return;
     }
