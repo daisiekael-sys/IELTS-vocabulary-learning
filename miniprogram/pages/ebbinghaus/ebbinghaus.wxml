@@ -1,0 +1,164 @@
+<!-- 艾宾浩斯学习页面 -->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">艾宾浩斯记忆训练</text>
+    <text class="page-subtitle">基于遗忘曲线的智能复习系统</text>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-card">
+    <view class="stat-item">
+      <text class="stat-number">{{stats.totalMaster}}</text>
+      <text class="stat-label">已掌握</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-number">{{stats.totalError}}</text>
+      <text class="stat-label">需复习</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-number">{{stats.progress}}%</text>
+      <text class="stat-label">总进度</text>
+    </view>
+  </view>
+
+  <!-- 混合模式横条 -->
+  <view class="mixed-mode-bar {{currentCategory === 'mixed' ? 'active' : ''}}" bindtap="selectCategory" data-category="mixed">
+    <text class="mixed-icon">⭐</text>
+    <text class="mixed-text">混合模式</text>
+    <text class="mixed-count">全部 {{categoryStats.mixed || 475}} 词</text>
+  </view>
+
+  <!-- 分类选择 -->
+  <view class="category-section">
+    <text class="section-title">选择分类</text>
+    <view class="category-grid">
+      <view class="category-item {{currentCategory === 'tech' ? 'active' : ''}}" bindtap="selectCategory" data-category="tech">
+        <text class="category-icon">💻</text>
+        <text class="category-name">科技</text>
+        <text class="category-count">{{categoryStats.tech || 0}}词</text>
+      </view>
+      <view class="category-item {{currentCategory === 'culture' ? 'active' : ''}}" bindtap="selectCategory" data-category="culture">
+        <text class="category-icon">🎭</text>
+        <text class="category-name">文化</text>
+        <text class="category-count">{{categoryStats.culture || 0}}词</text>
+      </view>
+      <view class="category-item {{currentCategory === 'work' ? 'active' : ''}}" bindtap="selectCategory" data-category="work">
+        <text class="category-icon">💼</text>
+        <text class="category-name">工作</text>
+        <text class="category-count">{{categoryStats.work || 0}}词</text>
+      </view>
+      <view class="category-item {{currentCategory === 'traffic' ? 'active' : ''}}" bindtap="selectCategory" data-category="traffic">
+        <text class="category-icon">🚗</text>
+        <text class="category-name">交通</text>
+        <text class="category-count">{{categoryStats.traffic || 0}}词</text>
+      </view>
+      <view class="category-item {{currentCategory === 'media' ? 'active' : ''}}" bindtap="selectCategory" data-category="media">
+        <text class="category-icon">📺</text>
+        <text class="category-name">媒体</text>
+        <text class="category-count">{{categoryStats.media || 0}}词</text>
+      </view>
+      <view class="category-item {{currentCategory === 'society' ? 'active' : ''}}" bindtap="selectCategory" data-category="society">
+        <text class="category-icon">🏙️</text>
+        <text class="category-name">社会</text>
+        <text class="category-count">{{categoryStats.society || 0}}词</text>
+      </view>
+      <view class="category-item {{currentCategory === 'animal' ? 'active' : ''}}" bindtap="selectCategory" data-category="animal">
+        <text class="category-icon">🐾</text>
+        <text class="category-name">动物保护</text>
+        <text class="category-count">{{categoryStats.animal || 0}}词</text>
+      </view>
+      <view class="category-item {{currentCategory === 'spellError' ? 'active' : ''}}" bindtap="selectCategory" data-category="spellError">
+        <text class="category-icon">✏️</text>
+        <text class="category-name">易拼错词</text>
+        <text class="category-count">{{categoryStats.spellError || 0}}词</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学习模式 -->
+  <view class="learning-section" wx:if="{{currentCategory}}">
+    <view class="section-header">
+      <text class="section-title">{{isReviewMode ? '复习模式' : '学习模式'}}</text>
+      <view class="mode-toggle" bindtap="toggleLearningMode">
+        <text>{{isReviewMode ? '切换到学习' : '切换到复习'}}</text>
+      </view>
+    </view>
+
+    <!-- 当前单词卡片 -->
+    <view class="word-card" wx:if="{{currentWord}}">
+      <view class="word-header">
+        <text class="word-category">{{currentWord.categoryName}}</text>
+        <view class="difficulty-stars">
+          <text wx:for="{{currentWord.difficulty}}" wx:key="*this">⭐</text>
+        </view>
+      </view>
+      
+      <view class="word-content">
+        <text class="word-en-large">{{currentWord.en}}</text>
+        <text class="word-phonetic" wx:if="{{currentWord.phonetic}}">{{currentWord.phonetic}}</text>
+        
+        <!-- 中文释义（可切换显示） -->
+        <view class="cn-reveal" bindtap="toggleCnReveal">
+          <text class="word-cn-large {{showCn ? '' : 'hidden'}}">{{currentWord.cn}}</text>
+          <text class="reveal-hint" wx:if="{{!showCn}}">点击查看释义</text>
+        </view>
+      </view>
+
+      <!-- 例句 -->
+      <view class="example-section" wx:if="{{currentWord.example}}">
+        <text class="example-label">例句：</text>
+        <text class="example-text">{{currentWord.example}}</text>
+        <text class="example-cn" wx:if="{{showCn}}">{{currentWord.exampleCn}}</text>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="action-buttons">
+        <view class="btn-forget" bindtap="markForget">
+          <text>😰 忘记</text>
+        </view>
+        <view class="btn-vague" bindtap="markVague">
+          <text>🤔 模糊</text>
+        </view>
+        <view class="btn-remember" bindtap="markRemember">
+          <text>😊 记住</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:else>
+      <text class="empty-icon">🎉</text>
+      <text class="empty-text">该分类下的单词已学习完毕！</text>
+      <view class="btn-primary" bindtap="resetCategory">重新开始</view>
+    </view>
+
+    <!-- 进度条 -->
+    <view class="progress-bar" wx:if="{{currentWord}}">
+      <view class="progress-fill" style="width: {{learningProgress}}%"></view>
+      <text class="progress-text">{{currentIndex + 1}} / {{totalWords}}</text>
+    </view>
+  </view>
+
+  <!-- 复习列表 -->
+  <view class="review-list-section" wx:if="{{reviewList.length > 0}}">
+    <text class="section-title">待复习单词 ({{reviewList.length}})</text>
+    <scroll-view class="review-scroll" scroll-y>
+      <view class="review-item" wx:for="{{reviewList}}" wx:key="en">
+        <view class="review-word">
+          <text class="review-en">{{item.en}}</text>
+          <text class="review-cn">{{item.cn}}</text>
+        </view>
+        <text class="review-due">{{item.dueText}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 底部提示 -->
+  <view class="tips-section">
+    <text class="tips-title">💡 艾宾浩斯记忆提示</text>
+    <text class="tips-text">第1次复习：20分钟后 | 第2次：1小时后 | 第3次：9小时后 | 第4次：1天后 | 第5次：2天后 | 第6次：6天后 | 第7次：31天后</text>
+  </view>
+</view>

@@ -1,0 +1,128 @@
+<!-- 我的页面 -->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">我的学习</text>
+  </view>
+
+  <!-- 今日统计卡片 -->
+  <view class="today-stats-card">
+    <view class="today-title">📅 今日表现</view>
+    <view class="today-grid">
+      <view class="today-item">
+        <text class="today-num">{{todayStats.learned}}</text>
+        <text class="today-label">学习词数</text>
+      </view>
+      <view class="today-item">
+        <text class="today-num">{{todayStats.correct}}</text>
+        <text class="today-label">正确词数</text>
+      </view>
+      <view class="today-item">
+        <text class="today-num">{{todayStats.accuracy}}%</text>
+        <text class="today-label">正确率</text>
+      </view>
+    </view>
+    <view class="estimate-row" wx:if="{{todayStats.correct > 0}}">
+      <text class="estimate-text">按今天速度，预计 {{estimateDays}} 天完成</text>
+    </view>
+  </view>
+
+  <!-- 总进度卡片 -->
+  <view class="progress-card">
+    <view class="progress-title">📊 总进度</view>
+    <view class="progress-ring-wrapper">
+      <view class="progress-ring">
+        <view class="progress-inner">
+          <text class="progress-percent">{{totalProgress}}%</text>
+          <text class="progress-label">已掌握</text>
+        </view>
+      </view>
+    </view>
+    <view class="progress-detail">
+      <view class="detail-item">
+        <text class="detail-dot mastered"></text>
+        <text class="detail-label">已掌握</text>
+        <text class="detail-num">{{stats.mastered}} 词</text>
+      </view>
+      <view class="detail-item">
+        <text class="detail-dot learning"></text>
+        <text class="detail-label">学习中</text>
+        <text class="detail-num">{{stats.learning}} 词</text>
+      </view>
+      <view class="detail-item">
+        <text class="detail-dot new"></text>
+        <text class="detail-label">未学习</text>
+        <text class="detail-num">{{stats.new}} 词</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 数据同步 -->
+  <view class="sync-section">
+    <view class="section-title">🔄 数据同步</view>
+    <view class="sync-card">
+      <view class="sync-status">
+        <text class="sync-icon">☁️</text>
+        <view class="sync-info">
+          <text class="sync-label">Firebase 同步</text>
+          <text class="sync-time">{{isLoggedIn ? lastSyncTime : '未登录'}}</text>
+        </view>
+        <view class="login-badge logged-in" bindtap="setCustomUserId">
+          <text>已绑定</text>
+        </view>
+      </view>
+      
+      <!-- 一键同步按钮 -->
+      <view class="sync-main-btn {{isLoggedIn ? '' : 'disabled'}}" bindtap="syncData">
+        <text class="main-btn-icon">🔄</text>
+        <text class="main-btn-text">一键同步</text>
+        <text class="main-btn-hint">自动合并本地和云端数据</text>
+      </view>
+      
+      <view class="sync-divider"></view>
+      
+      <view class="sync-actions">
+        <view class="sync-btn upload {{isLoggedIn ? '' : 'disabled'}}" bindtap="uploadData">
+          <text class="btn-icon">↑</text>
+          <text class="btn-text">仅上传</text>
+        </view>
+        <view class="sync-btn download {{isLoggedIn ? '' : 'disabled'}}" bindtap="downloadData">
+          <text class="btn-icon">↓</text>
+          <text class="btn-text">仅下载</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 设置列表 -->
+  <view class="settings-section">
+    <view class="section-title">⚙️ 设置</view>
+    <view class="settings-list">
+      <view class="setting-item" bindtap="exportData">
+        <text class="setting-icon">📤</text>
+        <text class="setting-label">导出备份</text>
+        <text class="setting-arrow">›</text>
+      </view>
+      <view class="setting-item" bindtap="importData">
+        <text class="setting-icon">📥</text>
+        <text class="setting-label">导入备份</text>
+        <text class="setting-arrow">›</text>
+      </view>
+      <view class="setting-item" bindtap="clearCache">
+        <text class="setting-icon">🗑️</text>
+        <text class="setting-label">清除缓存</text>
+        <text class="setting-arrow">›</text>
+      </view>
+      <view class="setting-item danger" bindtap="resetProgress">
+        <text class="setting-icon">⚠️</text>
+        <text class="setting-label">重置所有进度</text>
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 版本信息 -->
+  <view class="version-info">
+    <text>IELTS词汇学习 v1.0.0</text>
+  </view>
+</view>

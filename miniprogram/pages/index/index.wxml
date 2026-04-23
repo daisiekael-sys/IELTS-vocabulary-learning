@@ -1,0 +1,40 @@
+<!-- 首页 -->
+<view class="container">
+  <view class="hero">
+    <text class="hero-title">雅思词汇学习中心</text>
+    <text class="hero-subtitle">选择适合你的词汇学习模式</text>
+  </view>
+
+  <view class="module-grid">
+    <!-- 艾宾浩斯宇宙版 -->
+    <view class="module-card" bindtap="goToEbbinghaus">
+      <view class="module-icon">📚</view>
+      <text class="module-title">艾宾浩斯宇宙版</text>
+      <text class="module-desc">基于艾宾浩斯遗忘曲线的智能词汇记忆系统，包含科技、文化、工作等多个分类，帮助你高效记忆雅思词汇。</text>
+      <view class="btn-primary module-btn">开始训练</view>
+    </view>
+
+    <!-- 高频同义替换 -->
+    <view class="module-card" bindtap="goToSynonyms">
+      <view class="module-icon">🔄</view>
+      <text class="module-title">高频同义替换</text>
+      <text class="module-desc">包含80多个词汇分组，提供高频同义替换和学术词汇，帮助你在写作中丰富表达，提升词汇多样性。</text>
+      <view class="btn-primary module-btn">开始学习</view>
+    </view>
+  </view>
+
+  <!-- 数据管理 -->
+  <view class="data-section">
+    <text class="section-title">数据管理</text>
+    <view class="btn-group">
+      <button class="btn-secondary" bindtap="exportData">📤 导出学习数据</button>
+      <button class="btn-secondary" bindtap="importData">📥 导入学习数据</button>
+      <button class="btn-secondary btn-danger" bindtap="clearData">🗑️ 清除所有数据</button>
+    </view>
+  </view>
+
+  <!-- 页脚 -->
+  <view class="footer">
+    <text>© 2026 雅思词汇学习中心 | 架构设计：艾宾浩斯宇宙版</text>
+  </view>
+</view>

@@ -4,15 +4,8 @@
  * 强制使用 Firebase Auth，不使用 localStorage 降级
  */
 
-// Firebase 项目配置
-const authConfig = {
-    apiKey: "AIzaSyA3zBg6XgHrFZgVfH86TxjnSlSzi44_Ekk",
-    authDomain: "synonymous-substitutions.firebaseapp.com",
-    projectId: "synonymous-substitutions",
-    storageBucket: "synonymous-substitutions.firebasestorage.app",
-    messagingSenderId: "183899195249",
-    appId: "1:183899195249:web:3d2e2bb9590df74cbfd8d0"
-};
+// Firebase 项目配置（从 firebase-config.js 加载，如未加载则使用空配置）
+const authConfig = window.authConfig || {};
 
 // 全局状态
 window.firebaseInitialized = false;
@@ -115,7 +108,10 @@ async function initFirebase() {
     window.auth.onAuthStateChanged(function(user) {
         if (user) {
             console.log('[Auth] User is logged in:', user.email);
-            document.dispatchEvent(new CustomEvent('userLoggedIn', { detail: user }));
+            // 登录后自动从云端同步数据
+            syncDataFromCloud().then(() => {
+                document.dispatchEvent(new CustomEvent('userLoggedIn', { detail: user }));
+            });
         } else {
             console.log('[Auth] No user logged in');
             document.dispatchEvent(new CustomEvent('userLoggedOut'));
@@ -174,10 +170,14 @@ async function logoutUser() {
 }
 
 /**
- * 同步数据到云端 Firestore
+ * 同步数据到云端 Firestore（节流：30秒内最多一次）
  */
-async function syncDataWithCloud() {
+let _lastSyncTime = 0;
+async function syncDataWithCloud(force) {
     if (!window.firebaseInitialized || !window.auth || !window.auth.currentUser) return;
+    const now = Date.now();
+    if (!force && now - _lastSyncTime < 30000) return; // 30s 节流
+    _lastSyncTime = now;
 
     const user = window.auth.currentUser;
     const localData = localStorage.getItem('ielts_learning_system');

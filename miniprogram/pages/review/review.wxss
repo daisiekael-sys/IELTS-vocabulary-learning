@@ -1,0 +1,413 @@
+/* 复习页面样式 */
+.container {
+  padding: 20rpx 24rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: #0a1028;
+}
+
+/* 页面标题 */
+.page-header {
+  text-align: center;
+  margin-bottom: 24rpx;
+  padding-top: 10rpx;
+}
+
+.page-title {
+  display: block;
+  font-size: 36rpx;
+  color: #c7d1ff;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.page-subtitle {
+  display: block;
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+/* 切换标签 */
+.tab-bar {
+  display: flex;
+  background: rgba(26, 35, 69, 0.6);
+  border-radius: 16rpx;
+  padding: 8rpx;
+  margin-bottom: 24rpx;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 0;
+  border-radius: 12rpx;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.tab-item.active {
+  background: rgba(106, 133, 255, 0.3);
+}
+
+.tab-text {
+  font-size: 28rpx;
+  color: #8a94a6;
+}
+
+.tab-item.active .tab-text {
+  color: #c7d1ff;
+  font-weight: 500;
+}
+
+.tab-badge {
+  position: absolute;
+  top: 10rpx;
+  right: 20rpx;
+  background: #ff7272;
+  color: #fff;
+  font-size: 20rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+}
+
+/* 复习内容区域 */
+.review-content {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 复习区块 */
+.review-section {
+  margin-bottom: 24rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: #aabbff;
+  font-weight: 500;
+}
+
+.section-count {
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+/* 标星卡片 */
+.star-card {
+  display: flex;
+  align-items: center;
+  background: rgba(26, 35, 69, 0.6);
+  border: 2rpx solid rgba(130, 150, 255, 0.2);
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+  margin-bottom: 16rpx;
+}
+
+.star-card.star-1 {
+  border-left: 6rpx solid #ffb957;
+}
+
+.star-card.star-2 {
+  border-left: 6rpx solid #ff7272;
+}
+
+.star-info {
+  flex: 1;
+}
+
+.star-label {
+  display: block;
+  font-size: 30rpx;
+  color: #c7d1ff;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.star-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+.star-stats {
+  display: flex;
+  align-items: baseline;
+  margin-right: 20rpx;
+}
+
+.star-num {
+  font-size: 40rpx;
+  color: #c7d1ff;
+  font-weight: bold;
+}
+
+.star-unit {
+  font-size: 24rpx;
+  color: #8a94a6;
+  margin-left: 4rpx;
+}
+
+.star-arrow {
+  font-size: 36rpx;
+  color: #8a94a6;
+}
+
+/* 错题卡片 */
+.error-card {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 100, 100, 0.1);
+  border: 2rpx solid rgba(255, 100, 100, 0.2);
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+}
+
+.error-info {
+  flex: 1;
+}
+
+.error-label {
+  display: block;
+  font-size: 30rpx;
+  color: #ff9999;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.error-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+.error-action {
+  display: flex;
+  align-items: center;
+}
+
+.error-num {
+  font-size: 36rpx;
+  color: #ff7272;
+  font-weight: bold;
+  margin-right: 16rpx;
+}
+
+.error-arrow {
+  font-size: 36rpx;
+  color: #8a94a6;
+}
+
+/* 高频错误卡片 */
+.highfreq-card {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 100, 100, 0.15);
+  border: 2rpx solid rgba(255, 100, 100, 0.3);
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+}
+
+.highfreq-info {
+  flex: 1;
+}
+
+.highfreq-label {
+  display: block;
+  font-size: 30rpx;
+  color: #ff9999;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.highfreq-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+.highfreq-action {
+  display: flex;
+  align-items: center;
+}
+
+.highfreq-num {
+  font-size: 36rpx;
+  color: #ff7272;
+  font-weight: bold;
+  margin-right: 16rpx;
+}
+
+.highfreq-arrow {
+  font-size: 36rpx;
+  color: #8a94a6;
+}
+
+/* 今日复习卡片 */
+.today-review-card {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 185, 87, 0.1);
+  border: 2rpx solid rgba(255, 185, 87, 0.2);
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+}
+
+.today-review-card.has-data {
+  background: linear-gradient(135deg, rgba(255, 185, 87, 0.15), rgba(255, 114, 114, 0.1));
+  border-color: rgba(255, 185, 87, 0.4);
+}
+
+.today-info {
+  flex: 1;
+}
+
+.today-label {
+  display: block;
+  font-size: 30rpx;
+  color: #ffb957;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.today-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+.today-action {
+  display: flex;
+  align-items: center;
+}
+
+.today-num {
+  font-size: 40rpx;
+  color: #ff7272;
+  font-weight: bold;
+  margin-right: 16rpx;
+}
+
+.today-arrow {
+  font-size: 36rpx;
+  color: #8a94a6;
+}
+
+.today-done {
+  width: 60rpx;
+  height: 60rpx;
+  background: rgba(95, 255, 151, 0.2);
+  border-radius: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #5fff97;
+}
+
+/* 历史错题卡片 */
+.history-card {
+  display: flex;
+  align-items: center;
+  background: rgba(26, 35, 69, 0.6);
+  border: 2rpx solid rgba(130, 150, 255, 0.2);
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+}
+
+.history-info {
+  flex: 1;
+}
+
+.history-label {
+  display: block;
+  font-size: 30rpx;
+  color: #c7d1ff;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.history-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+.history-action {
+  display: flex;
+  align-items: center;
+}
+
+.history-num {
+  font-size: 36rpx;
+  color: #c7d1ff;
+  font-weight: bold;
+  margin-right: 16rpx;
+}
+
+.history-arrow {
+  font-size: 36rpx;
+  color: #8a94a6;
+}
+
+/* 已掌握卡片 */
+.mastered-card {
+  display: flex;
+  align-items: center;
+  background: rgba(95, 255, 151, 0.1);
+  border: 2rpx solid rgba(95, 255, 151, 0.2);
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+}
+
+.mastered-info {
+  flex: 1;
+}
+
+.mastered-label {
+  display: block;
+  font-size: 30rpx;
+  color: #5fff97;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.mastered-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+.mastered-action {
+  display: flex;
+  align-items: center;
+}
+
+.mastered-num {
+  font-size: 36rpx;
+  color: #5fff97;
+  font-weight: bold;
+  margin-right: 16rpx;
+}
+
+.mastered-arrow {
+  font-size: 36rpx;
+  color: #8a94a6;
+}

@@ -1,0 +1,195 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- 柔和光晕 -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- 投影 -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#B8A0D0" flood-opacity="0.35"/>
+    </filter>
+    <!-- 书本投影 -->
+    <filter id="bookShadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="14" flood-color="#8060A0" flood-opacity="0.3"/>
+    </filter>
+    <!-- 左页渐变（薄荷绿） -->
+    <linearGradient id="lp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0FFF8"/>
+      <stop offset="50%" stop-color="#E2FFE8"/>
+      <stop offset="100%" stop-color="#D0F5E0"/>
+    </linearGradient>
+    <!-- 右页渐变（粉） -->
+    <linearGradient id="rp" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF5F8"/>
+      <stop offset="50%" stop-color="#FFE4EE"/>
+      <stop offset="100%" stop-color="#FFD0E5"/>
+    </linearGradient>
+    <!-- 书脊渐变（淡紫） -->
+    <linearGradient id="sp" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EDD8F5"/>
+      <stop offset="40%" stop-color="#F5ECFA"/>
+      <stop offset="60%" stop-color="#EDD8F5"/>
+      <stop offset="100%" stop-color="#E0C8EE"/>
+    </linearGradient>
+    <!-- 封底渐变 -->
+    <linearGradient id="bc" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8D8F0"/>
+      <stop offset="100%" stop-color="#D8C0E8"/>
+    </linearGradient>
+    <!-- 左页顶部打光（薄荷） -->
+    <linearGradient id="lpTop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.55)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <!-- 右页顶部打光（粉） -->
+    <linearGradient id="rpTop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.6)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <!-- 星星渐变（金色） -->
+    <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE0F0"/>
+      <stop offset="100%" stop-color="#FFB8D8"/>
+    </linearGradient>
+    <!-- 金色星星 -->
+    <linearGradient id="gsg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE566"/>
+      <stop offset="100%" stop-color="#F5A623"/>
+    </linearGradient>
+    <!-- 地面光斑 -->
+    <radialGradient id="floor" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#B0D8C0" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#B0D8C0" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 粉色地面光斑 -->
+    <radialGradient id="floorPink" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E8C0D8" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#E8C0D8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 背景光斑（薄荷绿） -->
+  <ellipse cx="120" cy="420" rx="90" ry="22" fill="url(#floor)"/>
+  <!-- 背景光斑（粉） -->
+  <ellipse cx="390" cy="420" rx="85" ry="20" fill="url(#floorPink)"/>
+
+  <!-- 整本书悬浮组 -->
+  <g filter="url(#shadow)" transform="translate(0,8)">
+
+    <!-- 左页封底（薰衣草） -->
+    <path d="M 70 55 Q 60 228 65 400 L 242 400 Q 240 228 242 55 Z" fill="url(#bc)"/>
+    <!-- 右页封底（薰衣草） -->
+    <path d="M 270 55 Q 272 228 270 400 L 447 400 Q 452 228 442 55 Z" fill="url(#bc)"/>
+
+    <!-- 左页粉色书页（→ 薄荷绿） -->
+    <path d="M 65 60 Q 58 228 62 398 L 244 398 Q 240 228 244 60 Z"
+          fill="url(#lp)"/>
+    <!-- 左页阴影 -->
+    <path d="M 220 65 Q 228 228 226 395 L 244 398 Q 240 228 244 60 Z"
+          fill="rgba(80,160,120,0.12)"/>
+    <!-- 左页打光 -->
+    <path d="M 65 60 Q 58 228 62 398 L 244 398 Q 240 228 244 60 Z"
+          fill="url(#lpTop)"/>
+
+    <!-- 左页文字区 -->
+    <g clip-path="url(#leftClip)">
+      <clipPath id="leftClip"><path d="M 72 65 Q 68 228 72 395 L 236 395 Q 232 228 236 65 Z"/></clipPath>
+      <!-- 左页文字行线 -->
+      <line x1="80" y1="162" x2="228" y2="158"/>
+      <line x1="80" y1="194" x2="228" y2="190"/>
+      <line x1="80" y1="226" x2="228" y2="222"/>
+      <line x1="80" y1="258" x2="228" y2="254"/>
+      <line x1="80" y1="290" x2="228" y2="286"/>
+      <line x1="80" y1="322" x2="228" y2="318"/>
+      <line x1="80" y1="354" x2="228" y2="350"/>
+    </g>
+
+    <!-- 左页 IELTS 文字（薄荷绿色调） -->
+    <text x="155" y="105" text-anchor="middle"
+          font-family="Georgia, serif" font-size="26" font-weight="800"
+          fill="#3DA870" letter-spacing="4">IELTS</text>
+    <text x="155" y="130" text-anchor="middle"
+          font-family="sans-serif" font-size="13"
+          fill="#7DC4A0">雅思词汇</text>
+
+    <!-- 左页绿色标签 -->
+    <rect x="76" y="165" width="50" height="22" rx="11" fill="rgba(100,220,160,0.25)" stroke="rgba(80,200,140,0.45)" stroke-width="1"/>
+    <text x="101" y="180" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="600" fill="#2E9058">2026</text>
+
+    <!-- 左页小星星（粉色→薄荷绿） -->
+    <polygon points="82,380 85,390 96,390 88,397 90,408 82,401 74,408 76,397 68,390 79,390"
+             fill="#C8F0DC" opacity="0.7"/>
+
+    <!-- 左页金色五角星（大） -->
+    <g transform="translate(155, 235)" filter="url(#glow)" opacity="0.95">
+      <polygon points="0,-26 7,-9 25,-9 11,3 16,21 0,10 -16,21 -11,3 -25,-9 -7,-9"
+        fill="url(#gsg)" stroke="#F5A623" stroke-width="1"/>
+      <polygon points="0,-15 5,-5 15,-5 8,1 10,13 0,7 -10,13 -8,1 -15,-5 -5,-5"
+        fill="rgba(255,255,255,0.5)"/>
+    </g>
+
+    <!-- 右页绿色书页（→ 粉色） -->
+    <path d="M 268 60 Q 276 228 272 398 L 450 398 Q 454 228 450 60 Z"
+          fill="url(#rp)"/>
+    <!-- 右页阴影 -->
+    <path d="M 286 65 Q 280 228 284 395 L 272 398 Q 276 228 268 60 Z"
+          fill="rgba(200,100,130,0.12)"/>
+    <!-- 右页打光 -->
+    <path d="M 268 60 Q 276 228 272 398 L 450 398 Q 454 228 450 60 Z"
+          fill="url(#rpTop)"/>
+
+    <!-- 右页文字区 -->
+    <g clip-path="url(#rightClip)">
+      <clipPath id="rightClip"><path d="M 276 65 Q 280 228 276 395 L 440 395 Q 444 228 440 65 Z"/></clipPath>
+      <!-- 右页文字行线 -->
+      <line x1="292" y1="158" x2="432" y2="162"/>
+      <line x1="292" y1="190" x2="432" y2="194"/>
+      <line x1="292" y1="222" x2="432" y2="226"/>
+      <line x1="292" y1="254" x2="432" y2="258"/>
+      <line x1="292" y1="286" x2="432" y2="290"/>
+      <line x1="292" y1="318" x2="432" y2="322"/>
+      <line x1="292" y1="350" x2="432" y2="354"/>
+    </g>
+
+    <!-- 右页 Word 文字（粉色色调） -->
+    <text x="360" y="105" text-anchor="middle"
+          font-family="Georgia, serif" font-size="26" font-weight="800"
+          fill="#FF7096" letter-spacing="4">Word</text>
+    <text x="360" y="130" text-anchor="middle"
+          font-family="sans-serif" font-size="13"
+          fill="#FFB0C8">核心词汇</text>
+
+    <!-- 右页桃子标签 -->
+    <rect x="300" y="165" width="48" height="22" rx="11" fill="rgba(255,170,120,0.25)" stroke="rgba(240,140,90,0.45)" stroke-width="1"/>
+    <text x="324" y="180" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="600" fill="#D06030">Core</text>
+
+    <!-- 右页粉色五角星（大） -->
+    <g transform="translate(360, 230)" filter="url(#glow)" opacity="0.95">
+      <polygon points="0,-26 7,-9 25,-9 11,3 16,21 0,10 -16,21 -11,3 -25,-9 -7,-9"
+        fill="url(#sg)" stroke="#FFB8D8" stroke-width="1"/>
+      <polygon points="0,-15 5,-5 15,-5 8,1 10,13 0,7 -10,13 -8,1 -15,-5 -5,-5"
+        fill="rgba(255,255,255,0.5)"/>
+    </g>
+
+    <!-- 书脊（淡紫色居中） -->
+    <path d="M 246 60 Q 248 228 246 395 L 266 395 Q 268 228 266 60 Z"
+      fill="url(#sp)"/>
+    <!-- 书脊中线高光 -->
+    <line x1="256" y1="60" x2="256" y2="395" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+
+    <!-- 页面顶部整体高光条 -->
+    <path d="M 35 65 L 477 65 L 477 12 Q 256 18 35 12 Z"
+      fill="rgba(255,255,255,0.25)"/>
+
+    <!-- 页脚虚线装饰 -->
+    <line x1="55" y1="375" x2="222" y2="375" stroke="rgba(100,180,140,0.25)" stroke-width="1" stroke-dasharray="4,4"/>
+    <line x1="290" y1="375" x2="457" y2="375" stroke="rgba(200,150,180,0.25)" stroke-width="1" stroke-dasharray="4,4"/>
+
+  </g>
+
+  <!-- 悬浮高光层（最顶层） -->
+  <ellipse cx="120" cy="130" rx="60" ry="18" fill="rgba(180,255,200,0.18)" transform="rotate(-20,120,130)"/>
+  <ellipse cx="390" cy="125" rx="55" ry="16" fill="rgba(255,200,220,0.2)" transform="rotate(20,390,125)"/>
+
+</svg>

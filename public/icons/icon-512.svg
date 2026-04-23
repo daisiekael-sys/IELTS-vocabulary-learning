@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <!-- 蓝色宇宙背景 -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A6E"/>
+      <stop offset="50%" stop-color="#152550"/>
+      <stop offset="100%" stop-color="#0C1835"/>
+    </linearGradient>
+
+    <!-- 星球金色渐变 -->
+    <radialGradient id="planetGrad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FFF0A0"/>
+      <stop offset="30%" stop-color="#FFD030"/>
+      <stop offset="65%" stop-color="#FFA020"/>
+      <stop offset="100%" stop-color="#D07010"/>
+    </radialGradient>
+
+    <!-- 光环渐变 -->
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFE566" stop-opacity="0.3"/>
+      <stop offset="25%" stop-color="#FFD020" stop-opacity="0.95"/>
+      <stop offset="50%" stop-color="#FFF8C0" stop-opacity="1"/>
+      <stop offset="75%" stop-color="#FFD020" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#FFE566" stop-opacity="0.3"/>
+    </linearGradient>
+
+    <!-- 柔和发光 -->
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 星光效果 -->
+    <filter id="starGlow">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 裁剪：隐藏下半圆（作为前方光环） -->
+    <clipPath id="frontHalf">
+      <rect x="0" y="256" width="512" height="256"/>
+    </clipPath>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="512" height="512" fill="url(#bgGrad)" rx="90" ry="90"/>
+
+  <!-- 背景星星 -->
+  <g fill="white" filter="url(#starGlow)">
+    <circle cx="55" cy="50" r="2" opacity="0.9"/>
+    <circle cx="120" cy="35" r="1.5" opacity="0.7"/>
+    <circle cx="195" cy="65" r="1.8" opacity="0.8"/>
+    <circle cx="320" cy="40" r="1.5" opacity="0.75"/>
+    <circle cx="415" cy="55" r="2" opacity="0.85"/>
+    <circle cx="460" cy="35" r="1.2" opacity="0.6"/>
+    <circle cx="45" cy="170" r="1.5" opacity="0.5"/>
+    <circle cx="470" cy="140" r="1.5" opacity="0.55"/>
+    <circle cx="40" cy="380" r="1.8" opacity="0.6"/>
+    <circle cx="100" cy="440" r="1.5" opacity="0.65"/>
+    <circle cx="450" cy="320" r="1.8" opacity="0.6"/>
+    <circle cx="410" cy="450" r="1.5" opacity="0.55"/>
+    <circle cx="170" cy="460" r="1.2" opacity="0.5"/>
+    <circle cx="350" cy="470" r="1.5" opacity="0.5"/>
+    <circle cx="250" cy="30" r="1" opacity="0.6"/>
+    <circle cx="65" cy="280" r="1" opacity="0.4"/>
+    <circle cx="440" cy="250" r="1.2" opacity="0.45"/>
+  </g>
+
+  <!-- 金色外边框 -->
+  <rect x="12" y="12" width="488" height="488" rx="78" ry="78"
+        fill="none" stroke="#FFD700" stroke-width="3" opacity="0.7"/>
+
+  <!-- 光环 - 后半部分（在星球后面） -->
+  <g transform="rotate(-15, 256, 258)">
+    <ellipse cx="256" cy="258" rx="210" ry="45"
+             fill="none" stroke="#C89010" stroke-width="16" opacity="0.6"/>
+  </g>
+
+  <!-- 星球 - 放大到约40% -->
+  <circle cx="256" cy="258" r="145" fill="url(#planetGrad)" filter="url(#softGlow)"/>
+
+  <!-- 星球高光 -->
+  <ellipse cx="215" cy="195" rx="65" ry="45"
+           fill="white" opacity="0.25" transform="rotate(-20, 215, 195)"/>
+
+  <!-- 光环 - 前半部分（在星球前面） -->
+  <g transform="rotate(-15, 256, 258)" clip-path="url(#frontHalf)">
+    <ellipse cx="256" cy="258" rx="210" ry="45"
+             fill="none" stroke="url(#ringGrad)" stroke-width="16"/>
+  </g>
+</svg>

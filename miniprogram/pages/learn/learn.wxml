@@ -1,0 +1,72 @@
+<!-- 学习页面 - 同义替换 + 艾宾浩斯入口 -->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">开始学习</text>
+    <text class="page-subtitle">选择学习方式，开启今日任务</text>
+  </view>
+
+  <!-- 今日进度卡片 -->
+  <view class="today-card">
+    <view class="today-title">📅 今日学习</view>
+    <view class="today-stats">
+      <view class="today-item">
+        <text class="today-num">{{todayStats.synonyms}}</text>
+        <text class="today-label">同义替换</text>
+      </view>
+      <view class="today-divider"></view>
+      <view class="today-item">
+        <text class="today-num">{{todayStats.ebbinghaus}}</text>
+        <text class="today-label">艾宾浩斯</text>
+      </view>
+      <view class="today-divider"></view>
+      <view class="today-item">
+        <text class="today-num">{{todayStats.total}}</text>
+        <text class="today-label">总计</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学习模式选择 -->
+  <view class="mode-section">
+    <!-- 同义替换模式 -->
+    <view class="mode-card" bindtap="goToSynonyms">
+      <view class="mode-icon">🔄</view>
+      <view class="mode-info">
+        <text class="mode-name">同义替换</text>
+        <text class="mode-desc">学习高频同义替换词组，提升写作表达</text>
+        <view class="mode-meta">
+          <text class="mode-count">{{synonymsCount}} 组词汇</text>
+          <text class="mode-progress">已学 {{synonymsProgress}}%</text>
+        </view>
+      </view>
+      <text class="mode-arrow">›</text>
+    </view>
+
+    <!-- 艾宾浩斯模式 -->
+    <view class="mode-card" bindtap="goToEbbinghaus">
+      <view class="mode-icon">🧠</view>
+      <view class="mode-info">
+        <text class="mode-name">艾宾浩斯记忆</text>
+        <text class="mode-desc">基于遗忘曲线的科学记忆训练</text>
+        <view class="mode-meta">
+          <text class="mode-count">{{ebbinghausCount}} 个词汇</text>
+          <text class="mode-progress">已学 {{ebbinghausProgress}}%</text>
+        </view>
+      </view>
+      <text class="mode-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 快速继续 -->
+  <view class="continue-section" wx:if="{{lastLearning}}">
+    <text class="section-title">继续学习</text>
+    <view class="continue-card" bindtap="continueLearning">
+      <view class="continue-info">
+        <text class="continue-mode">{{lastLearning.mode}}</text>
+        <text class="continue-detail">{{lastLearning.detail}}</text>
+      </view>
+      <view class="continue-btn">继续</view>
+    </view>
+  </view>
+</view>

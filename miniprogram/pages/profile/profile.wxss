@@ -1,0 +1,378 @@
+/* 我的页面样式 */
+.container {
+  padding: 20rpx 24rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: #0a1028;
+}
+
+/* 页面标题 */
+.page-header {
+  text-align: center;
+  margin-bottom: 24rpx;
+  padding-top: 10rpx;
+}
+
+.page-title {
+  font-size: 36rpx;
+  color: #c7d1ff;
+  font-weight: 500;
+}
+
+/* 今日统计卡片 */
+.today-stats-card {
+  background: linear-gradient(135deg, rgba(106, 133, 255, 0.2), rgba(74, 108, 255, 0.1));
+  border: 2rpx solid rgba(106, 133, 255, 0.3);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 24rpx;
+}
+
+.today-title {
+  font-size: 28rpx;
+  color: #aabbff;
+  margin-bottom: 24rpx;
+  text-align: center;
+}
+
+.today-grid {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20rpx;
+}
+
+.today-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.today-num {
+  font-size: 44rpx;
+  color: #c7d1ff;
+  font-weight: bold;
+  margin-bottom: 8rpx;
+}
+
+.today-label {
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+.estimate-row {
+  text-align: center;
+  padding-top: 20rpx;
+  border-top: 1rpx solid rgba(130, 150, 255, 0.2);
+}
+
+.estimate-text {
+  font-size: 26rpx;
+  color: #5fff97;
+}
+
+/* 总进度卡片 */
+.progress-card {
+  background: rgba(26, 35, 69, 0.6);
+  border: 2rpx solid rgba(130, 150, 255, 0.2);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 24rpx;
+}
+
+.progress-title {
+  font-size: 28rpx;
+  color: #aabbff;
+  margin-bottom: 24rpx;
+  text-align: center;
+}
+
+.progress-ring-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30rpx;
+}
+
+.progress-ring {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #5fff97 0deg,
+    #5fff97 calc(var(--progress, 0) * 3.6deg),
+    rgba(130, 150, 255, 0.2) calc(var(--progress, 0) * 3.6deg)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.progress-ring::before {
+  content: '';
+  position: absolute;
+  width: 160rpx;
+  height: 160rpx;
+  background: #0a1028;
+  border-radius: 50%;
+}
+
+.progress-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.progress-percent {
+  display: block;
+  font-size: 48rpx;
+  color: #5fff97;
+  font-weight: bold;
+}
+
+.progress-label {
+  display: block;
+  font-size: 24rpx;
+  color: #8a94a6;
+  margin-top: 4rpx;
+}
+
+.progress-detail {
+  display: flex;
+  justify-content: space-around;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.detail-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+}
+
+.detail-dot.mastered {
+  background: #5fff97;
+}
+
+.detail-dot.learning {
+  background: #ffb957;
+}
+
+.detail-dot.new {
+  background: rgba(130, 150, 255, 0.4);
+}
+
+.detail-label {
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+.detail-num {
+  font-size: 24rpx;
+  color: #c7d1ff;
+  font-weight: 500;
+}
+
+/* 同步区域 */
+.sync-section {
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 28rpx;
+  color: #aabbff;
+  margin-bottom: 16rpx;
+}
+
+.sync-card {
+  background: rgba(26, 35, 69, 0.6);
+  border: 2rpx solid rgba(130, 150, 255, 0.2);
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+}
+
+.sync-status {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid rgba(130, 150, 255, 0.1);
+}
+
+.sync-icon {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+}
+
+.sync-info {
+  flex: 1;
+}
+
+.sync-label {
+  display: block;
+  font-size: 30rpx;
+  color: #c7d1ff;
+  margin-bottom: 4rpx;
+}
+
+.sync-time {
+  display: block;
+  font-size: 24rpx;
+  color: #8a94a6;
+}
+
+.sync-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.sync-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 20rpx 0;
+  border-radius: 12rpx;
+}
+
+.sync-btn.upload {
+  background: rgba(106, 133, 255, 0.2);
+}
+
+.sync-btn.upload.disabled {
+  background: rgba(106, 133, 255, 0.05);
+  opacity: 0.5;
+}
+
+.sync-btn.download {
+  background: rgba(95, 255, 151, 0.15);
+}
+
+.sync-btn.download.disabled {
+  background: rgba(95, 255, 151, 0.05);
+  opacity: 0.5;
+}
+
+.btn-icon {
+  font-size: 28rpx;
+}
+
+.btn-text {
+  font-size: 28rpx;
+  color: #c7d1ff;
+}
+
+/* 登录状态标签 */
+.login-badge {
+  padding: 8rpx 16rpx;
+  background: rgba(255, 114, 114, 0.2);
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  color: #ff7272;
+}
+
+.login-badge.logged-in {
+  background: rgba(95, 255, 151, 0.2);
+  color: #5fff97;
+}
+
+/* 一键同步按钮 */
+.sync-main-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30rpx;
+  background: linear-gradient(135deg, rgba(106, 133, 255, 0.3), rgba(74, 108, 255, 0.2));
+  border: 2rpx solid rgba(106, 133, 255, 0.4);
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.sync-main-btn.disabled {
+  background: rgba(106, 133, 255, 0.1);
+  border-color: rgba(106, 133, 255, 0.2);
+  opacity: 0.6;
+}
+
+.main-btn-icon {
+  font-size: 48rpx;
+  margin-bottom: 8rpx;
+}
+
+.main-btn-text {
+  font-size: 32rpx;
+  color: #c7d1ff;
+  font-weight: 500;
+  margin-bottom: 4rpx;
+}
+
+.main-btn-hint {
+  font-size: 22rpx;
+  color: #8a94a6;
+}
+
+.sync-divider {
+  height: 1rpx;
+  background: rgba(130, 150, 255, 0.1);
+  margin: 20rpx 0;
+}
+
+/* 设置区域 */
+.settings-section {
+  margin-bottom: 30rpx;
+}
+
+.settings-list {
+  background: rgba(26, 35, 69, 0.6);
+  border: 2rpx solid rgba(130, 150, 255, 0.2);
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 30rpx;
+  border-bottom: 1rpx solid rgba(130, 150, 255, 0.1);
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-item.danger .setting-label {
+  color: #ff7272;
+}
+
+.setting-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.setting-label {
+  flex: 1;
+  font-size: 28rpx;
+  color: #c7d1ff;
+}
+
+.setting-arrow {
+  font-size: 32rpx;
+  color: #8a94a6;
+}
+
+/* 版本信息 */
+.version-info {
+  text-align: center;
+  padding: 20rpx 0;
+}
+
+.version-info text {
+  font-size: 22rpx;
+  color: #8a94a6;
+}

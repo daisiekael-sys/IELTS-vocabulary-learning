@@ -1,0 +1,47 @@
+# === 依赖 ===
+node_modules/
+**/node_modules/
+package-lock.json
+
+# === Firebase ===
+.firebase/
+.firebase-debug.log
+firebase-debug.*.log
+
+# === 工具 / IDE / AI 助手 ===
+.workbuddy/
+.agents/
+.claude/
+.trae/
+.vscode/
+.idea/
+skills-lock.json
+
+# === 生成的文件 ===
+generated-images/
+start-server.ps1
+
+# === 敏感配置 ===
+# Firebase 配置已抽离到 firebase-config.js，GitHub 上不提交
+# 部署到 Firebase Hosting 时需手动确保此文件存在
+public/firebase-config.js
+.env
+.env.local
+.env.*.local
+
+# === 小程序私有配置 ===
+miniprogram/project.private.config.json
+
+# === 小程序云函数依赖（本地开发需要，但不上传 GitHub） ===
+miniprogram/cloudfunctions/**/node_modules/
+miniprogram/cloudfunctions/**/package-lock.json
+
+# === 系统文件 ===
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+
+# === 构建产物 ===
+coverage/
+.nyc_output/

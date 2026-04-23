@@ -1,0 +1,94 @@
+<!-- 高频同义替换页面 -->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">高频同义替换与学术词汇</text>
+  </view>
+
+  <!-- 控制栏 -->
+  <view class="controls">
+    <!-- 单元选择 -->
+    <view class="control-group">
+      <text class="control-label">单元选择：</text>
+      <picker mode="selector" range="{{unitOptions}}" value="{{unitIndex}}" bindchange="onUnitChange">
+        <view class="picker">
+          {{unitOptions[unitIndex]}} <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 学习模式 -->
+    <view class="control-group">
+      <text class="control-label">学习模式：</text>
+      <view class="mode-buttons">
+        <view class="mode-btn {{currentMode === 'normal' ? 'active' : ''}}" bindtap="setMode" data-mode="normal">正常模式</view>
+        <view class="mode-btn {{currentMode === 'hide-cn' ? 'active' : ''}}" bindtap="setMode" data-mode="hide-cn">隐藏中文</view>
+      </view>
+    </view>
+
+    <!-- 过滤选项 -->
+    <view class="control-group">
+      <text class="control-label">过滤：</text>
+      <view class="filter-buttons">
+        <view class="filter-btn {{currentFilter === 'all' ? 'active' : ''}}" bindtap="setFilter" data-filter="all">全部</view>
+        <view class="filter-btn {{currentFilter === 'starred' ? 'active' : ''}}" bindtap="setFilter" data-filter="starred">带星词汇</view>
+        <view class="filter-btn {{currentFilter === 'starred-single' ? 'active' : ''}}" bindtap="setFilter" data-filter="starred-single">单星词汇</view>
+        <view class="filter-btn {{currentFilter === 'starred-double' ? 'active' : ''}}" bindtap="setFilter" data-filter="starred-double">双星词汇</view>
+      </view>
+    </view>
+
+    <!-- 重置星标 -->
+    <view class="control-group">
+      <view class="btn-secondary" bindtap="resetStars">重置星标</view>
+    </view>
+  </view>
+
+  <!-- 模式指示器 -->
+  <view class="mode-indicator {{currentMode === 'hide-cn' ? 'mode-hide' : 'mode-normal'}}" bindtap="toggleMode">
+    <text>{{currentMode === 'hide-cn' ? '🔒 隐藏中文' : '📖 正常模式'}}</text>
+  </view>
+
+  <!-- 词汇列表 -->
+  <scroll-view class="vocabulary-scroll" scroll-y enhanced show-scrollbar>
+    <view class="vocabulary-list">
+      <block wx:for="{{displayData}}" wx:key="unitIndex" wx:for-item="unit">
+        <!-- 单元标题 -->
+        <view class="unit-section" wx:if="{{unit.show}}">
+          <view class="unit-title">{{unit.unit}}</view>
+          
+          <block wx:for="{{unit.categories}}" wx:key="groupIndex" wx:for-item="category">
+            <!-- 分组 -->
+            <view class="group-section" wx:if="{{category.show}}">
+              <view class="group-header">
+                <text class="group-title">{{category.group}}</text>
+                <text class="word-count">({{category.words.length}}个词)</text>
+              </view>
+              
+              <view class="word-list">
+                <block wx:for="{{category.words}}" wx:key="wordKey" wx:for-item="word">
+                  <view class="word-item {{word.starClass}}" wx:if="{{word.show}}">
+                    <view class="word-content" bindtap="toggleWordReveal" data-word="{{word}}">
+                      <text class="word-en">{{word.en}}</text>
+                      <text class="word-cn {{currentMode === 'hide-cn' && !word.revealed ? 'hidden' : ''}} {{word.revealed ? 'revealed' : ''}}">{{word.cn}}</text>
+                    </view>
+                    <view class="star-btn {{word.starClass}}" bindtap="toggleStar" data-word="{{word}}">
+                      <text>{{word.starIcon}}</text>
+                    </view>
+                  </view>
+                </block>
+              </view>
+            </view>
+          </block>
+        </view>
+      </block>
+    </view>
+    
+    <!-- 底部留白 -->
+    <view style="height: 100rpx;"></view>
+  </scroll-view>
+
+  <!-- 回到顶部按钮 -->
+  <view class="scroll-top-btn {{showScrollTop ? 'visible' : ''}}" bindtap="scrollToTop">
+    <text>↑</text>
+  </view>
+</view>

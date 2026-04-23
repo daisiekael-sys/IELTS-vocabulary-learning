@@ -1,0 +1,131 @@
+/* 全局样式 */
+page {
+  background: #0a1028;
+  background-image: radial-gradient(circle at 50% 50%, #1a2345 0%, #050714 100%);
+  color: #e6edf7;
+  font-family: "Microsoft YaHei", Arial, sans-serif;
+  min-height: 100vh;
+}
+
+/* 容器样式 */
+.container {
+  padding: 20rpx 30rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* 标题样式 */
+.title {
+  font-size: 36rpx;
+  color: #c7d1ff;
+  text-align: center;
+  margin: 30rpx 0;
+  text-shadow: 0 0 15rpx rgba(130, 150, 255, 0.5);
+}
+
+/* 卡片样式 */
+.card {
+  background: rgba(26, 35, 69, 0.6);
+  border: 1rpx solid rgba(130, 150, 255, 0.2);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+/* 按钮样式 */
+.btn-primary {
+  background: linear-gradient(90deg, #6a85ff, #4a6cff);
+  color: #fff;
+  border-radius: 40rpx;
+  padding: 20rpx 40rpx;
+  font-size: 28rpx;
+  border: none;
+  text-align: center;
+}
+
+.btn-primary::after {
+  border: none;
+}
+
+.btn-secondary {
+  background: rgba(106, 133, 255, 0.2);
+  color: #aabbff;
+  border: 1rpx solid rgba(130, 150, 255, 0.3);
+  border-radius: 40rpx;
+  padding: 16rpx 32rpx;
+  font-size: 26rpx;
+}
+
+.btn-secondary::after {
+  border: none;
+}
+
+.btn-active {
+  background: linear-gradient(90deg, #5fff97, #3bff7f);
+  color: #0e2212;
+}
+
+/* 输入框样式 */
+.input {
+  background: rgba(26, 35, 69, 0.7);
+  border: 1rpx solid rgba(130, 150, 255, 0.3);
+  border-radius: 10rpx;
+  padding: 20rpx;
+  color: #e6edf7;
+  font-size: 28rpx;
+}
+
+/* 文本颜色 */
+.text-primary { color: #c7d1ff; }
+.text-secondary { color: #aabbff; }
+.text-muted { color: #8a94a6; }
+
+/* 间距 */
+.mt-10 { margin-top: 10rpx; }
+.mt-20 { margin-top: 20rpx; }
+.mt-30 { margin-top: 30rpx; }
+.mb-10 { margin-bottom: 10rpx; }
+.mb-20 { margin-bottom: 20rpx; }
+.mb-30 { margin-bottom: 30rpx; }
+
+/* Flex布局 */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.flex-wrap { flex-wrap: wrap; }
+.gap-10 { gap: 10rpx; }
+.gap-20 { gap: 20rpx; }
+
+/* 滚动区域 */
+.scroll-view {
+  height: calc(100vh - 200rpx);
+}
+
+/* 标签样式 */
+.tag {
+  display: inline-block;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  margin-right: 10rpx;
+}
+
+.tag-primary {
+  background: rgba(106, 133, 255, 0.2);
+  color: #aabbff;
+  border: 1rpx solid rgba(130, 150, 255, 0.3);
+}
+
+.tag-starred {
+  background: rgba(255, 185, 87, 0.2);
+  color: #ffb957;
+  border: 1rpx solid rgba(255, 185, 87, 0.4);
+}
+
+.tag-starred-double {
+  background: rgba(255, 128, 74, 0.2);
+  color: #ff804a;
+  border: 1rpx solid rgba(255, 128, 74, 0.4);
+}

@@ -1,0 +1,21 @@
+# Firebase Hosting 部署 - push 到 main 时自动部署
+# 项目为纯静态文件，无需构建步骤
+
+name: Deploy to Firebase Hosting on merge
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create firebase-config.js from secret
+        run: echo "${{ secrets.FIREBASE_CONFIG_JS }}" > public/firebase-config.js
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SYNONYMOUS_SUBSTITUTIONS }}
+          channelId: live
+          projectId: synonymous-substitutions

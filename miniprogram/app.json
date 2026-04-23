@@ -1,0 +1,39 @@
+{
+  "pages": [
+    "pages/learn/learn",
+    "pages/review/review",
+    "pages/profile/profile",
+    "pages/synonyms/synonyms",
+    "pages/ebbinghaus/ebbinghaus"
+  ],
+  "cloud": true,
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#0a1028",
+    "navigationBarTitleText": "雅思词汇学习",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0a1028"
+  },
+  "tabBar": {
+    "color": "#8a94a6",
+    "selectedColor": "#6a85ff",
+    "backgroundColor": "#0a1028",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/learn/learn",
+        "text": "学习"
+      },
+      {
+        "pagePath": "pages/review/review",
+        "text": "复习"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

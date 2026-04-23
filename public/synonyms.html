@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>高频同义替换与学术词汇</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <!-- PWA & iOS 支持 -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a2345">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IELTS词汇">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png">
+    <!-- 自定义脚本 -->
+    <script src="config.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="vocabulary_data.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        body {
+            background: #0a1028;
+            background-image: radial-gradient(circle at 50% 50%, #1a2345 0%, #050714 100%);
+            color: #e6edf7;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: rgba(18, 28, 58, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(100, 120, 255, 0.2);
+            padding: 40px;
+            border: 1px solid rgba(130, 150, 255, 0.2);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                margin: 10px auto;
+                padding: 16px 12px;
+                border-radius: 12px;
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #c7d1ff;
+            text-shadow: 0 0 15px rgba(130, 150, 255, 0.5);
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.3rem;
+                margin-bottom: 16px;
+                margin-top: 8px;
+            }
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 640px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+
+            .control-group {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .control-group label {
+                font-size: 13px;
+                min-width: 70px;
+            }
+
+            select {
+                flex: 1;
+                min-width: 120px;
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            button {
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #6a85ff, #4a6cff);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #5a75ff, #3a5cff);
+            transform: scale(1.05);
+        }
+
+        select {
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(130, 150, 255, 0.3);
+            background: rgba(26, 35, 69, 0.7);
+            color: #e6edf7;
+            font-size: 15px;
+            outline: none;
+            min-width: 140px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4"%3E%3Cpath fill="%23ffffff" d="M287 69.4a17.6 17.6 0 0 0-13-5.4H18.4c-5 0-9.3 1.8-12.9 5.4A17.6 17.6 0 0 0 0 82.2c0 5 1.8 9.3 5.4 12.9l128 127.9c3.6 3.6 7.8 5.4 12.8 5.4s9.2-1.8 12.8-5.4L287 95c3.5-3.5 5.4-7.8 5.4-12.8 0-5-1.9-9.2-5.5-12.8z"/%3E%3C/svg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 10px;
+            padding-right: 30px;
+        }
+
+        select:hover {
+            border-color: rgba(130, 150, 255, 0.5);
+        }
+
+        select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(106, 133, 255, 0.5);
+        }
+
+        select option {
+            background-color: #1a2345 !important;
+            color: white !important;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        select option:hover {
+            background-color: #3a5cff !important;
+        }
+
+        select option:checked {
+            background-color: #4a6cff !important;
+        }
+
+        /* 为下拉菜单添加圆角和过渡效果 */
+        select::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        select::-webkit-scrollbar-track {
+            background: #1a2345;
+            border-radius: 4px;
+        }
+
+        select::-webkit-scrollbar-thumb {
+            background: #4a6cff;
+            border-radius: 4px;
+        }
+
+        select::-webkit-scrollbar-thumb:hover {
+            background: #6a85ff;
+        }
+
+        button.active {
+            background: linear-gradient(90deg, #5fff97, #3bff7f);
+            color: #0e2212;
+        }
+
+        .group {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(26, 35, 69, 0.5);
+            border: 1px solid rgba(130, 150, 255, 0.2);
+            border-radius: 12px;
+        }
+
+        .unit h2 {
+            color: #c7d1ff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(130, 150, 255, 0.3);
+        }
+
+        .group h3 {
+            color: #aabbff;
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media (max-width: 640px) {
+            .group {
+                padding: 14px;
+                margin-bottom: 16px;
+                border-radius: 10px;
+            }
+
+            .unit h2 {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+
+            .group h3 {
+                font-size: 0.95rem;
+                margin-bottom: 10px;
+            }
+
+            .word-count {
+                font-size: 12px;
+            }
+        }
+
+        .word-count {
+            font-size: 14px;
+            color: #aabbff;
+            font-weight: normal;
+        }
+
+        .word-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 640px) {
+            .word-list {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+
+        .word-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(26, 35, 69, 0.3);
+            border: 1px solid rgba(130, 150, 255, 0.1);
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .word-item:hover {
+            background: rgba(26, 35, 69, 0.6);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 640px) {
+            .word-item {
+                padding: 12px 14px;
+                min-height: 48px;
+            }
+
+            .word-en {
+                font-size: 15px;
+            }
+
+            .word-cn {
+                font-size: 13px;
+                max-width: 50%;
+                text-align: right;
+            }
+
+            .star-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+                margin-left: 8px;
+            }
+        }
+
+        .word-item.starred {
+            background: rgba(255, 185, 87, 0.2);
+            border-color: rgba(255, 185, 87, 0.4);
+        }
+
+        .word-item.starred-double {
+            background: rgba(255, 128, 74, 0.2);
+            border-color: rgba(255, 128, 74, 0.4);
+        }
+
+        .word-en {
+            font-weight: bold;
+            color: #d6e0ff;
+        }
+
+        .word-cn {
+            color: #aabbff;
+        }
+
+        .word-cn.hidden {
+            opacity: 0;
+            user-select: none;
+            transition: opacity 0.3s;
+            cursor: pointer;
+        }
+
+        .word-cn.hidden.revealed {
+            opacity: 1;
+            color: #5fff97;
+            text-shadow: 0 0 8px rgba(95, 255, 151, 0.4);
+        }
+
+        /* 快捷键提示条 */
+        .shortcut-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 35, 69, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(130, 150, 255, 0.3);
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-size: 13px;
+            color: #aabbff;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .shortcut-hint.hidden-hint {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+            pointer-events: none;
+        }
+
+        .shortcut-hint kbd {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(106, 133, 255, 0.3);
+            border: 1px solid rgba(130, 150, 255, 0.5);
+            border-radius: 4px;
+            font-family: "Microsoft YaHei", monospace;
+            font-size: 12px;
+            color: #c7d1ff;
+            margin: 0 2px;
+        }
+
+        .shortcut-hint .separator {
+            width: 1px;
+            height: 16px;
+            background: rgba(130, 150, 255, 0.3);
+        }
+
+        @media (max-width: 640px) {
+            .shortcut-hint {
+                display: none;
+            }
+
+            .mode-indicator {
+                position: fixed;
+                top: 100px;
+                right: 0;
+                padding: 4px 8px 4px 10px;
+                font-size: 10px;
+                border-radius: 10px 0 0 10px;
+                pointer-events: auto;
+                cursor: pointer;
+                z-index: 1001;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border-right: none;
+            }
+
+            .mode-indicator::before {
+                content: '👁 ';
+            }
+
+            /* 左侧小标签 - 回到顶部 */
+            .scroll-top-btn {
+                position: fixed;
+                top: 84px;
+                left: 0px;
+                height: 18px;
+                width: 24px;
+                padding: 0;
+                background: linear-gradient(135deg, #6a85ff, #4a6cff);
+                color: #fff;
+                border: none;
+                border-radius: 0;
+                cursor: pointer;
+                z-index: 1001;
+                font-size: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 2px 2px 6px rgba(106, 133, 255, 0.3);
+                clip-path: polygon(0 0, 70% 0, 100% 50%, 70% 100%, 0 100%);
+                opacity: 0;
+                visibility: hidden;
+                transform: translateX(-100%);
+                transition: all 0.3s ease;
+            }
+
+            .scroll-top-btn.visible {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(0);
+            }
+
+            /* 向上箭头 */
+            .scroll-top-btn::before {
+                content: '↑';
+                font-size: 12px;
+                font-weight: bold;
+                margin-right: 4px;
+            }
+
+            /* 点击按钮时的背景遮罩 */
+            .ui-overlay-active::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            }
+
+            .ui-overlay-active.show-overlay::before {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            /* 按钮激活状态 - 置于遮罩之上 */
+            .back-btn.active-ui,
+            .scroll-top-btn.active-ui,
+            .mode-indicator.active-ui {
+                z-index: 1002;
+                transform: scale(1.05);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        /* 模式状态指示器 */
+        .mode-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 999;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .mode-indicator.mode-normal-indicator {
+            background: rgba(106, 133, 255, 0.2);
+            border: 1px solid rgba(106, 133, 255, 0.4);
+            color: #aabbff;
+        }
+
+        .mode-indicator.mode-hide-indicator {
+            background: rgba(255, 185, 87, 0.2);
+            border: 1px solid rgba(255, 185, 87, 0.4);
+            color: #ffb957;
+        }
+
+        .star-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #6677cc;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+        }
+
+        .star-btn.starred {
+            color: #ffb957;
+        }
+
+        .star-btn.starred-double {
+            color: #ff804a;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section label {
+            margin-right: 10px;
+            color: #aabbff;
+        }
+
+        .special-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(26, 35, 69, 0.5);
+            border: 1px solid rgba(130, 150, 255, 0.2);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .special-section h3 {
+            color: #c7d1ff;
+            margin-bottom: 15px;
+        }
+
+        .special-section button {
+            background: linear-gradient(90deg, #8899ff, #6677cc);
+            margin: 0 10px;
+        }
+
+        .special-section button:hover {
+            background: linear-gradient(90deg, #7788ee, #5566bb);
+        }
+
+        /* 桌面端返回按钮 */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333333;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+            font-weight: 500;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-btn::after {
+            content: '‹';
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #ffed4e, #ffd700);
+            transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.6);
+        }
+
+        /* 桌面端滚动隐藏/显示效果 */
+        .back-btn.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-20px);
+        }
+
+        /* 桌面端回到顶部旗子标签（左侧） */
+        .scroll-top-flag {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%) translateX(-100%);
+            background: linear-gradient(135deg, #6a85ff, #4a6cff);
+            color: #fff;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            z-index: 1000;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            padding: 16px 8px;
+            box-shadow: 2px 2px 8px rgba(106, 133, 255, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, width 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .scroll-top-flag .flag-arrow {
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .scroll-top-flag .flag-text {
+            font-size: 11px;
+            letter-spacing: 3px;
+        }
+
+        .scroll-top-flag.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        /* 悬停效果：整体变宽，像被拉出但未拉断 */
+        .scroll-top-flag:hover {
+            box-shadow: 4px 4px 16px rgba(106, 133, 255, 0.6);
+            padding: 16px 12px 16px 8px;
+        }
+
+        .scroll-top-flag:active {
+            padding: 16px 8px;
+        }
+
+        @media (max-width: 640px) {
+            .scroll-top-flag {
+                display: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            /* 左侧小标签 - 返回键 */
+            .back-btn {
+                position: fixed;
+                top: 45px;
+                left: 0px;
+                height: 18px;
+                width: 20px;
+                padding: 0;
+                background: linear-gradient(135deg, #ffd700, #ffed4e);
+                color: #333;
+                border: none;
+                border-radius: 0;
+                cursor: pointer;
+                z-index: 1001;
+                font-size: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 2px 2px 6px rgba(255, 215, 0, 0.3);
+                clip-path: polygon(0 0, 70% 0, 100% 50%, 70% 100%, 0 100%);
+                transform: none;
+            }
+
+            /* 三层燕尾纹理 - 朝右 */
+            .back-btn::before {
+                content: '';
+                position: absolute;
+                right: 2px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 8px;
+                height: 12px;
+                background: linear-gradient(90deg, 
+                    transparent 0%, transparent 15%,
+                    #b8860b 15%, #b8860b 30%,
+                    transparent 30%, transparent 50%,
+                    #b8860b 50%, #b8860b 65%,
+                    transparent 65%, transparent 85%,
+                    #b8860b 85%, #b8860b 100%
+                );
+                clip-path: polygon(100% 0, 0 50%, 100% 100%);
+            }
+
+            /* 去掉黑色符号 */
+            .back-btn::after {
+                content: none;
+            }
+
+            .back-btn:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>applyConfig();</script>
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='index.html'"></button>
+        <h1>高频同义替换与学术词汇</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="unit-select">单元选择：</label>
+                <select id="unit-select">
+                    <option value="all">全部单元</option>
+                    <option value="0">第一单元</option>
+                    <option value="1">第二单元</option>
+                    <option value="2">第三单元</option>
+                    <option value="3">第四单元</option>
+                    <option value="4">第五单元</option>
+                    <option value="5">第六单元</option>
+                    <option value="6">第七单元</option>
+                    <option value="7">第八单元</option>
+                    <option value="8">第九单元</option>
+                    <option value="9">第十单元</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="mode">学习模式：</label>
+                <button id="mode-normal" class="active">正常模式</button>
+                <button id="mode-hide-cn">隐藏中文</button>
+            </div>
+            <div class="control-group">
+                <label for="filter">过滤：</label>
+                <button id="filter-all" class="active">全部</button>
+                <button id="filter-starred">带星词汇</button>
+                <button id="filter-starred-single">单星词汇</button>
+                <button id="filter-starred-double">双星词汇</button>
+            </div>
+            <div class="control-group">
+                <button id="reset-stars">重置星标</button>
+            </div>
+        </div>
+        
+
+        
+        <div id="vocabulary-container"></div>
+    </div>
+
+    <!-- 快捷键提示条 -->
+    <div class="shortcut-hint" id="shortcutHint">
+        <span><kbd>Space</kbd> 切换中文显示/隐藏</span>
+        <div class="separator"></div>
+        <span>隐藏模式下点击单个词可临时显示</span>
+    </div>
+
+    <!-- 模式状态指示器 -->
+    <div class="mode-indicator mode-normal-indicator" id="modeIndicator" onclick="toggleModeFromIndicator()">📖 正常模式</div>
+
+    <!-- 回到顶部按钮（移动端） -->
+    <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()">顶部</button>
+
+    <!-- 回到顶部按钮（桌面端） -->
+    <button class="scroll-top-flag" id="scrollTopFlag" onclick="scrollToTop()">
+        <span class="flag-arrow">↑</span>
+        <span class="flag-text">顶部</span>
+    </button>
+    
+    <script>
+        // 全局变量
+        let currentUnit = 'all';
+        let currentMode = 'normal';
+        let currentFilter = 'all';
+
+        // 本地存储功能 - 使用统一存储结构
+        const STORAGE_KEY = 'ielts_learning_system';
+        
+        function getStorageData() {
+            try {
+                let d = localStorage.getItem(STORAGE_KEY);
+                return d ? JSON.parse(d) : {
+                    ebbinghaus: {
+                        masterMap: {},
+                        stats: {totalError: 0, totalMaster: 0},
+                        errors: [],
+                        memory: {}
+                    },
+                    synonyms: {
+                        starred: {}
+                    },
+                    microbe: {
+                        starred: {}
+                    }
+                };
+            } catch (error) {
+                console.error('Error getting storage data:', error);
+                return {
+                    ebbinghaus: {
+                        masterMap: {},
+                        stats: {totalError: 0, totalMaster: 0},
+                        errors: [],
+                        memory: {}
+                    },
+                    synonyms: {
+                        starred: {}
+                    },
+                    microbe: {
+                        starred: {}
+                    }
+                };
+            }
+        }
+        
+        function setStorageData(data) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                // 每次保存本地数据后自动同步到云端（节流保护，30s 内最多一次）
+                if (typeof syncDataWithCloud === 'function') {
+                    syncDataWithCloud();
+                }
+                return true;
+            } catch (error) {
+                console.error('Error setting storage data:', error);
+                return false;
+            }
+        }
+        
+        function getStarredWords() {
+            const data = getStorageData();
+            return data.synonyms.starred || {};
+        }
+
+        function saveStarredWords(starred) {
+            const data = getStorageData();
+            data.synonyms.starred = starred;
+            return setStorageData(data);
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            renderVocabulary();
+            setupEventListeners();
+        });
+
+        // 渲染词汇
+        function renderVocabulary() {
+            const container = document.getElementById('vocabulary-container');
+            container.innerHTML = '';
+            const starredWords = getStarredWords();
+
+            // 获取当前单元数据
+            const unitsToRender = currentUnit === 'all' 
+                ? vocabularyData 
+                : [vocabularyData[parseInt(currentUnit)]];
+
+            unitsToRender.forEach(unit => {
+                const unitElement = document.createElement('div');
+                unitElement.className = 'unit';
+                unitElement.innerHTML = `<h2>${unit.unit}</h2>`;
+                
+                unit.categories.forEach(group => {
+                    const groupElement = document.createElement('div');
+                    groupElement.className = 'group';
+
+                    const groupHeader = document.createElement('h3');
+                    groupHeader.innerHTML = `${group.group} <span class="word-count">(${group.words.length}个词)</span>`;
+                    groupElement.appendChild(groupHeader);
+
+                    const wordList = document.createElement('div');
+                    wordList.className = 'word-list';
+
+                    group.words.forEach(word => {
+                        const wordItem = document.createElement('div');
+                        wordItem.className = 'word-item';
+                        wordItem.dataset.word = word.en;
+                        wordItem.dataset.cn = word.cn;
+
+                        const wordEn = document.createElement('span');
+                        wordEn.className = 'word-en';
+                        wordEn.textContent = word.en;
+
+                        const wordCn = document.createElement('span');
+                        wordCn.className = 'word-cn';
+                        wordCn.textContent = word.cn;
+
+                        const starBtn = document.createElement('button');
+                        starBtn.className = 'star-btn';
+                        
+                        // 加载本地存储的标星状态
+                        const wordKey = word.en + '_' + word.cn;
+                        if (starredWords[wordKey] === 'starred') {
+                            wordItem.classList.add('starred');
+                            starBtn.className = 'star-btn starred';
+                            starBtn.innerHTML = '🌟';
+                        } else if (starredWords[wordKey] === 'starred-double') {
+                            wordItem.classList.add('starred-double');
+                            starBtn.className = 'star-btn starred-double';
+                            starBtn.innerHTML = '🌟🌟';
+                        } else {
+                            starBtn.innerHTML = '☆';
+                        }
+                        
+                        starBtn.addEventListener('click', function() {
+                            toggleStar(wordItem, starBtn);
+                        });
+
+                        wordItem.appendChild(wordEn);
+                        wordItem.appendChild(wordCn);
+                        wordItem.appendChild(starBtn);
+                        wordList.appendChild(wordItem);
+                    });
+
+                    groupElement.appendChild(wordList);
+                    unitElement.appendChild(groupElement);
+                });
+                container.appendChild(unitElement);
+            });
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 单元选择
+            document.getElementById('unit-select').addEventListener('change', function() {
+                currentUnit = this.value;
+                renderVocabulary();
+            });
+
+            // 模式切换
+            document.getElementById('mode-normal').addEventListener('click', function() {
+                setMode('normal');
+            });
+
+            document.getElementById('mode-hide-cn').addEventListener('click', function() {
+                setMode('hide-cn');
+            });
+
+            // 过滤切换
+            document.getElementById('filter-all').addEventListener('click', function() {
+                setFilter('all');
+            });
+
+            document.getElementById('filter-starred').addEventListener('click', function() {
+                setFilter('starred');
+            });
+
+            document.getElementById('filter-starred-single').addEventListener('click', function() {
+                setFilter('starred-single');
+            });
+
+            document.getElementById('filter-starred-double').addEventListener('click', function() {
+                setFilter('starred-double');
+            });
+
+            // 重置星标
+            document.getElementById('reset-stars').addEventListener('click', function() {
+                resetStars();
+            });
+        }
+
+        // 设置模式
+        function setMode(mode) {
+            currentMode = mode;
+            // 更新按钮状态
+            document.getElementById('mode-normal').classList.remove('active');
+            document.getElementById('mode-hide-cn').classList.remove('active');
+            document.getElementById(`mode-${mode}`).classList.add('active');
+
+            // 更新模式指示器
+            const indicator = document.getElementById('modeIndicator');
+            if (mode === 'hide-cn') {
+                indicator.className = 'mode-indicator mode-hide-indicator';
+                indicator.textContent = '🔒 隐藏中文';
+            } else {
+                indicator.className = 'mode-indicator mode-normal-indicator';
+                indicator.textContent = '📖 正常模式';
+            }
+
+            // 更新显示
+            const wordCns = document.querySelectorAll('.word-cn');
+            wordCns.forEach(cn => {
+                if (mode === 'hide-cn') {
+                    cn.classList.add('hidden');
+                    cn.classList.remove('revealed');
+                } else {
+                    cn.classList.remove('hidden');
+                    cn.classList.remove('revealed');
+                }
+            });
+        }
+
+        // 从指示器切换模式（移动端点击）
+        function toggleModeFromIndicator() {
+            const newMode = currentMode === 'hide-cn' ? 'normal' : 'hide-cn';
+            setMode(newMode);
+            // 添加点击反馈动画
+            const indicator = document.getElementById('modeIndicator');
+            indicator.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                indicator.style.transform = '';
+            }, 150);
+        }
+
+        // UI 遮罩控制
+        let uiOverlayTimeout;
+        function showUIOverlay(element) {
+            document.body.classList.add('ui-overlay-active', 'show-overlay');
+            element.classList.add('active-ui');
+
+            clearTimeout(uiOverlayTimeout);
+            uiOverlayTimeout = setTimeout(() => {
+                hideUIOverlay();
+            }, 2000);
+        }
+
+        function hideUIOverlay() {
+            document.body.classList.remove('show-overlay');
+            document.querySelectorAll('.active-ui').forEach(el => el.classList.remove('active-ui'));
+        }
+
+        // 为返回键、回到顶部按钮和模式指示器添加遮罩效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const backBtn = document.querySelector('.back-btn');
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            const scrollTopFlag = document.getElementById('scrollTopFlag');
+            const modeIndicator = document.getElementById('modeIndicator');
+
+            if (backBtn) {
+                backBtn.addEventListener('mouseenter', () => showUIOverlay(backBtn));
+                backBtn.addEventListener('mouseleave', hideUIOverlay);
+                backBtn.addEventListener('touchstart', () => showUIOverlay(backBtn), {passive: true});
+            }
+
+            if (scrollTopBtn) {
+                scrollTopBtn.addEventListener('mouseenter', () => showUIOverlay(scrollTopBtn));
+                scrollTopBtn.addEventListener('mouseleave', hideUIOverlay);
+                scrollTopBtn.addEventListener('touchstart', () => showUIOverlay(scrollTopBtn), {passive: true});
+            }
+
+            if (scrollTopFlag) {
+                scrollTopFlag.addEventListener('mouseenter', () => showUIOverlay(scrollTopFlag));
+                scrollTopFlag.addEventListener('mouseleave', hideUIOverlay);
+            }
+
+            if (modeIndicator) {
+                modeIndicator.addEventListener('mouseenter', () => showUIOverlay(modeIndicator));
+                modeIndicator.addEventListener('mouseleave', hideUIOverlay);
+                modeIndicator.addEventListener('touchstart', () => showUIOverlay(modeIndicator), {passive: true});
+            }
+
+            // 点击遮罩关闭
+            document.addEventListener('click', function(e) {
+                if (e.target === document.body || e.target.classList.contains('container')) {
+                    hideUIOverlay();
+                }
+            });
+        });
+
+        // 设置过滤
+        function setFilter(filter) {
+            // 更新按钮状态
+            document.getElementById('filter-all').classList.remove('active');
+            document.getElementById('filter-starred').classList.remove('active');
+            document.getElementById('filter-starred-single').classList.remove('active');
+            document.getElementById('filter-starred-double').classList.remove('active');
+            document.getElementById(`filter-${filter}`).classList.add('active');
+
+            // 更新显示
+            const groups = document.querySelectorAll('.group');
+            groups.forEach(group => {
+                const wordItems = group.querySelectorAll('.word-item');
+                let hasVisibleItems = false;
+
+                wordItems.forEach(item => {
+                    if (filter === 'all') {
+                        item.style.display = 'flex';
+                        hasVisibleItems = true;
+                    } else if (filter === 'starred') {
+                        if (item.classList.contains('starred') || item.classList.contains('starred-double')) {
+                            item.style.display = 'flex';
+                            hasVisibleItems = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    } else if (filter === 'starred-single') {
+                        if (item.classList.contains('starred') && !item.classList.contains('starred-double')) {
+                            item.style.display = 'flex';
+                            hasVisibleItems = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    } else if (filter === 'starred-double') {
+                        if (item.classList.contains('starred-double')) {
+                            item.style.display = 'flex';
+                            hasVisibleItems = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    }
+                });
+
+                // 隐藏没有可见项目的组
+                group.style.display = hasVisibleItems ? 'block' : 'none';
+            });
+        }
+
+        // 切换星标
+        function toggleStar(wordItem, starBtn) {
+            const wordEn = wordItem.dataset.word;
+            const wordCn = wordItem.dataset.cn;
+            const wordKey = wordEn + '_' + wordCn;
+            const starredWords = getStarredWords();
+            
+            if (wordItem.classList.contains('starred-double')) {
+                // 移除所有星标
+                wordItem.classList.remove('starred-double');
+                wordItem.classList.remove('starred');
+                starBtn.className = 'star-btn';
+                starBtn.innerHTML = '☆';
+                delete starredWords[wordKey];
+            } else if (wordItem.classList.contains('starred')) {
+                // 升级为双星
+                wordItem.classList.remove('starred');
+                wordItem.classList.add('starred-double');
+                starBtn.className = 'star-btn starred-double';
+                starBtn.innerHTML = '🌟🌟';
+                starredWords[wordKey] = 'starred-double';
+            } else {
+                // 添加单星
+                wordItem.classList.add('starred');
+                starBtn.className = 'star-btn starred';
+                starBtn.innerHTML = '🌟';
+                starredWords[wordKey] = 'starred';
+            }
+            
+            // 保存到本地存储
+            saveStarredWords(starredWords);
+        }
+
+        // 重置星标
+        function resetStars() {
+            const wordItems = document.querySelectorAll('.word-item');
+            wordItems.forEach(item => {
+                item.classList.remove('starred');
+                item.classList.remove('starred-double');
+            });
+
+            const starBtns = document.querySelectorAll('.star-btn');
+            starBtns.forEach(btn => {
+                btn.className = 'star-btn';
+                btn.innerHTML = '☆';
+            });
+
+            // 清空本地存储
+            saveStarredWords({});
+
+            // 确保显示所有项目
+            setFilter('all');
+        }
+
+        // 监听数据同步事件
+        document.addEventListener('dataSynced', function() {
+            // 数据从云端同步后刷新页面
+            renderVocabulary();
+        });
+
+        // 监听用户登录事件
+        document.addEventListener('userLoggedIn', function() {
+            // 用户登录后从云端同步数据
+            syncDataFromCloud();
+        });
+
+        // 滚动检测 - 显示/隐藏回到顶部按钮
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        const scrollTopFlag = document.getElementById('scrollTopFlag');
+
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const isMobile = window.innerWidth <= 640;
+
+            // 显示/隐藏回到顶部按钮
+            if (scrollTopBtn) {
+                if (scrollTop > 200) {
+                    scrollTopBtn.classList.add('visible');
+                } else {
+                    scrollTopBtn.classList.remove('visible');
+                }
+            }
+
+            // 桌面端旗子按钮 - 仅在非移动端显示
+            if (scrollTopFlag && !isMobile) {
+                if (scrollTop > 300) {
+                    scrollTopFlag.classList.add('visible');
+                } else {
+                    scrollTopFlag.classList.remove('visible');
+                }
+            } else if (scrollTopFlag) {
+                scrollTopFlag.classList.remove('visible');
+            }
+        });
+
+        // 回到顶部函数
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // ========== 快捷键 & 单词点击显示 ==========
+
+        // Space 键切换中文显示/隐藏
+        document.addEventListener('keydown', function(e) {
+            // 排除在输入框、选择框等元素内的按键
+            const tag = e.target.tagName.toLowerCase();
+            if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'button') return;
+
+            if (e.code === 'Space') {
+                e.preventDefault(); // 阻止页面滚动
+                const newMode = currentMode === 'hide-cn' ? 'normal' : 'hide-cn';
+                setMode(newMode);
+            }
+        });
+
+        // 隐藏模式下，点击单个中文词临时显示
+        document.addEventListener('click', function(e) {
+            const wordCn = e.target.closest('.word-cn');
+            if (!wordCn) return;
+            if (!wordCn.classList.contains('hidden')) return;
+
+            // 切换该词的 revealed 状态
+            if (wordCn.classList.contains('revealed')) {
+                wordCn.classList.remove('revealed');
+            } else {
+                wordCn.classList.add('revealed');
+            }
+        });
+
+        // 3秒后自动隐藏快捷键提示条
+        setTimeout(function() {
+            const hint = document.getElementById('shortcutHint');
+            if (hint) hint.classList.add('hidden-hint');
+        }, 5000);
+    </script>
+    <!-- PWA Service Worker 注册 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('[PWA] Service Worker 注册成功', reg.scope))
+                    .catch(err => console.warn('[PWA] Service Worker 注册失败', err));
+            });
+        }
+    </script>
+    <!-- Service Worker 注册 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('SW registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

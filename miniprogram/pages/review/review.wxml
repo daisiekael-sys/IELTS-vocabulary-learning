@@ -1,0 +1,152 @@
+<!-- 复习页面 -->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">复习巩固</text>
+    <text class="page-subtitle">针对性复习，强化记忆效果</text>
+  </view>
+
+  <!-- 切换标签 -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 'synonyms' ? 'active' : ''}}" bindtap="switchTab" data-tab="synonyms">
+      <text class="tab-text">同义替换</text>
+      <view class="tab-badge" wx:if="{{synonymsReviewCount > 0}}">{{synonymsReviewCount}}</view>
+    </view>
+    <view class="tab-item {{activeTab === 'ebbinghaus' ? 'active' : ''}}" bindtap="switchTab" data-tab="ebbinghaus">
+      <text class="tab-text">艾宾浩斯</text>
+      <view class="tab-badge" wx:if="{{ebbinghausReviewCount > 0}}">{{ebbinghausReviewCount}}</view>
+    </view>
+  </view>
+
+  <!-- 同义替换复习内容 -->
+  <view class="review-content" wx:if="{{activeTab === 'synonyms'}}">
+    <!-- 标星词汇 -->
+    <view class="review-section">
+      <view class="section-header">
+        <text class="section-title">⭐ 标星词汇</text>
+        <text class="section-count">{{starredWords.length}} 词</text>
+      </view>
+      
+      <!-- 1星词汇 -->
+      <view class="star-card star-1" bindtap="reviewStar1">
+        <view class="star-info">
+          <text class="star-label">标 1 星</text>
+          <text class="star-desc">认识但需巩固</text>
+        </view>
+        <view class="star-stats">
+          <text class="star-num">{{star1Count}}</text>
+          <text class="star-unit">词</text>
+        </view>
+        <text class="star-arrow">›</text>
+      </view>
+
+      <!-- 2星词汇 -->
+      <view class="star-card star-2" bindtap="reviewStar2">
+        <view class="star-info">
+          <text class="star-label">标 2 星</text>
+          <text class="star-desc">重点记忆词汇</text>
+        </view>
+        <view class="star-stats">
+          <text class="star-num">{{star2Count}}</text>
+          <text class="star-unit">词</text>
+        </view>
+        <text class="star-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 拼写错题 -->
+    <view class="review-section">
+      <view class="section-header">
+        <text class="section-title">❌ 拼写错题</text>
+        <text class="section-count">{{spellingErrors.length}} 题</text>
+      </view>
+      <view class="error-card" bindtap="reviewSpellingErrors">
+        <view class="error-info">
+          <text class="error-label">错题回顾</text>
+          <text class="error-desc">重新测试拼写错误的词汇</text>
+        </view>
+        <view class="error-action">
+          <text class="error-num">{{spellingErrors.length}}</text>
+          <text class="error-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 易错高频词 -->
+    <view class="review-section">
+      <view class="section-header">
+        <text class="section-title">🔥 易错高频词</text>
+        <text class="section-count">{{highFreqErrors.length}} 词</text>
+      </view>
+      <view class="highfreq-card" bindtap="reviewHighFreq">
+        <view class="highfreq-info">
+          <text class="highfreq-label">高频易错</text>
+          <text class="highfreq-desc">多次出错的词汇，重点强化</text>
+        </view>
+        <view class="highfreq-action">
+          <text class="highfreq-num">{{highFreqErrors.length}}</text>
+          <text class="highfreq-arrow">›</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 艾宾浩斯复习内容 -->
+  <view class="review-content" wx:if="{{activeTab === 'ebbinghaus'}}">
+    <!-- 今日待复习 -->
+    <view class="review-section">
+      <view class="section-header">
+        <text class="section-title">🔥 今日待复习</text>
+        <text class="section-count">{{todayReview.length}} 词</text>
+      </view>
+      <view class="today-review-card {{todayReview.length > 0 ? 'has-data' : ''}}" bindtap="reviewToday">
+        <view class="today-info">
+          <text class="today-label">按遗忘曲线提醒</text>
+          <text class="today-desc" wx:if="{{todayReview.length > 0}}">有 {{todayReview.length}} 个单词需要复习</text>
+          <text class="today-desc" wx:else>今日暂无待复习单词</text>
+        </view>
+        <view class="today-action" wx:if="{{todayReview.length > 0}}">
+          <text class="today-num">{{todayReview.length}}</text>
+          <text class="today-arrow">›</text>
+        </view>
+        <view class="today-done" wx:if="{{todayReview.length === 0}}">✓</view>
+      </view>
+    </view>
+
+    <!-- 历史错题本 -->
+    <view class="review-section">
+      <view class="section-header">
+        <text class="section-title">📋 历史错题本</text>
+        <text class="section-count">{{ebbinghausErrors.length}} 词</text>
+      </view>
+      <view class="history-card" bindtap="reviewHistoryErrors">
+        <view class="history-info">
+          <text class="history-label">所有错题</text>
+          <text class="history-desc">查看并复习所有历史错题</text>
+        </view>
+        <view class="history-action">
+          <text class="history-num">{{ebbinghausErrors.length}}</text>
+          <text class="history-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 已掌握词汇 -->
+    <view class="review-section">
+      <view class="section-header">
+        <text class="section-title">✅ 已掌握词汇</text>
+        <text class="section-count">{{masteredWords.length}} 词</text>
+      </view>
+      <view class="mastered-card" bindtap="viewMastered">
+        <view class="mastered-info">
+          <text class="mastered-label">完全掌握</text>
+          <text class="mastered-desc">艾宾浩斯7级熟练度词汇</text>
+        </view>
+        <view class="mastered-action">
+          <text class="mastered-num">{{masteredWords.length}}</text>
+          <text class="mastered-arrow">›</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
