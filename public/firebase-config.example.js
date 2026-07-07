@@ -6,6 +6,7 @@
  * 2. 填入你的 Firebase 项目配置
  * 
  * ⚠️ firebase-config.js 已在 .gitignore 中排除，不会被提交到 GitHub
+ * 线上部署通过 GitHub Actions Secrets 自动注入
  */
 window.authConfig = {
     apiKey: "YOUR_API_KEY",
