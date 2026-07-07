@@ -6,8 +6,17 @@
 
 // Firebase 项目配置（由 firebase-config.js 通过 window.authConfig 注入）
 // 必须在 auth.js 之前加载 firebase-config.js
-if (!window.authConfig || !window.authConfig.apiKey) {
-    console.error('[Auth] firebase-config.js 未加载或配置为空！Firebase 将无法初始化。');
+// 兜底：如果外挂配置加载失败（如 GitHub Actions 注入时引号丢失），使用内嵌配置
+if (!window.authConfig || !window.authConfig.apiKey || typeof window.authConfig.apiKey !== 'string') {
+    console.warn('[Auth] firebase-config.js 未正确加载，使用内嵌兜底配置');
+    window.authConfig = {
+        apiKey: "AIzaSyA3zBg6XgHrFZgVfH86TxjnSlSzi44_Ekk",
+        authDomain: "synonymous-substitutions.firebaseapp.com",
+        projectId: "synonymous-substitutions",
+        storageBucket: "synonymous-substitutions.firebasestorage.app",
+        messagingSenderId: "183899195249",
+        appId: "1:183899195249:web:3d2e2bb9590df74cbfd8d0"
+    };
 }
 
 // 全局状态
