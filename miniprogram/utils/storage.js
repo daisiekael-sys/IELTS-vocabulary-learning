@@ -213,9 +213,13 @@ function setLastSync(timestamp) {
   }
 }
 
-// 清除所有数据
+// 清除所有数据（自动备份后清除）
 function clearAllData() {
   try {
+    // 删除前自动备份
+    const backup = require('./backup.js');
+    backup.createBackup('清除数据前自动备份');
+
     wx.removeStorageSync(STORAGE_KEY);
     wx.removeStorageSync(TODAY_KEY);
     wx.removeStorageSync(LAST_LEARNING_KEY);

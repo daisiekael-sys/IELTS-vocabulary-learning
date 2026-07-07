@@ -7,7 +7,7 @@
  * 
  * ⚠️ firebase-config.js 已在 .gitignore 中排除，不会被提交到 GitHub
  */
-const authConfig = {
+window.authConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_PROJECT.firebaseapp.com",
     projectId: "YOUR_PROJECT_ID",

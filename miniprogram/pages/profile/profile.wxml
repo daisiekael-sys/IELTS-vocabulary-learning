@@ -108,6 +108,16 @@
         <text class="setting-label">导入备份</text>
         <text class="setting-arrow">›</text>
       </view>
+      <view class="setting-item" bindtap="openBackups">
+        <text class="setting-icon">💾</text>
+        <text class="setting-label">恢复备份</text>
+        <text class="setting-arrow">›</text>
+      </view>
+      <view class="setting-item" bindtap="manualBackup">
+        <text class="setting-icon">📸</text>
+        <text class="setting-label">立即创建备份</text>
+        <text class="setting-arrow">›</text>
+      </view>
       <view class="setting-item" bindtap="clearCache">
         <text class="setting-icon">🗑️</text>
         <text class="setting-label">清除缓存</text>

@@ -30,9 +30,9 @@
     <!-- 禁用电话号码自动检测 -->
     <meta name="format-detection" content="telephone=no">
     <!-- 自定义脚本 -->
-    <script src="config.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="auth.js"></script>
+    <script src="config.js?v=3"></script>
+    <script src="firebase-config.js?v=3"></script>
+    <script src="auth.js?v=3"></script>
     <style>
         * {
             margin: 0;
@@ -358,6 +358,117 @@
                 font-size: 0.75rem;
             }
         }
+
+        .backup-modal-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 7, 20, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .backup-modal {
+            width: min(480px, 92vw);
+            max-height: 80vh;
+            overflow-y: auto;
+            background: #121c3a;
+            border: 1px solid rgba(130, 150, 255, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            color: #e6edf7;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .backup-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .backup-close {
+            background: none;
+            border: none;
+            color: #aabbff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .backup-tip {
+            color: #8a94a6;
+            font-size: 13px;
+            margin: 0 0 16px;
+        }
+
+        .backup-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .backup-empty {
+            color: #8a94a6;
+            text-align: center;
+            padding: 24px 0;
+        }
+
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(26, 35, 69, 0.6);
+            border: 1px solid rgba(130, 150, 255, 0.15);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+
+        .backup-label {
+            font-weight: 600;
+        }
+
+        .backup-time {
+            color: #8a94a6;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .backup-ops {
+            display: flex;
+            gap: 8px;
+        }
+
+        .backup-restore {
+            background: linear-gradient(90deg, #6a85ff, #4a6cff);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 14px;
+            cursor: pointer;
+        }
+
+        .backup-del {
+            background: transparent;
+            color: #ff7272;
+            border: 1px solid rgba(255, 114, 114, 0.4);
+            border-radius: 8px;
+            padding: 6px 14px;
+            cursor: pointer;
+        }
+
+        .backup-manual {
+            margin-top: 16px;
+            width: 100%;
+            background: rgba(130, 150, 255, 0.12);
+            color: #c7d1ff;
+            border: 1px dashed rgba(130, 150, 255, 0.4);
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -396,6 +507,7 @@
                 <button onclick="exportData()">📤 导出学习数据</button>
                 <button onclick="importData()">📥 导入学习数据</button>
                 <button onclick="clearData()">🗑️ 清除所有数据</button>
+                <button onclick="openBackups()">💾 恢复备份</button>
             </div>
         </div>
 
@@ -463,15 +575,78 @@
             }
 
             function clearData() {
-                if (confirm('确定要清除所有学习数据吗？此操作不可恢复！')) {
+                if (confirm('确定要清除所有学习数据吗？删除前会自动生成一个备份，可随时在「恢复备份」中还原。')) {
                     try {
+                        if (window.BackupManager) BackupManager.createBackup('清空前自动备份');
                         localStorage.removeItem('ielts_learning_system');
-                        alert('数据已清除！请刷新页面');
+                        alert('数据已清除！如需找回，可在「恢复备份」中还原。');
                     } catch (error) {
                         console.error('Error clearing data:', error);
                         alert('数据清除失败，请重试');
                     }
                 }
+            }
+
+            // ---------- 数据备份与恢复 ----------
+            function renderBackups() {
+                if (!window.BackupManager) return;
+                const list = BackupManager.getBackups().map(function (b) {
+                    return Object.assign({}, b, { time: new Date(b.timestamp).toLocaleString('zh-CN') });
+                });
+                const el = document.getElementById('backupList');
+                if (!list.length) {
+                    el.innerHTML = '<div class="backup-empty">暂无备份</div>';
+                    return;
+                }
+                el.innerHTML = list.map(function (b) {
+                    return '<div class="backup-item">' +
+                        '<div class="backup-meta">' +
+                        '<div class="backup-label">' + b.label + '</div>' +
+                        '<div class="backup-time">' + b.time + '</div>' +
+                        '</div>' +
+                        '<div class="backup-ops">' +
+                        '<button class="backup-restore" data-id="' + b.id + '">恢复</button>' +
+                        '<button class="backup-del" data-id="' + b.id + '">删除</button>' +
+                        '</div></div>';
+                }).join('');
+                el.querySelectorAll('.backup-restore').forEach(function (btn) {
+                    btn.addEventListener('click', function () { restoreBackupById(btn.dataset.id); });
+                });
+                el.querySelectorAll('.backup-del').forEach(function (btn) {
+                    btn.addEventListener('click', function () { deleteBackupById(btn.dataset.id); });
+                });
+            }
+
+            function openBackups() {
+                renderBackups();
+                document.getElementById('backupModal').style.display = 'flex';
+            }
+
+            function closeBackups() {
+                document.getElementById('backupModal').style.display = 'none';
+            }
+
+            function manualBackup() {
+                if (!window.BackupManager) return;
+                BackupManager.createBackup('手动备份');
+                renderBackups();
+                alert('已创建备份 ✓');
+            }
+
+            function restoreBackupById(id) {
+                if (!confirm('恢复到该备份会覆盖当前学习数据，确定吗？')) return;
+                if (BackupManager.restoreBackup(id)) {
+                    alert('已恢复！请刷新页面查看。');
+                    closeBackups();
+                } else {
+                    alert('恢复失败，备份不存在');
+                }
+            }
+
+            function deleteBackupById(id) {
+                if (!confirm('确定删除该备份？')) return;
+                BackupManager.deleteBackup(id);
+                renderBackups();
             }
 
             // 处理登出
@@ -532,6 +707,19 @@
                 }
             });
         </script>
+
+        <!-- 恢复备份弹窗 -->
+        <div id="backupModal" class="backup-modal-mask" style="display:none;">
+            <div class="backup-modal">
+                <div class="backup-modal-header">
+                    <span>💾 数据备份与恢复</span>
+                    <button class="backup-close" onclick="closeBackups()">✕</button>
+                </div>
+                <p class="backup-tip">删除数据前会自动备份。误删后在这里一键还原。</p>
+                <div id="backupList" class="backup-list"></div>
+                <button class="backup-manual" onclick="manualBackup()">+ 立即创建一个备份</button>
+            </div>
+        </div>
     </div>
     <!-- PWA Service Worker 注册和安装提示 -->
     <script>

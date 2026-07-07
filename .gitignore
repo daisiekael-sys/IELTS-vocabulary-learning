@@ -25,6 +25,8 @@ start-server.ps1
 # Firebase 配置已抽离到 firebase-config.js，GitHub 上不提交
 # 部署到 Firebase Hosting 时需手动确保此文件存在
 public/firebase-config.js
+# 小程序端 Firebase 配置（含 API Key、默认 UID）
+miniprogram/utils/firebase-config.js
 .env
 .env.local
 .env.*.local

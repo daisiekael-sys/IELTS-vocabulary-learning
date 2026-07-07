@@ -1,19 +1,9 @@
 // Firebase 配置和同步功能
-const firebaseConfig = {
-  apiKey: "AIzaSyA3zBg6XgHrFZgVfH86TxjnSlSzi44_Ekk",
-  authDomain: "synonymous-substitutions.firebaseapp.com",
-  projectId: "synonymous-substitutions",
-  storageBucket: "synonymous-substitutions.firebasestorage.app",
-  messagingSenderId: "183899195249",
-  appId: "1:183899195249:web:3d2e2bb9590df74cbfd8d0",
-  measurementId: "G-14CB5KHRXK"
-};
+// 敏感配置从外挂文件读取（firebase-config.js 已加入 .gitignore）
+const { firebaseConfig, DEFAULT_USER_ID } = require('./firebase-config');
 
 // Firestore REST API 基础 URL
 const FIRESTORE_BASE_URL = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
-
-// 默认 Firebase UID（与网页版互通）
-const DEFAULT_USER_ID = 'x5Q3rdO1oXSCO57ukNky7Nh6LB52';
 
 // 获取存储的用户ID
 function getUserId() {
@@ -148,49 +138,72 @@ function fromFirestoreValue(value) {
   return null;
 }
 
-// 上传数据到云端（通过云函数）
+// 上传数据到 Firestore（通过 REST API 直连，不再依赖微信云函数）
 function uploadData(data) {
   return new Promise((resolve, reject) => {
     const userId = getUserId();
-    
-    wx.cloud.callFunction({
-      name: 'syncData',
-      data: {
-        action: 'upload',
-        userId: userId,
-        data: data
-      },
+    const url = FIRESTORE_BASE_URL + '/users/' + userId;
+    const firestoreData = {
+      fields: toFirestoreData({
+        data: JSON.stringify(data),
+        updatedAt: new Date().toISOString()
+      })
+    };
+
+    wx.request({
+      url: url,
+      method: 'PATCH',
+      header: { 'Content-Type': 'application/json' },
+      data: firestoreData,
       success: (res) => {
-        if (res.result && res.result.success) {
-          resolve(res.result);
+        if (res.statusCode === 200 || res.statusCode === 201) {
+          resolve({ success: true });
         } else {
-          reject(new Error(res.result?.error || '上传失败'));
+          reject(new Error('上传失败: HTTP ' + res.statusCode));
         }
       },
-      fail: reject
+      fail: (err) => {
+        reject(new Error('网络请求失败: ' + (err.errMsg || '未知错误')));
+      }
     });
   });
 }
 
-// 从云端下载数据（通过云函数）
+// 从 Firestore 下载数据（通过 REST API 直连）
 function downloadData() {
   return new Promise((resolve, reject) => {
     const userId = getUserId();
-    
-    wx.cloud.callFunction({
-      name: 'syncData',
-      data: {
-        action: 'download',
-        userId: userId
-      },
+    const url = FIRESTORE_BASE_URL + '/users/' + userId;
+
+    wx.request({
+      url: url,
+      method: 'GET',
+      header: { 'Content-Type': 'application/json' },
       success: (res) => {
-        if (res.result && res.result.success) {
-          resolve(res.result.data);
+        if (res.statusCode === 200 && res.data && res.data.fields) {
+          const parsed = fromFirestoreData(res.data.fields);
+          // 兼容网页版字段名：网页版用 data 字段存对象，小程序用 data 字段存 JSON 字符串
+          try {
+            if (typeof parsed.data === 'string') {
+              resolve(JSON.parse(parsed.data));
+            } else if (typeof parsed.data === 'object' && parsed.data !== null) {
+              resolve(parsed.data);
+            } else {
+              resolve(null);
+            }
+          } catch (e) {
+            resolve(null);
+          }
+        } else if (res.statusCode === 404) {
+          // 文档不存在，返回 null（新用户）
+          resolve(null);
         } else {
-          reject(new Error(res.result?.error || '下载失败'));
+          reject(new Error('下载失败: HTTP ' + res.statusCode));
         }
       },
-      fail: reject
+      fail: (err) => {
+        reject(new Error('网络请求失败: ' + (err.errMsg || '未知错误')));
+      }
     });
   });
 }
@@ -264,6 +277,7 @@ module.exports = {
   login,
   getUserId,
   setUserId,
+  setCustomUserId,
   uploadData,
   downloadData,
   syncAllData,

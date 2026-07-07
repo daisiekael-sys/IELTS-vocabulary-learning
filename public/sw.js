@@ -1,5 +1,5 @@
 // Service Worker for IELTS Vocabulary Learning System
-const CACHE_NAME = 'ielts-vocab-v1';
+const CACHE_NAME = 'ielts-vocab-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -11,6 +11,7 @@ const STATIC_ASSETS = [
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/config.js',
+  '/firebase-config.js',
   '/auth.js',
   '/vocabulary_data.js'
 ];

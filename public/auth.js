@@ -4,8 +4,11 @@
  * 强制使用 Firebase Auth，不使用 localStorage 降级
  */
 
-// Firebase 项目配置（从 firebase-config.js 加载，如未加载则使用空配置）
-const authConfig = window.authConfig || {};
+// Firebase 项目配置（由 firebase-config.js 通过 window.authConfig 注入）
+// 必须在 auth.js 之前加载 firebase-config.js
+if (!window.authConfig || !window.authConfig.apiKey) {
+    console.error('[Auth] firebase-config.js 未加载或配置为空！Firebase 将无法初始化。');
+}
 
 // 全局状态
 window.firebaseInitialized = false;
@@ -94,9 +97,14 @@ async function initFirebase() {
         throw new Error('所有 CDN 均加载失败，请检查网络连接。' + (lastError ? lastError.message : ''));
     }
 
+    // 检查 Firebase 配置
+    if (!window.authConfig || !window.authConfig.apiKey) {
+        throw new Error('Firebase 配置缺失，firebase-config.js 可能未正确加载。请清除浏览器缓存后重试（Ctrl+Shift+Delete）。');
+    }
+
     // 初始化 Firebase App（防止重复初始化）
     if (!firebase.apps.length) {
-        firebase.initializeApp(authConfig);
+        firebase.initializeApp(window.authConfig);
     }
 
     window.auth = firebase.auth();
@@ -245,7 +253,8 @@ function translateFirebaseError(code) {
 }
 
 // 暴露到全局
-window.authConfig = authConfig;
+// authConfig 不再在此文件声明，由 firebase-config.js 通过 window.authConfig 注入
+// 如果未注入，Firebase 初始化会因缺少配置而报错（符合预期）
 window.registerUser = registerUser;
 window.loginUser = loginUser;
 window.logoutUser = logoutUser;

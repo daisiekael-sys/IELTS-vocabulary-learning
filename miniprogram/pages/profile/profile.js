@@ -1,6 +1,7 @@
 // 我的页面逻辑
 const storage = require('../../utils/storage.js');
 const firebase = require('../../utils/firebase.js');
+const backup = require('../../utils/backup.js');
 
 Page({
   data: {
@@ -318,19 +319,97 @@ Page({
     });
   },
 
+  // ---------- 数据备份与恢复 ----------
+
+  // 打开备份列表（用 ActionSheet 展示）
+  openBackups() {
+    const list = backup.getBackups();
+    if (!list.length) {
+      wx.showToast({ title: '暂无备份', icon: 'none' });
+      return;
+    }
+    const itemList = list.map(function (b) {
+      const time = new Date(b.timestamp).toLocaleString('zh-CN');
+      return b.label + '  (' + time + ')';
+    });
+    wx.showActionSheet({
+      itemList: itemList,
+      success: (res) => {
+        const b = list[res.tapIndex];
+        this.showBackupActions(b);
+      }
+    });
+  },
+
+  // 显示单个备份的操作选项
+  showBackupActions(b) {
+    wx.showActionSheet({
+      itemList: ['恢复此备份', '删除此备份'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.restoreBackup(b.id);
+        } else if (res.tapIndex === 1) {
+          this.deleteBackup(b.id);
+        }
+      }
+    });
+  },
+
+  // 恢复备份
+  restoreBackup(id) {
+    wx.showModal({
+      title: '恢复备份',
+      content: '恢复会覆盖当前学习数据，确定吗？',
+      success: (res) => {
+        if (res.confirm) {
+          if (backup.restoreBackup(id)) {
+            wx.showToast({ title: '已恢复', icon: 'success' });
+            this.loadStats();
+          } else {
+            wx.showToast({ title: '恢复失败', icon: 'error' });
+          }
+        }
+      }
+    });
+  },
+
+  // 删除备份
+  deleteBackup(id) {
+    wx.showModal({
+      title: '删除备份',
+      content: '确定删除此备份？',
+      success: (res) => {
+        if (res.confirm) {
+          backup.deleteBackup(id);
+          wx.showToast({ title: '已删除', icon: 'success' });
+        }
+      }
+    });
+  },
+
+  // 手动创建备份
+  manualBackup() {
+    const result = backup.createBackup('手动备份');
+    if (result) {
+      wx.showToast({ title: '备份已创建 ✓', icon: 'success' });
+    } else {
+      wx.showToast({ title: '备份失败', icon: 'error' });
+    }
+  },
+
   // 清除缓存
   clearCache() {
     wx.showModal({
       title: '清除缓存',
-      content: '确定要清除本地缓存吗？不会影响已同步的数据',
+      content: '确定要清除本地缓存吗？（会自动备份，不影响已同步的数据）',
       success: (res) => {
         if (res.confirm) {
-          wx.clearStorage({
-            success: () => {
-              wx.showToast({ title: '已清除', icon: 'success' });
-              this.loadStats();
-            }
-          });
+          // 清除前先备份
+          backup.createBackup('清除缓存前自动备份');
+          wx.removeStorageSync('ielts_today_stats');
+          wx.removeStorageSync('ielts_last_learning');
+          wx.showToast({ title: '已清除', icon: 'success' });
+          this.loadStats();
         }
       }
     });
@@ -340,13 +419,13 @@ Page({
   resetProgress() {
     wx.showModal({
       title: '⚠️ 危险操作',
-      content: '确定要重置所有学习进度吗？此操作不可恢复！',
+      content: '确定要重置所有学习进度吗？删除前会自动备份，可在「恢复备份」中还原。',
       confirmColor: '#ff7272',
       success: (res) => {
         if (res.confirm) {
           wx.showModal({
             title: '再次确认',
-            content: '真的确定吗？所有学习记录将被清空！',
+            content: '真的确定吗？所有学习记录将被清空！（会自动备份）',
             confirmColor: '#ff7272',
             success: (res2) => {
               if (res2.confirm) {
