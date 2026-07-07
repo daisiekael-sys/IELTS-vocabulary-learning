@@ -42,6 +42,13 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// 接收页面发来的 SKIP_WAITING 指令，立即激活新 SW
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // 网络优先策略：先尝试网络，失败时使用缓存
 self.addEventListener('fetch', (event) => {
   // 跳过非 GET 请求和跨域请求

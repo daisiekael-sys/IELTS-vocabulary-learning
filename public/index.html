@@ -502,13 +502,14 @@
         </div>
 
         <div class="special-section" style="margin-top: 40px;">
-            <h3>数据管理</h3>
-            <div class="btn-group">
-                <button onclick="exportData()">📤 导出学习数据</button>
-                <button onclick="importData()">📥 导入学习数据</button>
-                <button onclick="clearData()">🗑️ 清除所有数据</button>
-                <button onclick="openBackups()">💾 恢复备份</button>
-            </div>
+             <h3>数据管理</h3>
+             <div class="btn-group">
+                 <button onclick="exportData()">📤 导出学习数据</button>
+                 <button onclick="importData()">📥 导入学习数据</button>
+                 <button onclick="clearData()">🗑️ 清除所有数据</button>
+                 <button onclick="openBackups()">💾 恢复备份</button>
+                 <button onclick="forceUpdate()">🔄 检查更新</button>
+             </div>
         </div>
 
         <div class="footer">
@@ -584,6 +585,30 @@
                         console.error('Error clearing data:', error);
                         alert('数据清除失败，请重试');
                     }
+                }
+            }
+
+            // ---------- 检查更新 ----------
+            async function forceUpdate() {
+                try {
+                    if ('serviceWorker' in navigator) {
+                        const reg = await navigator.serviceWorker.getRegistration();
+                        if (reg) {
+                            // 注入新 SW 并跳过等待
+                            await reg.update();
+                            if (reg.waiting) {
+                                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                            }
+                        }
+                        // 清除所有 SW 缓存
+                        const keys = await caches.keys();
+                        await Promise.all(keys.map(k => caches.delete(k)));
+                    }
+                    alert('更新完成，即将重新加载页面');
+                    window.location.reload();
+                } catch (e) {
+                    console.error('更新失败:', e);
+                    alert('更新失败，请手动关闭后重新打开');
                 }
             }
 
