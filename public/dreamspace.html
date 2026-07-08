@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>梦境空间 - 雅思词汇学习中心</title>
+    <title>创造空间 - 雅思词汇学习中心</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#1a2345">
@@ -260,7 +260,9 @@
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(5,7,20,0.8);
-            display: none; align-items: center; justify-content: center;
+            display: none; align-items: flex-start; justify-content: center;
+            overflow-y: auto;
+            padding: 5vh 0;
             z-index: 200;
         }
         .modal-overlay.active { display: flex; }
@@ -270,6 +272,9 @@
             border-radius: 16px;
             padding: 24px;
             width: 90%; max-width: 400px;
+            max-height: 85vh;
+            overflow-y: auto;
+            margin: auto;
         }
         .modal h4 { color: #ffd700; font-size: 1rem; margin-bottom: 16px; }
         .form-group { margin-bottom: 14px; }
@@ -342,7 +347,7 @@
         <svg width="14" height="14" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
         返回
     </button>
-    <span class="top-title">🏵️ 梦境空间</span>
+    <span class="top-title">🏵️ 创造空间</span>
     <span class="top-s-info">🏵️ <span id="sFlowerBalance">0</span></span>
 </div>
 

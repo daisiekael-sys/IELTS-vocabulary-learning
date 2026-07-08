@@ -11,9 +11,11 @@
  *   - 如果IU始终未完成，其他任务的花朵不会发放
  * 
  * 许愿兑换（事件驱动，非时间凑数）：
- *   - 出去玩：1朵/h（1小时1朵），回来登记实际时长，余数≥15min补1朵
+ *   - 出去玩：1朵/h（1小时1朵），回来登记实际时长，余数≥30min补1朵
  *   - 运动：1朵/30min，回来登记实际时长，余数≥15min补1朵
  *   - 翻词典：1朵/3词（余2词扣1朵，余1不扣）
+ *   - 睡觉休息：1朵/h，回来登记实际时长，余数≥30min补1朵
+ *   - 创造空间：3朵🏵️S级 = 1个空间（直接兑换，无两步流程）
  * 
  * 两步流程：
  *   1. 出发：预扣花朵，记录 pending wish
@@ -154,10 +156,10 @@
             return cost;
         }
 
-        // 出去玩 / 运动：时间制，actualUnits 是分钟
+        // 出去玩 / 运动 / 睡觉：时间制，actualUnits 是分钟
         let minutes = actualUnits;
         let divisor, rounding;
-        if (type === 'outing') {
+        if (type === 'outing' || type === 'sleep') {
             divisor = 60;   // 60min=1朵
             rounding = 30;  // 余数≥30min进1朵
         } else {
@@ -283,7 +285,7 @@
             const def = WISH_TYPES[type];
             if (!def) return { success: false, id: null, cost: 0, message: '未知愿望类型' };
 
-            estUnits = Math.max(def.minUnit, type === 'outing' ? Math.round(estUnits * 2) / 2 : Math.round(estUnits));
+            estUnits = Math.max(def.minUnit, (type === 'outing' || type === 'sleep') ? Math.round(estUnits * 2) / 2 : Math.round(estUnits));
             let cost;
 
             if (type === 'dictionary') {
@@ -291,7 +293,7 @@
                 const rem = estUnits % 3;
                 cost = fullSets + (rem >= 2 ? 1 : 0);
                 cost = Math.max(1, cost);
-            } else if (type === 'outing') {
+            } else if (type === 'outing' || type === 'sleep') {
                 // estUnits 是小时，0.5h 步进
                 const fullHours = Math.floor(estUnits);
                 const remMin = (estUnits - fullHours) * 60;
