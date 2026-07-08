@@ -1257,6 +1257,7 @@
                         <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="12" y="16.5" text-anchor="middle" fill="currentColor" font-size="13" font-weight="700" font-family="Arial">i</text></svg>
                     </button>
                     <button class="wish-btn" onclick="openWishPanel()">🎁 许愿兑换</button>
+                    <button class="wish-btn" style="background:rgba(255,215,0,0.1);border-color:rgba(255,215,0,0.25);color:#ffd700;" onclick="location.href='dreamspace.html'">🏵️ 梦境空间</button>
                 </div>
 
                 <!-- 小红花规则卡片 -->
@@ -1281,10 +1282,16 @@
                         </div>
                         <div class="reward-rule-divider"></div>
                         <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
-                            <b style="color:#8a94a6;">许愿兑换</b><br>
+                            <b style="color:#8a94a6;">许愿兑换（普通小花 🌸）</b><br>
                             🌈 出去玩 · 1朵/60min<br>
                             💪 运动 · 1朵/30min<br>
-                            📖 翻词典 · 1朵/3词
+                            📖 翻词典 · 1朵/3词<br>
+                            😴 睡觉休息 · 1朵/60min
+                        </div>
+                        <div class="reward-rule-divider"></div>
+                        <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
+                            <b style="color:#ffd700;">S级专属（🏵️ 3朵 = 1个梦境空间）</b><br>
+                            创造主题式/项目制空间，设定世界法则，造梦
                         </div>
                     </div>
                 </div>
@@ -1376,6 +1383,19 @@
                             <div class="mp-fill" id="mpSpellFill" style="width:0%;background:linear-gradient(90deg,#ff6b6b,#ff9a56);"></div>
                         </div>
                         <div class="mp-sub" id="mpSpellSub">导入词库 · 三种模式 · 沉浸拼写</div>
+                    </div>
+
+                    <!-- 梦境空间 -->
+                    <div class="module-progress-item" onclick="location.href='dreamspace.html'" style="cursor:pointer;">
+                        <div class="mp-header">
+                            <span class="mp-icon">🏵️</span>
+                            <span class="mp-name">梦境空间</span>
+                            <span class="mp-count" id="mpDreamCount">3 🏵️ = 1空间</span>
+                        </div>
+                        <div class="mp-bar">
+                            <div class="mp-fill" id="mpDreamFill" style="width:0%;background:linear-gradient(90deg,#ffd700,#ff9a56);"></div>
+                        </div>
+                        <div class="mp-sub" id="mpDreamSub">S级小红花专属 · 创造你的世界</div>
                     </div>
                 </div>
 
@@ -2480,6 +2500,15 @@
                 document.getElementById('mpSpellFill').style.width = spellPct + '%';
                 document.getElementById('mpSpellSub').textContent =
                     todaySpell.total > 0 ? '正确率 ' + (todaySpell.total > 0 ? Math.round(todaySpell.correct / todaySpell.total * 100) : 0) + '%' : '导入词库 · 三种模式 · 沉浸拼写';
+
+                // 梦境空间
+                const sFlowers = d.rewards?.sFlowers || 0;
+                const dreamSpaces = d.dreamSpaces || [];
+                document.getElementById('mpDreamCount').textContent =
+                    dreamSpaces.length > 0 ? dreamSpaces.length + ' 个空间' : '3 🏵️ = 1空间';
+                document.getElementById('mpDreamFill').style.width = Math.min(100, (sFlowers / 3) * 100) + '%';
+                document.getElementById('mpDreamSub').textContent =
+                    dreamSpaces.length > 0 ? '🏵️ ' + sFlowers + ' · 可再创 ' + Math.floor(sFlowers / 3) + ' 个' : 'S级小红花专属 · 创造你的世界';
             } catch(e) {
                 console.error('[moduleProgress] error:', e);
             }

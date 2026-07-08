@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>梦境空间 - 雅思词汇学习中心</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a2345">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IELTS词汇">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <script src="config.js?v=3"></script>
+    <script src="firebase-config.js?v=3"></script>
+    <script src="auth.js?v=3"></script>
+    <script src="sfx.js?v=1"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", Arial, sans-serif; }
+        body {
+            background: #0a1028;
+            background-image: radial-gradient(circle at 50% 50%, #1a2345 0%, #050714 100%);
+            color: #e6edf7;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航 */
+        .top-bar {
+            position: sticky; top: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 20px;
+            background: rgba(10,16,40,0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,215,0,0.08);
+            z-index: 100;
+        }
+        .back-btn {
+            display: flex; align-items: center; gap: 6px;
+            color: #8a94a6; font-size: 0.85rem; cursor: pointer;
+            background: none; border: none; transition: color 0.2s;
+        }
+        .back-btn:hover { color: #c7d1ff; }
+        .top-title { color: #ffd700; font-size: 1rem; font-weight: 600; }
+        .top-s-info { color: #8a94a6; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; }
+
+        /* 空间列表 */
+        .space-list {
+            padding: 16px 20px;
+            max-width: 600px; margin: 0 auto;
+        }
+        .section-label {
+            color: #5a6480; font-size: 0.75rem; margin-bottom: 12px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        /* 空间卡片 */
+        .space-card {
+            background: rgba(26,35,69,0.5);
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .space-card:hover {
+            border-color: rgba(255,215,0,0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(255,215,0,0.08);
+        }
+        .space-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .space-name {
+            font-size: 1.05rem; color: #ffd700; font-weight: 500;
+        }
+        .space-type-badge {
+            font-size: 0.65rem; padding: 2px 8px; border-radius: 10px;
+            background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.2);
+            color: #ffd700;
+        }
+        .space-type-badge.project {
+            background: rgba(78,201,176,0.1); border-color: rgba(78,201,176,0.2);
+            color: #4ec9b0;
+        }
+        .space-laws {
+            color: #5a6480; font-size: 0.78rem; margin-top: 6px;
+            line-height: 1.5;
+        }
+        .space-meta {
+            display: flex; gap: 12px; margin-top: 8px;
+            color: #3d4a6a; font-size: 0.7rem;
+        }
+
+        /* 创建新空间 */
+        .create-card {
+            background: rgba(255,215,0,0.04);
+            border: 2px dashed rgba(255,215,0,0.15);
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        .create-card:hover {
+            border-color: rgba(255,215,0,0.35);
+            background: rgba(255,215,0,0.06);
+        }
+        .create-icon { font-size: 2rem; margin-bottom: 8px; }
+        .create-text { color: #ffd700; font-size: 0.9rem; font-weight: 500; }
+        .create-cost { color: #5a6480; font-size: 0.75rem; margin-top: 4px; }
+
+        /* 空间详情 */
+        .space-detail {
+            display: none;
+            padding: 16px 20px;
+            max-width: 600px; margin: 0 auto;
+        }
+        .space-detail.active { display: block; }
+
+        .detail-header {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 16px;
+        }
+        .detail-back {
+            background: rgba(130,150,255,0.08); border: 1px solid rgba(130,150,255,0.15);
+            border-radius: 8px; padding: 6px 10px; cursor: pointer;
+            color: #8a94a6; font-size: 0.8rem; transition: all 0.2s;
+        }
+        .detail-back:hover { color: #c7d1ff; background: rgba(130,150,255,0.15); }
+        .detail-title {
+            font-size: 1.3rem; color: #ffd700; font-weight: 600; flex: 1;
+        }
+
+        /* 子板块 */
+        .sub-section {
+            background: rgba(26,35,69,0.4);
+            border: 1px solid rgba(255,215,0,0.06);
+            border-radius: 12px;
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+        .sub-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sub-header:hover { background: rgba(255,215,0,0.03); }
+        .sub-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.9rem; color: #c7d1ff; font-weight: 500;
+        }
+        .sub-chevron {
+            transition: transform 0.3s; color: #5a6480;
+        }
+        .sub-chevron.open { transform: rotate(180deg); }
+        .sub-body {
+            display: none; padding: 0 16px 14px;
+        }
+        .sub-body.open { display: block; }
+
+        /* 世界法则编辑 */
+        .law-list { margin-bottom: 8px; }
+        .law-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,215,0,0.04);
+        }
+        .law-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #ffd700; flex-shrink: 0;
+        }
+        .law-text {
+            color: #c7d1ff; font-size: 0.82rem; flex: 1; line-height: 1.4;
+        }
+        .law-del {
+            background: none; border: none; color: #3d4a6a; cursor: pointer;
+            font-size: 0.75rem; transition: color 0.2s;
+        }
+        .law-del:hover { color: #ff6b6b; }
+        .add-row {
+            display: flex; gap: 6px; margin-top: 8px;
+        }
+        .add-input {
+            flex: 1; padding: 7px 10px; border-radius: 8px;
+            background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.1);
+            color: #c7d1ff; font-size: 0.8rem; outline: none;
+        }
+        .add-input::placeholder { color: #3d4a6a; }
+        .add-input:focus { border-color: rgba(255,215,0,0.3); }
+        .add-btn {
+            padding: 7px 12px; border-radius: 8px;
+            background: rgba(255,215,0,0.12); border: 1px solid rgba(255,215,0,0.2);
+            color: #ffd700; font-size: 0.8rem; cursor: pointer;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .add-btn:hover { background: rgba(255,215,0,0.2); }
+
+        /* 创造物卡片 */
+        .creation-card {
+            background: rgba(130,150,255,0.05);
+            border: 1px solid rgba(130,150,255,0.1);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+        }
+        .creation-name {
+            color: #c7d1ff; font-size: 0.88rem; font-weight: 500; margin-bottom: 4px;
+        }
+        .creation-type {
+            display: inline-block; font-size: 0.65rem; padding: 1px 6px;
+            border-radius: 6px; margin-right: 4px;
+        }
+        .creation-type.novel { background: rgba(178,132,255,0.15); color: #b284ff; }
+        .creation-type.invention { background: rgba(78,201,176,0.15); color: #4ec9b0; }
+        .creation-type.event { background: rgba(255,154,86,0.15); color: #ff9a56; }
+        .creation-type.shop { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+        .creation-desc {
+            color: #5a6480; font-size: 0.75rem; line-height: 1.5;
+        }
+        .creation-detail-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+            margin-top: 8px;
+        }
+        .creation-detail-item {
+            font-size: 0.7rem; color: #8a94a6;
+        }
+        .creation-detail-item b { color: #c7d1ff; }
+
+        /* 团队成员 */
+        .team-member {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,215,0,0.04);
+        }
+        .member-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem;
+        }
+        .member-info { flex: 1; }
+        .member-role { color: #ffd700; font-size: 0.8rem; font-weight: 500; }
+        .member-resp { color: #5a6480; font-size: 0.7rem; }
+
+        /* 图景/蓝图 */
+        .blueprint-text {
+            color: #c7d1ff; font-size: 0.85rem; line-height: 1.7;
+            padding: 12px 0;
+        }
+        .blueprint-text:empty::after {
+            content: '描绘达成后的世界会是什么样子…';
+            color: #3d4a6a; font-style: italic;
+        }
+
+        /* 创建弹窗 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5,7,20,0.8);
+            display: none; align-items: center; justify-content: center;
+            z-index: 200;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: #1a2345;
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%; max-width: 400px;
+        }
+        .modal h4 { color: #ffd700; font-size: 1rem; margin-bottom: 16px; }
+        .form-group { margin-bottom: 14px; }
+        .form-label { color: #8a94a6; font-size: 0.78rem; margin-bottom: 6px; display: block; }
+        .form-input {
+            width: 100%; padding: 10px 12px; border-radius: 10px;
+            background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.12);
+            color: #c7d1ff; font-size: 0.88rem; outline: none;
+        }
+        .form-input:focus { border-color: rgba(255,215,0,0.35); }
+        .form-input::placeholder { color: #3d4a6a; }
+        textarea.form-input { resize: vertical; min-height: 80px; }
+        .type-select {
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        .type-option {
+            padding: 6px 14px; border-radius: 10px; font-size: 0.78rem;
+            cursor: pointer; transition: all 0.2s;
+            background: rgba(255,215,0,0.06); border: 1px solid rgba(255,215,0,0.1);
+            color: #8a94a6;
+        }
+        .type-option:hover { border-color: rgba(255,215,0,0.25); }
+        .type-option.selected {
+            background: rgba(255,215,0,0.12); border-color: rgba(255,215,0,0.3);
+            color: #ffd700;
+        }
+        .type-option.selected.project-opt {
+            background: rgba(78,201,176,0.12); border-color: rgba(78,201,176,0.3);
+            color: #4ec9b0;
+        }
+        .modal-btns {
+            display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px;
+        }
+        .modal-btn {
+            padding: 9px 20px; border-radius: 10px; border: none;
+            font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+        }
+        .modal-btn.cancel { background: rgba(130,150,255,0.08); color: #8a94a6; }
+        .modal-btn.confirm { background: rgba(255,215,0,0.15); color: #ffd700; }
+        .modal-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .modal-cost {
+            color: #5a6480; font-size: 0.75rem; text-align: center; margin-top: 8px;
+        }
+
+        /* 空状态 */
+        .empty-hint {
+            text-align: center; padding: 24px 16px;
+            color: #3d4a6a; font-size: 0.82rem; line-height: 1.6;
+        }
+
+        /* 悬浮刷新按钮 */
+        .float-refresh {
+            position: fixed; bottom: 20px; right: 20px;
+            width: 40px; height: 40px; border-radius: 50%;
+            border: none; cursor: pointer; z-index: 9998;
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+            background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.2);
+            color: #ffd700;
+        }
+        .float-refresh:hover { background: rgba(255,215,0,0.2); }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="top-bar">
+    <button class="back-btn" onclick="location.href='index.html'">
+        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        返回
+    </button>
+    <span class="top-title">🏵️ 梦境空间</span>
+    <span class="top-s-info">🏵️ <span id="sFlowerBalance">0</span></span>
+</div>
+
+<!-- 空间列表 -->
+<div class="space-list" id="spaceListView">
+    <div class="section-label">我的空间</div>
+    <div id="spaceListContainer"></div>
+
+    <div class="create-card" onclick="openCreateModal()">
+        <div class="create-icon">✦</div>
+        <div class="create-text">创造新空间</div>
+        <div class="create-cost">消耗 3 朵 🏵️S级小红花</div>
+    </div>
+</div>
+
+<!-- 空间详情 -->
+<div class="space-detail" id="spaceDetailView"></div>
+
+<!-- 创建弹窗 -->
+<div class="modal-overlay" id="createModal">
+    <div class="modal">
+        <h4>✦ 创造新空间</h4>
+        <div class="form-group">
+            <label class="form-label">空间名称</label>
+            <input class="form-input" id="newSpaceName" placeholder="给你的世界起个名字" maxlength="30">
+        </div>
+        <div class="form-group">
+            <label class="form-label">空间类型</label>
+            <div class="type-select">
+                <div class="type-option selected" data-type="theme" onclick="selectSpaceType('theme')">🌌 主题式</div>
+                <div class="type-option project-opt" data-type="project" onclick="selectSpaceType('project')">⚙️ 项目制</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">世界法则（每行一条）</label>
+            <textarea class="form-input" id="newSpaceLaws" placeholder="这个世界的基本规则是什么？&#10;例：这里的时间流速是外界的3倍&#10;例：每个人只能携带3件物品"></textarea>
+        </div>
+        <div class="modal-cost">消耗 3 朵 🏵️S级小红花 · 当前拥有 <span id="modalSCount">0</span> 朵</div>
+        <div class="modal-btns">
+            <button class="modal-btn cancel" onclick="closeCreateModal()">取消</button>
+            <button class="modal-btn confirm" id="createConfirmBtn" onclick="confirmCreate()">创造</button>
+        </div>
+    </div>
+</div>
+
+<!-- 悬浮刷新按钮 -->
+<button class="float-refresh" onclick="location.reload()" title="刷新">
+    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5" stroke="#ffd700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+</button>
+
+<script>
+    const STORAGE_KEY = 'ielts_learning_system';
+    let currentSpaceId = null;
+    let newSpaceType = 'theme';
+
+    // ===== 数据 =====
+    function loadData() {
+        try {
+            const d = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            return d.dreamSpaces || [];
+        } catch(e) { return []; }
+    }
+
+    function saveData(spaces) {
+        try {
+            const d = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            d.dreamSpaces = spaces;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+        } catch(e) {}
+    }
+
+    function getSFlowers() {
+        try {
+            const d = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            return d.rewards?.sFlowers || 0;
+        } catch(e) { return 0; }
+    }
+
+    function deductSFlowers(count) {
+        try {
+            const d = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            d.rewards.sFlowers = Math.max(0, (d.rewards.sFlowers || 0) - count);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+        } catch(e) {}
+    }
+
+    // ===== 渲染空间列表 =====
+    function renderSpaceList() {
+        const spaces = loadData();
+        const container = document.getElementById('spaceListContainer');
+        document.getElementById('sFlowerBalance').textContent = getSFlowers();
+
+        if (spaces.length === 0) {
+            container.innerHTML = `<div class="empty-hint">还没有空间<br>用 S级小红花 创造你的第一个世界吧</div>`;
+            return;
+        }
+
+        container.innerHTML = spaces.map(s => `
+            <div class="space-card" onclick="openSpaceDetail('${s.id}')">
+                <div class="space-card-header">
+                    <span class="space-name">${esc(s.name)}</span>
+                    <span class="space-type-badge ${s.type === 'project' ? 'project' : ''}">${s.type === 'project' ? '⚙️ 项目制' : '🌌 主题式'}</span>
+                </div>
+                <div class="space-laws">${(s.laws || []).slice(0, 2).map(l => '✦ ' + esc(l)).join(' · ')}</div>
+                <div class="space-meta">
+                    <span>法则 ${s.laws?.length || 0}</span>
+                    <span>创造 ${s.creations?.length || 0}</span>
+                    <span>伙伴 ${s.team?.length || 0}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function esc(s) {
+        const d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    // ===== 创建空间 =====
+    function openCreateModal() {
+        const sCount = getSFlowers();
+        document.getElementById('modalSCount').textContent = sCount;
+        document.getElementById('createConfirmBtn').disabled = sCount < 3;
+        document.getElementById('newSpaceName').value = '';
+        document.getElementById('newSpaceLaws').value = '';
+        newSpaceType = 'theme';
+        document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+        document.querySelector('.type-option[data-type="theme"]').classList.add('selected');
+        document.getElementById('createModal').classList.add('active');
+    }
+
+    function closeCreateModal() {
+        document.getElementById('createModal').classList.remove('active');
+    }
+
+    function selectSpaceType(type) {
+        newSpaceType = type;
+        document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+        document.querySelector(`.type-option[data-type="${type}"]`).classList.add('selected');
+    }
+
+    function confirmCreate() {
+        const name = document.getElementById('newSpaceName').value.trim();
+        if (!name) { alert('给空间起个名字吧'); return; }
+        if (getSFlowers() < 3) { alert('S级小红花不足，需要3朵'); return; }
+
+        const lawsText = document.getElementById('newSpaceLaws').value.trim();
+        const laws = lawsText ? lawsText.split('\n').map(l => l.trim()).filter(l => l) : [];
+
+        const space = {
+            id: 'ds_' + Date.now(),
+            name: name,
+            type: newSpaceType,
+            laws: laws,
+            creations: [],
+            team: [],
+            blueprint: '',
+            createdAt: new Date().toISOString()
+        };
+
+        deductSFlowers(3);
+        const spaces = loadData();
+        spaces.unshift(space);
+        saveData(spaces);
+
+        closeCreateModal();
+        if (window.SFX) SFX.master();
+        renderSpaceList();
+        openSpaceDetail(space.id);
+    }
+
+    // ===== 空间详情 =====
+    function openSpaceDetail(id) {
+        currentSpaceId = id;
+        const spaces = loadData();
+        const space = spaces.find(s => s.id === id);
+        if (!space) return;
+
+        document.getElementById('spaceListView').style.display = 'none';
+        const detail = document.getElementById('spaceDetailView');
+        detail.classList.add('active');
+
+        const typeLabel = space.type === 'project' ? '⚙️ 项目制' : '🌌 主题式';
+        const typeClass = space.type === 'project' ? 'project' : '';
+
+        detail.innerHTML = `
+            <div class="detail-header">
+                <button class="detail-back" onclick="backToList()">← 返回</button>
+                <span class="detail-title">${esc(space.name)}</span>
+                <span class="space-type-badge ${typeClass}">${typeLabel}</span>
+            </div>
+
+            <!-- 世界法则 -->
+            <div class="sub-section">
+                <div class="sub-header" onclick="toggleSub(this)">
+                    <span class="sub-title">📜 世界法则</span>
+                    <svg class="sub-chevron open" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#5a6480" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+                </div>
+                <div class="sub-body open" id="lawsBody">
+                    <div class="law-list" id="lawList">
+                        ${(space.laws || []).map((l, i) => `
+                            <div class="law-item">
+                                <span class="law-dot"></span>
+                                <span class="law-text">${esc(l)}</span>
+                                <button class="law-del" onclick="removeLaw(${i})">✕</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="add-row">
+                        <input class="add-input" id="lawInput" placeholder="新增一条法则…" onkeydown="if(event.key==='Enter')addLaw()">
+                        <button class="add-btn" onclick="addLaw()">添加</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 创造物 -->
+            <div class="sub-section">
+                <div class="sub-header" onclick="toggleSub(this)">
+                    <span class="sub-title">🎯 创造物</span>
+                    <svg class="sub-chevron" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#5a6480" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+                </div>
+                <div class="sub-body" id="creationsBody">
+                    <div id="creationsList">
+                        ${(space.creations || []).map((c, i) => renderCreation(c, i)).join('')}
+                    </div>
+                    <div class="add-row" style="flex-wrap:wrap;gap:6px;">
+                        <button class="add-btn" onclick="addCreation('novel')">📖 小说</button>
+                        <button class="add-btn" onclick="addCreation('invention')">🔧 发明</button>
+                        <button class="add-btn" onclick="addCreation('event')">🎪 活动</button>
+                        <button class="add-btn" onclick="addCreation('shop')">🏪 主题店</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 团队 -->
+            <div class="sub-section">
+                <div class="sub-header" onclick="toggleSub(this)">
+                    <span class="sub-title">👥 团队</span>
+                    <svg class="sub-chevron" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#5a6480" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+                </div>
+                <div class="sub-body" id="teamBody">
+                    <div id="teamList">
+                        ${(space.team || []).map((m, i) => `
+                            <div class="team-member">
+                                <div class="member-avatar">${m.emoji || '🧑'}</div>
+                                <div class="member-info">
+                                    <div class="member-role">${esc(m.role)}</div>
+                                    <div class="member-resp">${esc(m.responsibility)}</div>
+                                </div>
+                                <button class="law-del" onclick="removeTeamMember(${i})">✕</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="add-row" style="flex-wrap:wrap;">
+                        <input class="add-input" id="memberRole" placeholder="角色（如：设计师）" style="flex:1;min-width:100px;">
+                        <input class="add-input" id="memberResp" placeholder="职责" style="flex:1;min-width:100px;">
+                    </div>
+                    <div class="add-row" style="margin-top:6px;">
+                        <input class="add-input" id="memberEmoji" placeholder="emoji" style="width:60px;">
+                        <button class="add-btn" onclick="addTeamMember()">加入</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图景/蓝图 -->
+            <div class="sub-section">
+                <div class="sub-header" onclick="toggleSub(this)">
+                    <span class="sub-title">🌅 达成图景</span>
+                    <svg class="sub-chevron" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#5a6480" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+                </div>
+                <div class="sub-body" id="blueprintBody">
+                    <div class="blueprint-text" id="blueprintText">${esc(space.blueprint || '')}</div>
+                    <textarea class="form-input" id="blueprintInput" placeholder="描绘达成后的世界会是什么样子…" style="min-height:100px;">${esc(space.blueprint || '')}</textarea>
+                    <button class="add-btn" style="margin-top:6px;" onclick="saveBlueprint()">保存</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderCreation(c, idx) {
+        const typeMap = {
+            novel: { label: '小说', cls: 'novel', fields: ['genre:题材', 'synopsis:简介', 'characters:角色'] },
+            invention: { label: '发明', cls: 'invention', fields: ['function:功能', 'structure:结构', 'color:花色', 'cost:成本', 'price:定价'] },
+            event: { label: '活动', cls: 'event', fields: ['flow:活动流程', 'participants:参与人', 'scene:场景'] },
+            shop: { label: '主题店', cls: 'shop', fields: ['concept:概念', 'products:产品', 'cost:成本', 'pricing:定价', 'profit:盈利计算'] }
+        };
+        const t = typeMap[c.type] || typeMap.novel;
+        let detailHtml = '';
+        if (c.details && Object.keys(c.details).length > 0) {
+            detailHtml = '<div class="creation-detail-grid">';
+            for (const [k, v] of Object.entries(c.details)) {
+                const field = t.fields.find(f => f.split(':')[0] === k);
+                const label = field ? field.split(':')[1] : k;
+                detailHtml += `<div class="creation-detail-item"><b>${esc(label)}:</b> ${esc(v)}</div>`;
+            }
+            detailHtml += '</div>';
+        }
+        return `
+            <div class="creation-card">
+                <div class="creation-name">
+                    <span class="creation-type ${t.cls}">${t.label}</span>
+                    ${esc(c.name)}
+                </div>
+                <div class="creation-desc">${esc(c.description || '')}</div>
+                ${detailHtml}
+                <div style="margin-top:6px;display:flex;gap:6px;">
+                    <button class="add-btn" style="font-size:0.7rem;padding:4px 8px;" onclick="editCreation(${idx})">编辑</button>
+                    <button class="law-del" onclick="removeCreation(${idx})">删除</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function backToList() {
+        currentSpaceId = null;
+        document.getElementById('spaceDetailView').classList.remove('active');
+        document.getElementById('spaceListView').style.display = 'block';
+        renderSpaceList();
+    }
+
+    function toggleSub(header) {
+        const body = header.nextElementSibling;
+        const chevron = header.querySelector('.sub-chevron');
+        body.classList.toggle('open');
+        chevron.classList.toggle('open');
+    }
+
+    // ===== 法则操作 =====
+    function addLaw() {
+        const input = document.getElementById('lawInput');
+        const text = input.value.trim();
+        if (!text) return;
+        const spaces = loadData();
+        const space = spaces.find(s => s.id === currentSpaceId);
+        if (!space) return;
+        if (!space.laws) space.laws = [];
+        space.laws.push(text);
+        saveData(spaces);
+        input.value = '';
+        openSpaceDetail(currentSpaceId);
+    }
+
+    function removeLaw(idx) {
+        const spaces = loadData();
+        const space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.laws) return;
+        space.laws.splice(idx, 1);
+        saveData(spaces);
+        openSpaceDetail(currentSpaceId);
+    }
+
+    // ===== 创造物操作 =====
+    function addCreation(type) {
+        const typeMap = {
+            novel: { label: '小说', fields: ['genre:题材', 'synopsis:简介', 'characters:角色'] },
+            invention: { label: '发明', fields: ['function:功能', 'structure:结构', 'color:花色', 'cost:成本', 'price:定价'] },
+            event: { label: '活动', fields: ['flow:活动流程', 'participants:参与人', 'scene:场景'] },
+            shop: { label: '主题店', fields: ['concept:概念', 'products:产品', 'cost:成本', 'pricing:定价', 'profit:盈利计算'] }
+        };
+        const t = typeMap[type];
+        const name = prompt(`${t.label}名称：`);
+        if (!name) return;
+
+        const description = prompt(`${t.label}描述：`) || '';
+        const details = {};
+        for (const f of t.fields) {
+            const [key, label] = f.split(':');
+            const val = prompt(`${label}：`);
+            if (val) details[key] = val;
+        }
+
+        const spaces = loadData();
+        const space = spaces.find(s => s.id === currentSpaceId);
+        if (!space) return;
+        if (!space.creations) space.creations = [];
+        space.creations.push({ name, type, description, details });
+        saveData(spaces);
+        if (window.SFX) SFX.correct();
+        openSpaceDetail(currentSpaceId);
+    }
+
+    function editCreation(idx) {
+        const spaces = loadData();
+        const space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[idx]) return;
+        const c = space.creations[idx];
+
+        const typeMap = {
+            novel: ['genre:题材', 'synopsis:简介', 'characters:角色'],
+            invention: ['function:功能', 'structure:结构', 'color:花色', 'cost:成本', 'price:定价'],
+            event: ['flow:活动流程', 'participants:参与人', 'scene:场景'],
+            shop: ['concept:概念', 'products:产品', 'cost:成本', 'pricing:定价', 'profit:盈利计算']
+        };
+
+        const desc = prompt('描述：', c.description || '');
+        if (desc !== null) c.description = desc;
+
+        const fields = typeMap[c.type] || [];
+        if (!c.details) c.details = {};
+        for (const f of fields) {
+            const [key, label] = f.split(':');
+            const val = prompt(`${label}：`, c.details[key] || '');
+            if (val !== null) c.details[key] = val;
+        }
+
+        saveData(spaces);
+        openSpaceDetail(currentSpaceId);
+    }
+
+    function removeCreation(idx) {
+        const spaces = loadData();
+        const space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations) return;
+        space.creations.splice(idx, 1);
+        saveData(spaces);
+        openSpaceDetail(currentSpaceId);
+    }
+
+    // ===== 团队操作 =====
+    function addTeamMember() {
+        const role = document.getElementById('memberRole').value.trim();
+        const resp = document.getElementById('memberResp').value.trim();
+        const emoji = document.getElementById('memberEmoji').value.trim() || '🧑';
+        if (!role) { alert('请输入角色'); return; }
+
+        const spaces = loadData();
+        const space = spaces.find(s => s.id === currentSpaceId);
+        if (!space) return;
+        if (!space.team) space.team = [];
+        space.team.push({ role, responsibility: resp, emoji });
+        saveData(spaces);
+        openSpaceDetail(currentSpaceId);
+    }
+
+    function removeTeamMember(idx) {
+        const spaces = loadData();
+        const space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.team) return;
+        space.team.splice(idx, 1);
+        saveData(spaces);
+        openSpaceDetail(currentSpaceId);
+    }
+
+    // ===== 图景 =====
+    function saveBlueprint() {
+        const text = document.getElementById('blueprintInput').value.trim();
+        const spaces = loadData();
+        const space = spaces.find(s => s.id === currentSpaceId);
+        if (!space) return;
+        space.blueprint = text;
+        saveData(spaces);
+        document.getElementById('blueprintText').textContent = text || '';
+        if (window.SFX) SFX.correct();
+    }
+
+    // ===== 初始化 =====
+    document.addEventListener('DOMContentLoaded', function() {
+        renderSpaceList();
+    });
+</script>
+</body>
+</html>

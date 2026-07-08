@@ -118,6 +118,20 @@
             registerUnit: '词',
             costPerRegisterUnit: 1/3,
             registerRounding: -1  // 特殊：余2词扣1朵，余1不扣
+        },
+        sleep: {
+            name: '睡觉休息',
+            icon: '😴',
+            unit: 'h',
+            unitLabel: '小时',
+            costPerUnit: 1,   // 1朵/h
+            minUnit: 1,
+            description: '躺床上休息，什么都不想，身体会感谢你的',
+            guide: '放下一切，躺平，让身体自己决定要休息多久',
+            registerLabel: '实际躺了多久（分钟）',
+            registerUnit: 'min',
+            costPerRegisterUnit: 1/60,
+            registerRounding: 30
         }
     };
 
