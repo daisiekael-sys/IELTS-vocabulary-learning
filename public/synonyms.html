@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>高频同义替换与学术词汇</title>
+    <title>高频同义替换</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <!-- PWA & iOS 支持 -->
     <link rel="manifest" href="/manifest.json">
@@ -27,7 +27,9 @@
     <script src="firebase-config.js?v=3"></script>
     <script src="auth.js?v=3"></script>
     <script src="backups.js?v=3"></script>
+    <script src="study-log.js?v=1"></script>
     <script src="vocabulary_data.js?v=3"></script>
+    <script src="sfx.js?v=1"></script>
     <style>
         * {
             margin: 0;
@@ -752,8 +754,8 @@
     <script>applyConfig();</script>
     <div class="container">
         <button class="back-btn" onclick="window.location.href='index.html'"></button>
-        <button class="backup-btn-float" onclick="openBackups()">💾 恢复备份</button>
-        <h1>高频同义替换与学术词汇</h1>
+        <button class="backup-btn-float" onclick="openBackups()"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><ellipse cx="12" cy="6" rx="8" ry="3" stroke="#c9a0ff" stroke-width="2" fill="rgba(201,160,255,0.1)"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6" stroke="#c9a0ff" stroke-width="2" fill="none"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" stroke="#c9a0ff" stroke-width="2" fill="none"/></svg>恢复备份</button>
+        <h1>高频同义替换</h1>
         
         <div class="controls">
             <div class="control-group">
@@ -802,7 +804,7 @@
     </div>
 
     <!-- 模式状态指示器 -->
-    <div class="mode-indicator mode-normal-indicator" id="modeIndicator" onclick="toggleModeFromIndicator()">📖 正常模式</div>
+    <div class="mode-indicator mode-normal-indicator" id="modeIndicator" onclick="toggleModeFromIndicator()"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path d="M12 6c-2 0-4 .5-5 2-1-1.5-3-2-5-2v12c2 0 4 .5 5 2 1-1.5 3-2 5-2s4 .5 5 2c1-1.5 3-2 5-2V6c-2 0-4 .5-5 2-1-1.5-3-2-5-2z" fill="#4ec9b0" opacity="0.7"/></svg>正常模式</div>
 
     <!-- 回到顶部按钮（移动端） -->
     <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()">顶部</button>
@@ -1016,10 +1018,10 @@
             const indicator = document.getElementById('modeIndicator');
             if (mode === 'hide-cn') {
                 indicator.className = 'mode-indicator mode-hide-indicator';
-                indicator.textContent = '🔒 隐藏中文';
+                indicator.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><rect x="5" y="11" width="14" height="10" rx="2" fill="#ff9a56" opacity="0.7"/><path d="M8 11V7a4 4 0 018 0v4" stroke="#ff9a56" stroke-width="2" fill="none"/></svg>隐藏中文';
             } else {
                 indicator.className = 'mode-indicator mode-normal-indicator';
-                indicator.textContent = '📖 正常模式';
+                indicator.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path d="M12 6c-2 0-4 .5-5 2-1-1.5-3-2-5-2v12c2 0 4 .5 5 2 1-1.5 3-2 5-2s4 .5 5 2c1-1.5 3-2 5-2V6c-2 0-4 .5-5 2-1-1.5-3-2-5-2z" fill="#4ec9b0" opacity="0.7"/></svg>正常模式';
             }
 
             // 更新显示
@@ -1164,6 +1166,7 @@
                 starBtn.className = 'star-btn';
                 starBtn.innerHTML = '☆';
                 delete starredWords[wordKey];
+                if (window.SFX) SFX.tick();
             } else if (wordItem.classList.contains('starred')) {
                 // 升级为双星
                 wordItem.classList.remove('starred');
@@ -1171,12 +1174,15 @@
                 starBtn.className = 'star-btn starred-double';
                 starBtn.innerHTML = '🌟🌟';
                 starredWords[wordKey] = 'starred-double';
+                if (window.SFX) SFX.master(); // 双星=完全掌握
             } else {
                 // 添加单星
                 wordItem.classList.add('starred');
                 starBtn.className = 'star-btn starred';
                 starBtn.innerHTML = '🌟';
                 starredWords[wordKey] = 'starred';
+                if (window.StudyLog) StudyLog.record('synonyms', { learned: 1, mastered: 1 });
+                if (window.SFX) SFX.correct();
             }
             
             // 保存到本地存储
@@ -1320,7 +1326,7 @@
     <div id="backupModal" class="backup-modal-mask" style="display:none;">
         <div class="backup-modal">
             <div class="backup-modal-header">
-                <span>💾 数据备份与恢复</span>
+                <span><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:6px;"><ellipse cx="12" cy="6" rx="8" ry="3" stroke="#c9a0ff" stroke-width="2" fill="rgba(201,160,255,0.1)"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6" stroke="#c9a0ff" stroke-width="2" fill="none"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" stroke="#c9a0ff" stroke-width="2" fill="none"/></svg>数据备份与恢复</span>
                 <button class="backup-close" onclick="closeBackups()">✕</button>
             </div>
             <p class="backup-tip">删除数据前会自动备份。误删后在这里一键还原。</p>
@@ -1350,5 +1356,10 @@
         function restoreBackupById(id) { if (!confirm('恢复到该备份会覆盖当前学习数据，确定吗？')) return; if (BackupManager.restoreBackup(id)) { alert('已恢复！请刷新页面查看。'); closeBackups(); location.reload(); } else { alert('恢复失败，备份不存在'); } }
         function deleteBackupById(id) { if (!confirm('确定删除该备份？')) return; BackupManager.deleteBackup(id); renderBackups(); }
     </script>
+
+    <!-- 悬浮刷新按钮 -->
+    <button onclick="location.reload()" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(78,201,176,0.15);border:1px solid rgba(78,201,176,0.3);color:#4ec9b0;cursor:pointer;z-index:9998;backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(78,201,176,0.3)'" onmouseout="this.style.background='rgba(78,201,176,0.15)'" title="刷新">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5" stroke="#4ec9b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </button>
 </body>
 </html>

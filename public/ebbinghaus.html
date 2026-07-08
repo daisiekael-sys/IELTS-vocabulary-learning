@@ -29,6 +29,8 @@
     <script src="firebase-config.js?v=3"></script>
     <script src="auth.js?v=3"></script>
     <script src="backups.js?v=3"></script>
+    <script src="study-log.js?v=1"></script>
+    <script src="sfx.js?v=1"></script>
     <style>
         * {
             margin: 0;
@@ -714,7 +716,7 @@
     <script>applyConfig();</script>
     <div class="container">
         <button class="back-btn" onclick="window.location.href='index.html'"></button>
-        <button class="backup-btn-float" onclick="openBackups()">💾 恢复备份</button>
+        <button class="backup-btn-float" onclick="openBackups()"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><ellipse cx="12" cy="6" rx="8" ry="3" stroke="#c9a0ff" stroke-width="2" fill="rgba(201,160,255,0.1)"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6" stroke="#c9a0ff" stroke-width="2" fill="none"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" stroke="#c9a0ff" stroke-width="2" fill="none"/></svg>恢复备份</button>
         <h1 class="title">🌌 雅思词汇拼写训练 · 艾宾浩斯宇宙版</h1>
 
         <!-- 全局总进度 -->
@@ -777,7 +779,7 @@
 
         <!-- 记忆阶段 -->
         <div class="stage" id="memStage">
-            <h2>📚 记忆阶段
+            <h2><svg width="20" height="20" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:6px;"><defs><linearGradient id="eg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#4d7fff"/></linearGradient></defs><path d="M12 6c-2 0-4 .5-5 2-1-1.5-3-2-5-2v12c2 0 4 .5 5 2 1-1.5 3-2 5-2s4 .5 5 2c1-1.5 3-2 5-2V6c-2 0-4 .5-5 2-1-1.5-3-2-5-2z" fill="url(#eg1)"/></svg>记忆阶段
                 <button class="icon-btn pause-btn" id="pauseBtn">⏸️</button>
                 <button class="icon-btn skip-mem-btn" id="skipMemBtn">🚀</button>
                 <button class="icon-btn back-btn" id="backToConfigFromMem">⬅️</button>
@@ -1481,17 +1483,38 @@
             if(val === target) {
                 rightNum++;
                 updateMemoryData(cur, true);
+                StudyLog.record('ebbinghaus', { learned: 1 });
                 if(!masterMap[key]) {
                     const memoryData = getMemoryData();
                     const memory = memoryData[key] || {stage: 0, correctStreak: 0};
                     if(memory.correctStreak >= 3) { // 连续答对3次以上才算掌握
                         masterMap[key]=1;
                         stats.totalMaster++;
+                        StudyLog.record('ebbinghaus', { mastered: 1 });
                         setMasterMap(masterMap);
+                        if(window.SFX) SFX.master(); // 掌握音效
+                        // 如果该词在错词本中，播放纸飞机飞出音效
+                        const allErrs = getErrorVocab();
+                        if(allErrs.some(x => x.cn+'_'+x.en === key)) {
+                            setTimeout(() => { if(window.SFX) SFX.fly(); }, 300);
+                        }
+                    } else {
+                        if(window.SFX) SFX.correct(); // 普通答对音效
                     }
+                } else {
+                    if(window.SFX) SFX.correct(); // 已掌握的词再答对
                 }
                 const errIdx = sessionErrors.findIndex(x => x.cn+'_'+x.en===key);
-                if(errIdx>-1) sessionErrors.splice(errIdx,1);
+                if(errIdx>-1) {
+                    sessionErrors.splice(errIdx,1);
+                    // 同时从错词本移除已掌握的词
+                    const allErrors = getErrorVocab();
+                    const persistIdx = allErrors.findIndex(x => x.cn+'_'+x.en===key);
+                    if(persistIdx > -1) {
+                        allErrors.splice(persistIdx, 1);
+                        setErrorVocab(allErrors);
+                    }
+                }
                 testQueue.shift();
                 // 答对时立即清除错误状态和答案显示
                 qInput.classList.remove('error');
@@ -1502,6 +1525,7 @@
                 nextQ();
             } else {
                 updateMemoryData(cur, false);
+                if(window.SFX) SFX.wrong(); // 答错音效
                 qInput.classList.add('error');
                 qTip.textContent = '❌ 拼写错误，请重试';
                 qTip.classList.add('active');
@@ -1509,7 +1533,10 @@
                 answerShow.classList.add('active'); speak(cur.en);
                 ansPlayBtn.onclick=()=>speak(cur.en);
                 loopBtn.onclick=()=>loopMode?stopLoop():startLoop(cur.en);
-                if(!sessionErrors.some(x=>x.cn+'_'+x.en===key)) sessionErrors.push(cur);
+                if(!sessionErrors.some(x=>x.cn+'_'+x.en===key)) {
+                    sessionErrors.push(cur);
+                    StudyLog.record('ebbinghaus', { errors: 1 });
+                }
                 refreshAllProgress();
                 // 聚焦输入框方便重试
                 qInput.value = '';
@@ -1535,6 +1562,7 @@
 
         // 显示结果
         function showResult() {
+            if(window.SFX) SFX.complete(); // 完成音效
             resStage.classList.add('active');
             resTotal.textContent = totalQ;
             resRight.textContent = rightNum;
@@ -1611,6 +1639,25 @@
             renderList(pick);
             memStage.classList.add('active');
             startCountdown(Number(memTime.value)||120);
+        }
+
+        // 错词本复习模式：从 errorbook.html 跳转过来
+        function startErrorBookReview() {
+            const raw = sessionStorage.getItem('errorbook_review');
+            if (!raw) return false;
+            try {
+                const list = JSON.parse(raw);
+                if (!list.length) return false;
+                sessionStorage.removeItem('errorbook_review');
+                init();
+                currentList = list;
+                testQueue = [...list];
+                totalQ = testQueue.length;
+                renderList(list);
+                memStage.classList.add('active');
+                startCountdown(Number(memTime.value)||60);
+                return true;
+            } catch(e) { return false; }
         }
 
         // 事件绑定
@@ -1789,7 +1836,7 @@
     <div id="backupModal" class="backup-modal-mask" style="display:none;">
         <div class="backup-modal">
             <div class="backup-modal-header">
-                <span>💾 数据备份与恢复</span>
+                <span><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:6px;"><ellipse cx="12" cy="6" rx="8" ry="3" stroke="#c9a0ff" stroke-width="2" fill="rgba(201,160,255,0.1)"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6" stroke="#c9a0ff" stroke-width="2" fill="none"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" stroke="#c9a0ff" stroke-width="2" fill="none"/></svg>数据备份与恢复</span>
                 <button class="backup-close" onclick="closeBackups()">✕</button>
             </div>
             <p class="backup-tip">删除数据前会自动备份。误删后在这里一键还原。</p>
@@ -1819,5 +1866,19 @@
         function restoreBackupById(id) { if (!confirm('恢复到该备份会覆盖当前学习数据，确定吗？')) return; if (BackupManager.restoreBackup(id)) { alert('已恢复！请刷新页面查看。'); closeBackups(); location.reload(); } else { alert('恢复失败，备份不存在'); } }
         function deleteBackupById(id) { if (!confirm('确定删除该备份？')) return; BackupManager.deleteBackup(id); renderBackups(); }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 检查是否从错词本跳转过来
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('mode') === 'errorbook') {
+                setTimeout(() => startErrorBookReview(), 500);
+            }
+        });
+    </script>
+
+    <!-- 悬浮刷新按钮 -->
+    <button onclick="location.reload()" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(130,150,255,0.15);border:1px solid rgba(130,150,255,0.3);color:#8299ff;cursor:pointer;z-index:9998;backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(130,150,255,0.3)'" onmouseout="this.style.background='rgba(130,150,255,0.15)'" title="刷新">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5" stroke="#8299ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </button>
 </body>
 </html>

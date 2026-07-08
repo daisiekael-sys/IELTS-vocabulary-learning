@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>拼写练习 - 雅思词汇学习中心</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a2345">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IELTS词汇">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <script src="config.js?v=3"></script>
+    <script src="firebase-config.js?v=3"></script>
+    <script src="auth.js?v=3"></script>
+    <script src="vocabulary_data.js?v=3"></script>
+    <script src="study-log.js?v=1"></script>
+    <script src="sfx.js?v=1"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", Arial, sans-serif; }
+        body {
+            background: #0a1028;
+            background-image: radial-gradient(circle at 50% 50%, #1a2345 0%, #050714 100%);
+            color: #e6edf7;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 顶部导航 */
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 20px;
+            background: rgba(10,16,40,0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(130,150,255,0.08);
+            z-index: 100;
+        }
+        .back-btn {
+            display: flex; align-items: center; gap: 6px;
+            color: #8a94a6; font-size: 0.85rem; cursor: pointer;
+            background: none; border: none; transition: color 0.2s;
+        }
+        .back-btn:hover { color: #c7d1ff; }
+        .top-title { color: #c7d1ff; font-size: 1rem; font-weight: 500; }
+        .top-stats { color: #5a6480; font-size: 0.8rem; }
+
+        /* 选择界面 */
+        .setup-screen {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 24px;
+            z-index: 50;
+        }
+        .setup-title {
+            font-size: 1.5rem; color: #c7d1ff; margin-bottom: 8px; font-weight: 600;
+        }
+        .setup-sub {
+            color: #5a6480; font-size: 0.85rem; margin-bottom: 32px;
+        }
+
+        /* 模式卡片 */
+        .mode-cards {
+            display: flex; flex-direction: column; gap: 16px;
+            width: 100%; max-width: 420px;
+        }
+        .mode-card {
+            background: rgba(130,150,255,0.06);
+            border: 1px solid rgba(130,150,255,0.12);
+            border-radius: 16px; padding: 20px 24px;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .mode-card:hover {
+            background: rgba(130,150,255,0.12);
+            border-color: rgba(130,150,255,0.25);
+            transform: translateY(-2px);
+        }
+        .mode-card.selected {
+            border-color: rgba(78,201,176,0.5);
+            background: rgba(78,201,176,0.08);
+        }
+        .mode-name {
+            font-size: 1.05rem; color: #c7d1ff; font-weight: 500; margin-bottom: 4px;
+        }
+        .mode-desc { color: #5a6480; font-size: 0.8rem; line-height: 1.5; }
+
+        /* 导入区 */
+        .import-section {
+            width: 100%; max-width: 420px; margin-top: 24px;
+        }
+        .import-label {
+            color: #8a94a6; font-size: 0.8rem; margin-bottom: 8px;
+        }
+        .import-tabs {
+            display: flex; gap: 8px; margin-bottom: 12px;
+        }
+        .import-tab {
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
+            background: rgba(130,150,255,0.08); border: 1px solid rgba(130,150,255,0.12);
+            color: #8a94a6;
+        }
+        .import-tab.active {
+            background: rgba(78,201,176,0.15); border-color: rgba(78,201,176,0.3);
+            color: #4ec9b0;
+        }
+        .import-panel { display: none; }
+        .import-panel.active { display: block; }
+
+        .word-bank-list {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
+        }
+        .word-bank-chip {
+            padding: 6px 12px; border-radius: 16px; font-size: 0.75rem;
+            background: rgba(130,150,255,0.08); border: 1px solid rgba(130,150,255,0.12);
+            color: #8a94a6; cursor: pointer; transition: all 0.2s;
+        }
+        .word-bank-chip.active {
+            background: rgba(78,201,176,0.15); border-color: rgba(78,201,176,0.3);
+            color: #4ec9b0;
+        }
+
+        .import-textarea {
+            width: 100%; height: 120px; border-radius: 12px;
+            background: rgba(130,150,255,0.05); border: 1px solid rgba(130,150,255,0.12);
+            color: #c7d1ff; padding: 12px; font-size: 0.85rem; resize: vertical;
+            outline: none;
+        }
+        .import-textarea::placeholder { color: #3d4a6a; }
+        .import-textarea:focus { border-color: rgba(130,150,255,0.3); }
+        .import-hint { color: #3d4a6a; font-size: 0.7rem; margin-top: 6px; }
+
+        /* 文件上传 */
+        .file-upload-area {
+            border: 2px dashed rgba(130,150,255,0.15);
+            border-radius: 12px; padding: 24px; text-align: center;
+            cursor: pointer; transition: all 0.3s; margin-bottom: 8px;
+        }
+        .file-upload-area:hover, .file-upload-area.dragover {
+            border-color: rgba(78,201,176,0.4);
+            background: rgba(78,201,176,0.04);
+        }
+        .file-upload-icon { font-size: 1.8rem; margin-bottom: 8px; }
+        .file-upload-text { color: #8a94a6; font-size: 0.8rem; }
+        .file-upload-text em { color: #4ec9b0; font-style: normal; }
+        .file-input-hidden { display: none; }
+
+        /* 已保存词库 */
+        .saved-bank-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px; border-radius: 10px; margin-bottom: 6px;
+            background: rgba(130,150,255,0.05); border: 1px solid rgba(130,150,255,0.08);
+        }
+        .saved-bank-info { display: flex; align-items: center; gap: 8px; }
+        .saved-bank-name { color: #c7d1ff; font-size: 0.85rem; }
+        .saved-bank-count { color: #5a6480; font-size: 0.7rem; }
+        .saved-bank-del {
+            background: none; border: none; color: #3d4a6a; cursor: pointer;
+            font-size: 0.8rem; padding: 4px 8px; border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .saved-bank-del:hover { color: #ff6b6b; background: rgba(255,107,107,0.1); }
+
+        /* 保存词库弹窗 */
+        .save-modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 200;
+            display: none; align-items: center; justify-content: center;
+        }
+        .save-modal-overlay.active { display: flex; }
+        .save-modal {
+            background: #1a2345; border: 1px solid rgba(130,150,255,0.15);
+            border-radius: 16px; padding: 24px; width: 90%; max-width: 360px;
+        }
+        .save-modal h4 { color: #c7d1ff; margin-bottom: 12px; font-size: 1rem; }
+        .save-modal input {
+            width: 100%; padding: 10px 12px; border-radius: 10px;
+            background: rgba(130,150,255,0.08); border: 1px solid rgba(130,150,255,0.15);
+            color: #c7d1ff; font-size: 0.9rem; outline: none;
+        }
+        .save-modal input:focus { border-color: rgba(78,201,176,0.4); }
+        .save-modal-btns { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+        .save-modal-btn {
+            padding: 8px 18px; border-radius: 10px; border: none;
+            font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+        }
+        .save-modal-btn.cancel { background: rgba(130,150,255,0.08); color: #8a94a6; }
+        .save-modal-btn.confirm { background: rgba(78,201,176,0.2); color: #4ec9b0; }
+
+        .start-btn {
+            width: 100%; max-width: 420px; margin-top: 20px;
+            padding: 14px; border-radius: 12px; border: none;
+            font-size: 1rem; font-weight: 500; cursor: pointer;
+            background: linear-gradient(135deg, rgba(78,201,176,0.25), rgba(130,150,255,0.2));
+            color: #4ec9b0; transition: all 0.3s;
+        }
+        .start-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(78,201,176,0.2); }
+        .start-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+        /* 拼写全屏 */
+        .spell-screen {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            padding: 24px;
+            z-index: 80;
+        }
+        .spell-screen.active { display: flex; }
+
+        .spell-progress {
+            position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; gap: 12px;
+            color: #5a6480; font-size: 0.8rem;
+        }
+        .spell-progress-bar {
+            width: 120px; height: 3px; border-radius: 2px;
+            background: rgba(130,150,255,0.1);
+        }
+        .spell-progress-fill {
+            height: 100%; border-radius: 2px;
+            background: linear-gradient(90deg, #4ec9b0, #8299ff);
+            transition: width 0.3s;
+        }
+
+        .spell-prompt {
+            font-size: 1rem; color: #5a6480; margin-bottom: 16px;
+            min-height: 1.5em;
+        }
+
+        .spell-word-cn {
+            font-size: 1.6rem; color: #c7d1ff; margin-bottom: 32px;
+            min-height: 2em; text-align: center; line-height: 1.4;
+        }
+
+        .spell-input-wrap {
+            position: relative; margin-bottom: 24px;
+        }
+        .spell-input {
+            font-size: 2rem; text-align: center;
+            background: none; border: none; border-bottom: 2px solid rgba(130,150,255,0.2);
+            color: #e6edf7; padding: 8px 16px; outline: none;
+            min-width: 260px; transition: border-color 0.3s;
+            caret-color: #4ec9b0;
+        }
+        .spell-input:focus { border-bottom-color: rgba(78,201,176,0.5); }
+        .spell-input.correct { border-bottom-color: #4ec9b0; color: #4ec9b0; }
+        .spell-input.wrong { border-bottom-color: #ff6b6b; color: #ff6b6b; }
+
+        .spell-result {
+            text-align: center; min-height: 3em;
+            transition: opacity 0.3s;
+        }
+        .spell-answer {
+            font-size: 1.2rem; margin-bottom: 4px;
+        }
+        .spell-answer-correct { color: #4ec9b0; }
+        .spell-answer-wrong { color: #ff6b6b; }
+        .spell-definition {
+            color: #5a6480; font-size: 0.85rem;
+        }
+
+        .spell-hint {
+            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+            color: #3d4a6a; font-size: 0.75rem; text-align: center;
+        }
+
+        /* 底部控制按钮 */
+        .spell-controls {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 16px; align-items: center;
+        }
+        .ctrl-btn {
+            display: flex; align-items: center; gap: 6px;
+            padding: 10px 18px; border-radius: 12px;
+            border: 1px solid rgba(130,150,255,0.15);
+            background: rgba(130,150,255,0.06);
+            color: #8a94a6; font-size: 0.8rem; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ctrl-btn:hover {
+            background: rgba(130,150,255,0.12);
+            color: #c7d1ff;
+        }
+        .replay-btn {
+            background: rgba(78,201,176,0.1);
+            border-color: rgba(78,201,176,0.2);
+            color: #4ec9b0;
+        }
+        .replay-btn:hover {
+            background: rgba(78,201,176,0.2);
+        }
+
+        /* 限时模式计时 */
+        .timer-display {
+            position: absolute; top: 60px; right: 30px;
+            font-size: 1.5rem; color: #ff9a56; font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+        .timer-display.danger { color: #ff6b6b; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 标星模式 */
+        .star-btn-spell {
+            font-size: 1.5rem; cursor: pointer; transition: transform 0.2s;
+            background: none; border: none;
+        }
+        .star-btn-spell:hover { transform: scale(1.2); }
+
+        /* 结算 */
+        .result-screen {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            padding: 24px; z-index: 90;
+        }
+        .result-screen.active { display: flex; }
+
+        .result-title {
+            font-size: 2rem; color: #c7d1ff; margin-bottom: 24px; font-weight: 600;
+        }
+        .result-stats {
+            display: flex; gap: 32px; margin-bottom: 32px;
+        }
+        .result-stat {
+            text-align: center;
+        }
+        .result-num {
+            font-size: 2.5rem; font-weight: 700;
+        }
+        .result-label {
+            color: #5a6480; font-size: 0.8rem; margin-top: 4px;
+        }
+        .result-btns {
+            display: flex; gap: 12px;
+        }
+        .result-btn {
+            padding: 12px 28px; border-radius: 12px; border: none;
+            font-size: 0.95rem; cursor: pointer; transition: all 0.2s;
+        }
+        .result-btn.primary {
+            background: linear-gradient(135deg, rgba(78,201,176,0.25), rgba(130,150,255,0.2));
+            color: #4ec9b0;
+        }
+        .result-btn.secondary {
+            background: rgba(130,150,255,0.08);
+            border: 1px solid rgba(130,150,255,0.15);
+            color: #8a94a6;
+        }
+        .result-btn:hover { transform: translateY(-1px); }
+
+        /* 错词列表 */
+        .wrong-list {
+            width: 100%; max-width: 420px;
+            margin-top: 16px; max-height: 200px; overflow-y: auto;
+        }
+        .wrong-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 12px; border-bottom: 1px solid rgba(130,150,255,0.06);
+        }
+        .wrong-en { color: #ff6b6b; font-size: 0.9rem; }
+        .wrong-cn { color: #5a6480; font-size: 0.8rem; }
+
+        /* 悬浮刷新按钮 */
+        .float-refresh {
+            position: fixed; bottom: 20px; right: 20px;
+            width: 40px; height: 40px; border-radius: 50%;
+            border: none; cursor: pointer; z-index: 9998;
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+            background: rgba(255,107,107,0.12); border: 1px solid rgba(255,107,107,0.25);
+            color: #ff6b6b;
+        }
+        .float-refresh:hover { background: rgba(255,107,107,0.25); }
+    </style>
+</head>
+<body>
+
+<!-- 选择界面 -->
+<div class="setup-screen" id="setupScreen">
+    <div class="setup-title">拼写练习</div>
+    <div class="setup-sub">听发音，拼单词，沉浸式记忆</div>
+
+    <!-- 模式选择 -->
+    <div class="mode-cards">
+        <div class="mode-card" data-mode="spelling" onclick="selectMode('spelling')">
+            <div class="mode-name">✍️ 拼写模式</div>
+            <div class="mode-desc">听发音拼单词，Tab重播，Enter下一词。拼对拼错都显示释义，全屏沉浸。</div>
+        </div>
+        <div class="mode-card" data-mode="timed" onclick="selectMode('timed')">
+            <div class="mode-name">⏱️ 限时模式</div>
+            <div class="mode-desc">每词限时10秒，超时自动跳过。紧张感拉满，训练快速反应。</div>
+        </div>
+        <div class="mode-card" data-mode="star" onclick="selectMode('star')">
+            <div class="mode-name">🌟 标星模式</div>
+            <div class="mode-desc">看释义回忆英文，标星掌握程度。不拼字只认词，轻量记忆。</div>
+        </div>
+    </div>
+
+    <!-- 导入区 -->
+    <div class="import-section">
+        <div class="import-label">选择词库</div>
+        <div class="import-tabs">
+            <div class="import-tab active" onclick="switchImport('bank')">内置词库</div>
+            <div class="import-tab" onclick="switchImport('upload')">上传文件</div>
+            <div class="import-tab" onclick="switchImport('custom')">粘贴导入</div>
+        </div>
+
+        <div class="import-panel active" id="bankPanel">
+            <div class="word-bank-list" id="bankList"></div>
+            <!-- 已保存的自定义词库 -->
+            <div id="savedBanksSection" style="margin-top:12px;display:none;">
+                <div style="color:#5a6480;font-size:0.75rem;margin-bottom:6px;">已保存的词库</div>
+                <div id="savedBanksList"></div>
+            </div>
+        </div>
+
+        <div class="import-panel" id="uploadPanel">
+            <div class="file-upload-area" id="fileDropArea" onclick="document.getElementById('fileInput').click()">
+                <div class="file-upload-icon">📂</div>
+                <div class="file-upload-text">拖拽文件到这里，或 <em>点击选择文件</em></div>
+                <div style="color:#3d4a6a;font-size:0.7rem;margin-top:4px;">支持 .txt .md .csv .json</div>
+            </div>
+            <input type="file" class="file-input-hidden" id="fileInput" accept=".txt,.md,.csv,.json,.tsv" onchange="handleFileSelect(event)">
+            <div id="uploadPreview" style="display:none;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <span id="uploadFileName" style="color:#4ec9b0;font-size:0.8rem;"></span>
+                    <button onclick="clearUpload()" style="background:none;border:none;color:#ff6b6b;font-size:0.75rem;cursor:pointer;">清除</button>
+                </div>
+                <div style="display:flex;gap:12px;color:#8a94a6;font-size:0.8rem;">
+                    <span>识别: <b id="uploadWordCount" style="color:#c7d1ff;">0</b> 词</span>
+                    <span>有效: <b id="uploadValidCount" style="color:#4ec9b0;">0</b> 条</span>
+                </div>
+                <button onclick="saveUploadedBank()" style="margin-top:8px;padding:6px 14px;border-radius:8px;background:rgba(78,201,176,0.12);border:1px solid rgba(78,201,176,0.2);color:#4ec9b0;font-size:0.75rem;cursor:pointer;">💾 保存为词库</button>
+            </div>
+            <div class="import-hint" style="margin-top:8px;">
+                支持格式：每行 <code style="color:#4ec9b0;">english 中文</code>（Tab/空格/逗号/| 分隔）<br>
+                CSV: <code style="color:#4ec9b0;">english,cn</code> · Markdown表格 · JSON数组
+            </div>
+        </div>
+
+        <div class="import-panel" id="customPanel">
+            <textarea class="import-textarea" id="customInput" placeholder="每行一个单词&#10;格式: english&#9;中文释义&#10;例:&#10;abandon&#9;放弃&#10;absurd&#9;荒唐的"></textarea>
+            <div class="import-hint">Tab/逗号/空格 分隔英文和中文，或每行只写英文（将自动查找释义）</div>
+            <button onclick="savePastedBank()" id="savePastedBtn" style="display:none;margin-top:8px;padding:6px 14px;border-radius:8px;background:rgba(78,201,176,0.12);border:1px solid rgba(78,201,176,0.2);color:#4ec9b0;font-size:0.75rem;cursor:pointer;">💾 保存为词库</button>
+        </div>
+    </div>
+
+    <button class="start-btn" id="startBtn" onclick="startPractice()" disabled>开始练习</button>
+</div>
+
+<!-- 拼写全屏 -->
+<div class="spell-screen" id="spellScreen">
+    <div class="spell-progress">
+        <span id="spellIndex">0</span> / <span id="spellTotal">0</span>
+        <div class="spell-progress-bar"><div class="spell-progress-fill" id="spellProgressFill"></div></div>
+    </div>
+
+    <div class="timer-display" id="timerDisplay" style="display:none;">10</div>
+
+    <div class="spell-prompt" id="spellPrompt">听发音，拼写单词</div>
+    <div class="spell-word-cn" id="spellCn"></div>
+
+    <div class="spell-input-wrap">
+        <input type="text" class="spell-input" id="spellInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="拼写...">
+    </div>
+
+    <div class="spell-result" id="spellResult">
+        <div class="spell-answer" id="spellAnswer"></div>
+        <div class="spell-definition" id="spellDef"></div>
+    </div>
+
+    <div class="spell-hint" id="spellHint">Tab 重播发音 · Enter 下一词</div>
+
+    <div class="spell-controls">
+        <button class="ctrl-btn replay-btn" onclick="replayPronunciation()">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3z" fill="#4ec9b0"/><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" fill="#4ec9b0"/></svg>
+            重播
+        </button>
+        <button class="ctrl-btn" id="starBtn" onclick="toggleSpellStar()" style="display:none;">☆</button>
+        <button class="ctrl-btn" onclick="quitPractice()">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="#8a94a6" stroke-width="2" stroke-linecap="round"/></svg>
+            退出
+        </button>
+    </div>
+</div>
+
+<!-- 结算 -->
+<div class="result-screen" id="resultScreen">
+    <div class="result-title" id="resultTitle">练习完成</div>
+    <div class="result-stats">
+        <div class="result-stat">
+            <div class="result-num" style="color:#4ec9b0;" id="resultCorrect">0</div>
+            <div class="result-label">正确</div>
+        </div>
+        <div class="result-stat">
+            <div class="result-num" style="color:#ff6b6b;" id="resultWrong">0</div>
+            <div class="result-label">错误</div>
+        </div>
+        <div class="result-stat">
+            <div class="result-num" style="color:#8299ff;" id="resultTotal">0</div>
+            <div class="result-label">总计</div>
+        </div>
+    </div>
+    <div class="wrong-list" id="wrongList"></div>
+    <div class="result-btns">
+        <button class="result-btn secondary" onclick="backToSetup()">重新选择</button>
+        <button class="result-btn primary" onclick="retryWrong()">只练错词</button>
+    </div>
+</div>
+
+<!-- 悬浮刷新按钮 -->
+<button class="float-refresh" onclick="location.reload()" title="刷新">
+    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+</button>
+
+<!-- 保存词库弹窗 -->
+<div class="save-modal-overlay" id="saveModal">
+    <div class="save-modal">
+        <h4>💾 保存词库</h4>
+        <input type="text" id="saveBankName" placeholder="词库名称，如：GRE核心词" maxlength="20">
+        <div class="save-modal-btns">
+            <button class="save-modal-btn cancel" onclick="closeSaveModal()">取消</button>
+            <button class="save-modal-btn confirm" onclick="confirmSaveBank()">保存</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = 'ielts_learning_system';
+
+    // ===== 艾宾浩斯词库（从 ebbinghaus.html 同步） =====
+    const ebbinghausVocab = {
+        tech: [
+            {cn:"尖端科学",en:"advanced science"},{cn:"科学发明",en:"scientific invention"},
+            {cn:"对…产生深远影响",en:"exert a far-reaching impact on…"},{cn:"双刃剑",en:"double-edged sword"},
+            {cn:"翻天覆地的改变",en:"earth-shaking changes"},{cn:"为未来发展铺平道路",en:"pave the way for the future development"},
+            {cn:"能源危机",en:"energy crisis"},{cn:"能源消耗",en:"depletion of resources"},
+            {cn:"里程碑",en:"milestone"},{cn:"尖端设备",en:"sophisticated equipment"},
+            {cn:"科技创新",en:"technical innovation"},{cn:"权宜之计",en:"expediency"},
+            {cn:"与…背道而驰的",en:"antithetical"},{cn:"过度商业化的",en:"over-commercialized"},
+            {cn:"热烈的讨论",en:"a heated discussion"},{cn:"废气",en:"exhaust gas"},
+            {cn:"灾难性的",en:"disastrous"},{cn:"使…相形见绌",en:"overshadow"},
+            {cn:"取代",en:"substitute"},{cn:"引领",en:"usher in"},
+            {cn:"既快捷又舒适",en:"speedy and comfortable"},{cn:"负面影响",en:"opposite forces"},
+            {cn:"致命故障",en:"a fatal breakdown"},{cn:"潜在危险",en:"potential hazards"},
+            {cn:"对…有一种威胁",en:"pose a threat to…"},{cn:"促进相关产业发展",en:"promote related industries"},
+            {cn:"加速…",en:"accelerate"},{cn:"交通方式",en:"means of transportation"},
+            {cn:"交通工具",en:"transportation tools"},{cn:"社会地位",en:"social status"},
+            {cn:"环保的能源",en:"environmentally-friendly resources"},{cn:"与…相比",en:"compared to/with…"},
+            {cn:"可替代燃料",en:"alternative fuel"},{cn:"可持续性发展",en:"sustainable development"},
+            {cn:"科学探索",en:"scientific exploration"},{cn:"航空旅行",en:"air travel"},
+            {cn:"可笑的",en:"ridiculous"},{cn:"荒唐的",en:"absurd"},
+            {cn:"万能良药",en:"cure-all solution"},{cn:"克服困难",en:"overcome difficulties"},
+            {cn:"取得进步",en:"make progress"},{cn:"民族自豪感",en:"a sense of national pride"},
+            {cn:"前所未有的",en:"unprecedented"},{cn:"不断上升的",en:"soaring"},
+            {cn:"极大地推动经济发展",en:"give a great push to the economic growth"},{cn:"使恶化",en:"aggravate"},
+            {cn:"优化",en:"optimize"},{cn:"取得突破性进展",en:"see dramatic breakthroughs"},
+            {cn:"科技发展",en:"scientific and technological development"},{cn:"创新能力",en:"innovation capability"}
+        ],
+        culture: [
+            {cn:"文化视角",en:"cultural insights"},{cn:"了解世界",en:"learn about the world"},
+            {cn:"令人激动的经历",en:"a thrilling experience"},{cn:"抽象的",en:"abstract"},
+            {cn:"具体的",en:"concrete"},{cn:"使…感动落泪",en:"move somebody to tears"},
+            {cn:"得到放松和娱乐",en:"get relaxed and entertained"},{cn:"场所",en:"venue"},
+            {cn:"有其自己价值",en:"has its value"},{cn:"灵感",en:"inspiration"},
+            {cn:"知识面",en:"scope of knowledge"},{cn:"传播知识",en:"spread knowledge"},
+            {cn:"永恒的艺术作品",en:"lasting artistic works"},{cn:"深奥的",en:"abstruse"},
+            {cn:"抛弃传统",en:"break with old customs"},{cn:"代代相传",en:"carry down from generation to generation"},
+            {cn:"倡导新的生活方式",en:"advocate the new lifestyle"},{cn:"娱乐",en:"entertainment"},
+            {cn:"与…不同",en:"be different from…"},{cn:"直接经验",en:"direct experience"},
+            {cn:"共识",en:"echo"},{cn:"满足心理需求",en:"satiate people's psychological demands"},
+            {cn:"更重视…",en:"attach more importance to…"},{cn:"精神升华",en:"spiritual enhancement"},
+            {cn:"文化多元性",en:"cultural diversity"},{cn:"文化遗产",en:"cultural heritage"},
+            {cn:"文化认同",en:"cultural identity"},{cn:"传统价值",en:"traditional values"},
+            {cn:"跨文化交流",en:"cross-cultural communication"},{cn:"精神财富",en:"spiritual wealth"},
+            {cn:"审美价值",en:"aesthetic value"},{cn:"文化冲突",en:"culture shock"},
+            {cn:"融合",en:"integration"},{cn:"民族特色",en:"national identity"},
+            {cn:"历史遗迹",en:"historical sites"},{cn:"文化传承",en:"cultural continuity"}
+        ],
+        work: [
+            {cn:"职业发展",en:"career development"},{cn:"工作满意度",en:"job satisfaction"},
+            {cn:"团队合作",en:"teamwork"},{cn:"领导力",en:"leadership"},
+            {cn:"职业道德",en:"professional ethics"},{cn:"工作效率",en:"work efficiency"},
+            {cn:"晋升机会",en:"promotion opportunity"},{cn:"加班",en:"work overtime"},
+            {cn:"工作与生活的平衡",en:"work-life balance"},{cn:"招聘",en:"recruitment"},
+            {cn:"裁员",en:"lay off"},{cn:"灵活的工作时间",en:"flexible working hours"},
+            {cn:"远程办公",en:"telecommuting"},{cn:"职场竞争",en:"workplace competition"},
+            {cn:"职业培训",en:"vocational training"},{cn:"就业市场",en:"job market"},
+            {cn:"自主创业",en:"self-employment"},{cn:"劳动合同",en:"employment contract"},
+            {cn:"绩效考核",en:"performance appraisal"},{cn:"沟通技巧",en:"communication skills"},
+            {cn:"时间管理",en:"time management"},{cn:"压力管理",en:"stress management"},
+            {cn:"职业倦怠",en:"burnout"},{cn:"薪资待遇",en:"salary and benefits"},
+            {cn:"社会保障",en:"social security"},{cn:"失业率",en:"unemployment rate"},
+            {cn:"劳动力",en:"labor force"},{cn:"专业知识",en:"professional knowledge"},
+            {cn:"责任心",en:"sense of responsibility"},{cn:"适应能力",en:"adaptability"}
+        ],
+        life: [
+            {cn:"生活质量",en:"quality of life"},{cn:"幸福感",en:"sense of happiness"},
+            {cn:"健康饮食",en:"healthy diet"},{cn:"锻炼",en:"exercise"},
+            {cn:"心理健康",en:"mental health"},{cn:"社交网络",en:"social network"},
+            {cn:"家庭关系",en:"family relationship"},{cn:"休闲活动",en:"leisure activity"},
+            {cn:"消费观念",en:"consumption concept"},{cn:"储蓄",en:"saving"},
+            {cn:"住房问题",en:"housing problem"},{cn:"交通拥堵",en:"traffic congestion"},
+            {cn:"环境污染",en:"environmental pollution"},{cn:"医疗保健",en:"health care"},
+            {cn:"教育资源",en:"educational resources"},{cn:"代沟",en:"generation gap"},
+            {cn:"人口老龄化",en:"population aging"},{cn:"城市化",en:"urbanization"},
+            {cn:"生活节奏",en:"pace of life"},{cn:"社区服务",en:"community service"},
+            {cn:"食品安全",en:"food safety"},{cn:"公共设施",en:"public facilities"},
+            {cn:"生活成本",en:"cost of living"},{cn:"安全感",en:"sense of security"},
+            {cn:"归属感",en:"sense of belonging"},{cn:"人际关系",en:"interpersonal relationship"},
+            {cn:"压力",en:"stress"},{cn:"抑郁症",en:"depression"},
+            {cn:"可持续的",en:"sustainable"},{cn:"环保的",en:"eco-friendly"}
+        ],
+        travel: [
+            {cn:"旅游目的地",en:"tourist destination"},{cn:"文化遗产",en:"cultural heritage"},
+            {cn:"观光",en:"sightseeing"},{cn:"背包旅行",en:"backpacking"},
+            {cn:"旅行社",en:"travel agency"},{cn:"签证",en:"visa"},
+            {cn:"入境",en:"entry"},{cn:"出境",en:"departure"},
+            {cn:"航班",en:"flight"},{cn:"住宿",en:"accommodation"},
+            {cn:"交通",en:"transportation"},{cn:"行程",en:"itinerary"},
+            {cn:"纪念品",en:"souvenir"},{cn:"语言障碍",en:"language barrier"},
+            {cn:"旅游旺季",en:"peak season"},{cn:"自然景观",en:"natural landscape"},
+            {cn:"风土人情",en:"local customs"},{cn:"探险",en:"adventure"},
+            {cn:"生态旅游",en:"eco-tourism"},{cn:"免税店",en:"duty-free shop"},
+            {cn:"货币兑换",en:"currency exchange"},{cn:"旅行保险",en:"travel insurance"},
+            {cn:"当地美食",en:"local cuisine"},{cn:"旅游攻略",en:"travel guide"},
+            {cn:"度假",en:"vacation"},{cn:"远足",en:"hiking"},
+            {cn:"旅行体验",en:"travel experience"},{cn:"出国留学",en:"study abroad"},
+            {cn:"文化交流",en:"cultural exchange"},{cn:"全球化",en:"globalization"}
+        ],
+        education: [
+            {cn:"素质教育",en:"quality education"},{cn:"应试教育",en:"exam-oriented education"},
+            {cn:"终身学习",en:"lifelong learning"},{cn:"批判性思维",en:"critical thinking"},
+            {cn:"创新精神",en:"innovative spirit"},{cn:"学术研究",en:"academic research"},
+            {cn:"奖学金",en:"scholarship"},{cn:"学费",en:"tuition fee"},
+            {cn:"义务教育",en:"compulsory education"},{cn:"高等教育",en:"higher education"},
+            {cn:"职业教育",en:"vocational education"},{cn:"远程教育",en:"distance education"},
+            {cn:"教育公平",en:"educational equity"},{cn:"课程设置",en:"curriculum design"},
+            {cn:"师生关系",en:"teacher-student relationship"},{cn:"学习方法",en:"learning method"},
+            {cn:"创造力",en:"creativity"},{cn:"知识经济",en:"knowledge economy"},
+            {cn:"学位",en:"degree"},{cn:"文凭",en:"diploma"},
+            {cn:"毕业",en:"graduation"},{cn:"入学",en:"enrollment"},
+            {cn:"校园生活",en:"campus life"},{cn:"课外活动",en:"extracurricular activity"},
+            {cn:"学术论文",en:"academic paper"},{cn:"实验室",en:"laboratory"},
+            {cn:"实践能力",en:"practical ability"},{cn:"全面发展",en:"all-round development"},
+            {cn:"教育改革",en:"educational reform"},{cn:"人才",en:"talent"}
+        ]
+    };
+
+    // ===== 同义替换词库 =====
+    const synonymVocab = [];
+    if (typeof vocabularyData !== 'undefined') {
+        vocabularyData.forEach(unit => {
+            unit.categories.forEach(cat => {
+                cat.words.forEach(w => synonymVocab.push(w));
+            });
+        });
+    }
+
+    // ===== 状态 =====
+    let currentMode = null;
+    let selectedBanks = new Set();
+    let practiceWords = [];
+    let currentIndex = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let wrongWords = [];
+    let answered = false;
+    let timerInterval = null;
+    let timeLeft = 10;
+    let uploadedWords = [];    // 上传文件解析出的词
+    let pendingSaveWords = []; // 待保存的词
+
+    // ===== 初始化词库列表 =====
+    function initBankList() {
+        const list = document.getElementById('bankList');
+        const banks = [
+            { id: 'ebbinghaus_all', label: '艾宾浩斯 全部', count: Object.values(ebbinghausVocab).flat().length },
+            { id: 'ebbinghaus_tech', label: '科技', count: ebbinghausVocab.tech.length },
+            { id: 'ebbinghaus_culture', label: '文化', count: ebbinghausVocab.culture.length },
+            { id: 'ebbinghaus_work', label: '工作', count: ebbinghausVocab.work.length },
+            { id: 'ebbinghaus_life', label: '生活', count: ebbinghausVocab.life.length },
+            { id: 'ebbinghaus_travel', label: '旅行', count: ebbinghausVocab.travel.length },
+            { id: 'ebbinghaus_education', label: '教育', count: ebbinghausVocab.education.length },
+            { id: 'synonyms', label: '同义替换', count: synonymVocab.length },
+        ];
+        list.innerHTML = banks.map(b =>
+            `<div class="word-bank-chip" data-bank="${b.id}" onclick="toggleBank('${b.id}')">${b.label} (${b.count})</div>`
+        ).join('');
+        renderSavedBanks();
+    }
+
+    function renderSavedBanks() {
+        const saved = getSavedBanks();
+        const section = document.getElementById('savedBanksSection');
+        const list = document.getElementById('savedBanksList');
+        if (Object.keys(saved).length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+        section.style.display = 'block';
+        list.innerHTML = Object.entries(saved).map(([id, bank]) =>
+            `<div class="saved-bank-item">
+                <div class="saved-bank-info">
+                    <span class="saved-bank-name">${escHtml(bank.name)}</span>
+                    <span class="saved-bank-count">${bank.words.length} 词</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:4px;">
+                    <div class="word-bank-chip" data-bank="saved_${id}" onclick="toggleBank('saved_${id}')" style="margin:0;font-size:0.7rem;padding:4px 10px;">选择</div>
+                    <button class="saved-bank-del" onclick="deleteSavedBank('${id}')">✕</button>
+                </div>
+            </div>`
+        ).join('');
+    }
+
+    function escHtml(s) {
+        const d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    function getSavedBanks() {
+        try {
+            const d = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            return d.spellingBanks || {};
+        } catch(e) { return {}; }
+    }
+
+    function saveBankToStorage(id, name, words) {
+        try {
+            const d = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            if (!d.spellingBanks) d.spellingBanks = {};
+            d.spellingBanks[id] = { name, words, createdAt: Date.now() };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+        } catch(e) {}
+    }
+
+    function deleteSavedBank(id) {
+        try {
+            const d = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            if (d.spellingBanks) delete d.spellingBanks[id];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+        } catch(e) {}
+        selectedBanks.delete('saved_' + id);
+        renderSavedBanks();
+        updateStartBtn();
+    }
+
+    function toggleBank(id) {
+        const chip = document.querySelector(`.word-bank-chip[data-bank="${id}"]`);
+        if (selectedBanks.has(id)) {
+            selectedBanks.delete(id);
+            chip.classList.remove('active');
+        } else {
+            selectedBanks.add(id);
+            chip.classList.add('active');
+        }
+        updateStartBtn();
+    }
+
+    function selectMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+        document.querySelector(`.mode-card[data-mode="${mode}"]`).classList.add('selected');
+        updateStartBtn();
+    }
+
+    function switchImport(type) {
+        document.querySelectorAll('.import-tab').forEach(t => t.classList.remove('active'));
+        const tabs = document.querySelectorAll('.import-tab');
+        const idx = { bank: 0, upload: 1, custom: 2 }[type] || 0;
+        tabs[idx].classList.add('active');
+        document.getElementById('bankPanel').classList.toggle('active', type === 'bank');
+        document.getElementById('uploadPanel').classList.toggle('active', type === 'upload');
+        document.getElementById('customPanel').classList.toggle('active', type === 'custom');
+        updateStartBtn();
+    }
+
+    function updateStartBtn() {
+        const hasWords = selectedBanks.size > 0 || uploadedWords.length > 0 || document.getElementById('customInput').value.trim();
+        document.getElementById('startBtn').disabled = !currentMode || !hasWords;
+        // 粘贴导入时显示保存按钮
+        const customText = document.getElementById('customInput').value.trim();
+        document.getElementById('savePastedBtn').style.display = customText ? 'inline-block' : 'none';
+    }
+
+    // ===== 获取练习词库 =====
+    function getPracticeWords() {
+        let words = [];
+
+        selectedBanks.forEach(id => {
+            if (id === 'ebbinghaus_all') {
+                Object.values(ebbinghausVocab).flat().forEach(w => words.push({...w}));
+            } else if (id.startsWith('ebbinghaus_')) {
+                const cat = id.replace('ebbinghaus_', '');
+                if (ebbinghausVocab[cat]) ebbinghausVocab[cat].forEach(w => words.push({...w}));
+            } else if (id === 'synonyms') {
+                synonymVocab.forEach(w => words.push({...w}));
+            } else if (id.startsWith('saved_')) {
+                const bankId = id.replace('saved_', '');
+                const saved = getSavedBanks();
+                if (saved[bankId]) saved[bankId].words.forEach(w => words.push({...w}));
+            }
+        });
+
+        // 上传文件解析的词
+        uploadedWords.forEach(w => words.push({...w}));
+
+        // 自定义粘贴导入
+        const customText = document.getElementById('customInput').value.trim();
+        if (customText) {
+            parseText(customText).forEach(w => words.push(w));
+        }
+
+        // 去重
+        const seen = new Set();
+        words = words.filter(w => {
+            const key = w.en.toLowerCase();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+
+        // 打乱
+        for (let i = words.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [words[i], words[j]] = [words[j], words[i]];
+        }
+
+        return words;
+    }
+
+    function findDefinition(enWord) {
+        // 从艾宾浩斯词库查找
+        for (const cat of Object.values(ebbinghausVocab)) {
+            const found = cat.find(w => w.en.toLowerCase() === enWord.toLowerCase());
+            if (found) return found.cn;
+        }
+        // 从同义替换词库查找
+        const found = synonymVocab.find(w => w.en.toLowerCase() === enWord.toLowerCase());
+        return found ? found.cn : '';
+    }
+
+    // ===== 多格式文本解析器 =====
+    function parseText(text) {
+        const words = [];
+        const trimmed = text.trim();
+        if (!trimmed) return words;
+
+        // 尝试 JSON 解析
+        try {
+            const json = JSON.parse(trimmed);
+            if (Array.isArray(json)) {
+                json.forEach(item => {
+                    if (typeof item === 'object' && item.en && item.cn) {
+                        words.push({ en: String(item.en).trim(), cn: String(item.cn).trim() });
+                    } else if (typeof item === 'string') {
+                        const parsed = parseLine(item);
+                        if (parsed) words.push(parsed);
+                    }
+                });
+                return words;
+            }
+        } catch(e) { /* 不是 JSON，继续 */ }
+
+        // 逐行解析
+        const lines = trimmed.split('\n');
+        for (const rawLine of lines) {
+            let line = rawLine.trim();
+            if (!line) continue;
+
+            // 跳过 markdown 表头分隔行 |---|---|
+            if (/^\|[\s\-:|]+\|$/.test(line)) continue;
+            // 跳过 markdown 标题行
+            if (/^#+\s/.test(line)) continue;
+
+            // Markdown 表格行 | en | cn |
+            if (line.startsWith('|') && line.endsWith('|')) {
+                const cells = line.split('|').map(c => c.trim()).filter(c => c);
+                if (cells.length >= 2 && isEnglish(cells[0])) {
+                    // 跳过表头行（如果第一个 cell 是 "english"/"英文"/"word" 等）
+                    const first = cells[0].toLowerCase();
+                    if (['english','word','英文','单词','en'].includes(first)) continue;
+                    words.push({ en: cells[0], cn: cells.slice(1).join('; ') });
+                    continue;
+                }
+            }
+
+            // 普通行解析
+            const parsed = parseLine(line);
+            if (parsed) words.push(parsed);
+        }
+        return words;
+    }
+
+    function parseLine(line) {
+        line = line.trim();
+        if (!line) return null;
+
+        // 尝试多种分隔符: Tab → | → , → 连续空格 → 单空格
+        // 1. Tab 分隔
+        if (line.includes('\t')) {
+            const parts = line.split('\t').map(s => s.trim()).filter(s => s);
+            if (parts.length >= 2 && isEnglish(parts[0])) {
+                return { en: parts[0], cn: parts.slice(1).join('; ') };
+            }
+        }
+
+        // 2. | 分隔
+        if (line.includes('|') && !line.startsWith('|')) {
+            const parts = line.split('|').map(s => s.trim()).filter(s => s);
+            if (parts.length >= 2 && isEnglish(parts[0])) {
+                return { en: parts[0], cn: parts.slice(1).join('; ') };
+            }
+        }
+
+        // 3. 逗号分隔（CSV）
+        if (line.includes(',')) {
+            const parts = line.split(',').map(s => s.trim()).filter(s => s);
+            if (parts.length >= 2 && isEnglish(parts[0])) {
+                return { en: parts[0], cn: parts.slice(1).join(',') };
+            }
+        }
+
+        // 4. 连续空格或特殊分隔（- / — / · / ：/ :）
+        const specialSplit = line.match(/^([\w\s\-']+?)\s*[-—·：:]\s*(.+)$/);
+        if (specialSplit && isEnglish(specialSplit[1].trim())) {
+            return { en: specialSplit[1].trim(), cn: specialSplit[2].trim() };
+        }
+
+        // 5. 双空格分隔
+        const doubleSpace = line.match(/^(\S+(?:\s\S+)*)\s{2,}(.+)$/);
+        if (doubleSpace && isEnglish(doubleSpace[1].trim())) {
+            return { en: doubleSpace[1].trim(), cn: doubleSpace[2].trim() };
+        }
+
+        // 6. 单空格：第一个英文词+剩余中文
+        const singleSplit = line.match(/^([\w\-']+)(?:\s+)(.+)$/);
+        if (singleSplit && isEnglish(singleSplit[1]) && /[\u4e00-\u9fff]/.test(singleSplit[2])) {
+            return { en: singleSplit[1], cn: singleSplit[2].trim() };
+        }
+
+        // 7. 只有英文，尝试查释义
+        if (isEnglish(line)) {
+            const def = findDefinition(line);
+            return { en: line, cn: def || '' };
+        }
+
+        return null;
+    }
+
+    function isEnglish(s) {
+        return /^[a-zA-Z]/.test(s.trim());
+    }
+
+    // ===== 文件上传处理 =====
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        readFile(file);
+    }
+
+    function readFile(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const text = e.target.result;
+            uploadedWords = parseText(text);
+            // 显示预览
+            document.getElementById('uploadPreview').style.display = 'block';
+            document.getElementById('uploadFileName').textContent = file.name;
+            document.getElementById('uploadWordCount').textContent = text.split('\n').filter(l => l.trim()).length + ' 行';
+            document.getElementById('uploadValidCount').textContent = uploadedWords.length;
+            pendingSaveWords = uploadedWords;
+            updateStartBtn();
+        };
+        reader.readAsText(file, 'UTF-8');
+    }
+
+    function clearUpload() {
+        uploadedWords = [];
+        pendingSaveWords = [];
+        document.getElementById('uploadPreview').style.display = 'none';
+        document.getElementById('fileInput').value = '';
+        updateStartBtn();
+    }
+
+    // 拖拽上传
+    const dropArea = document.getElementById('fileDropArea');
+    if (dropArea) {
+        ['dragenter', 'dragover'].forEach(evt => {
+            dropArea.addEventListener(evt, e => { e.preventDefault(); dropArea.classList.add('dragover'); });
+        });
+        ['dragleave', 'drop'].forEach(evt => {
+            dropArea.addEventListener(evt, e => { e.preventDefault(); dropArea.classList.remove('dragover'); });
+        });
+        dropArea.addEventListener('drop', e => {
+            const file = e.dataTransfer.files[0];
+            if (file) readFile(file);
+        });
+    }
+
+    // ===== 保存词库 =====
+    function saveUploadedBank() {
+        if (uploadedWords.length === 0) return;
+        pendingSaveWords = uploadedWords;
+        openSaveModal();
+    }
+
+    function savePastedBank() {
+        const text = document.getElementById('customInput').value.trim();
+        if (!text) return;
+        pendingSaveWords = parseText(text);
+        if (pendingSaveWords.length === 0) { alert('未识别到有效词条'); return; }
+        openSaveModal();
+    }
+
+    function openSaveModal() {
+        document.getElementById('saveModal').classList.add('active');
+        document.getElementById('saveBankName').value = '';
+        document.getElementById('saveBankName').focus();
+    }
+
+    function closeSaveModal() {
+        document.getElementById('saveModal').classList.remove('active');
+    }
+
+    function confirmSaveBank() {
+        const name = document.getElementById('saveBankName').value.trim();
+        if (!name) { alert('请输入词库名称'); return; }
+        const id = 'bank_' + Date.now();
+        saveBankToStorage(id, name, pendingSaveWords);
+        closeSaveModal();
+        renderSavedBanks();
+        // 自动选中新保存的词库
+        toggleBank('saved_' + id);
+    }
+
+    // ===== 发音 =====
+    function speak(text) {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        utter.rate = 0.9;
+        // 尝试选择女声
+        const voices = window.speechSynthesis.getVoices();
+        const femaleVoice = voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('female'))
+            || voices.find(v => v.lang.startsWith('en-US'))
+            || voices.find(v => v.lang.startsWith('en'));
+        if (femaleVoice) utter.voice = femaleVoice;
+        window.speechSynthesis.speak(utter);
+    }
+
+    // 预加载语音列表
+    if ('speechSynthesis' in window) {
+        speechSynthesis.getVoices();
+        speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+    }
+
+    function replayPronunciation() {
+        if (practiceWords[currentIndex]) {
+            speak(practiceWords[currentIndex].en);
+        }
+    }
+
+    // ===== 开始练习 =====
+    function startPractice() {
+        practiceWords = getPracticeWords();
+        if (practiceWords.length === 0) {
+            alert('没有可用的单词');
+            return;
+        }
+
+        currentIndex = 0;
+        correctCount = 0;
+        wrongCount = 0;
+        wrongWords = [];
+
+        document.getElementById('setupScreen').style.display = 'none';
+        document.getElementById('spellScreen').classList.add('active');
+
+        document.getElementById('spellTotal').textContent = practiceWords.length;
+
+        // 标星模式显示标星按钮
+        document.getElementById('starBtn').style.display = currentMode === 'star' ? 'flex' : 'none';
+
+        showWord();
+    }
+
+    function showWord() {
+        if (currentIndex >= practiceWords.length) {
+            showResult();
+            return;
+        }
+
+        const word = practiceWords[currentIndex];
+        answered = false;
+
+        // 进度
+        document.getElementById('spellIndex').textContent = currentIndex + 1;
+        const pct = ((currentIndex) / practiceWords.length * 100);
+        document.getElementById('spellProgressFill').style.width = pct + '%';
+
+        // 清空输入
+        const input = document.getElementById('spellInput');
+        input.value = '';
+        input.className = 'spell-input';
+        input.focus();
+
+        // 清空结果
+        document.getElementById('spellAnswer').textContent = '';
+        document.getElementById('spellDef').textContent = '';
+
+        if (currentMode === 'star') {
+            // 标星模式：显示中文，让用户回忆英文
+            document.getElementById('spellPrompt').textContent = '看释义，回忆英文';
+            document.getElementById('spellCn').textContent = word.cn;
+            document.getElementById('spellHint').textContent = '点击标星记录掌握程度 · Enter 下一词';
+            input.style.display = 'none';
+            // 直接显示英文
+            setTimeout(() => {
+                document.getElementById('spellAnswer').textContent = word.en;
+                document.getElementById('spellAnswer').className = 'spell-answer';
+                document.getElementById('spellDef').textContent = word.cn;
+            }, 500);
+        } else {
+            // 拼写/限时模式：听发音拼写
+            document.getElementById('spellPrompt').textContent = '听发音，拼写单词';
+            document.getElementById('spellCn').textContent = '';
+            document.getElementById('spellHint').textContent = 'Tab 重播发音 · Enter 下一词';
+            input.style.display = 'block';
+            // 自动发音
+            setTimeout(() => speak(word.en), 300);
+        }
+
+        // 限时模式
+        if (currentMode === 'timed') {
+            startTimer();
+        } else {
+            document.getElementById('timerDisplay').style.display = 'none';
+            if (timerInterval) clearInterval(timerInterval);
+        }
+
+        // 标星按钮重置
+        document.getElementById('starBtn').textContent = '☆';
+    }
+
+    function startTimer() {
+        timeLeft = 10;
+        const display = document.getElementById('timerDisplay');
+        display.style.display = 'block';
+        display.textContent = '10';
+        display.classList.remove('danger');
+
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            display.textContent = timeLeft;
+            if (timeLeft <= 3) display.classList.add('danger');
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                handleAnswer(false);
+            }
+        }, 1000);
+    }
+
+    function handleAnswer(skip) {
+        if (answered) return;
+        answered = true;
+
+        if (timerInterval) clearInterval(timerInterval);
+
+        const word = practiceWords[currentIndex];
+        const input = document.getElementById('spellInput');
+        const userAnswer = input.value.trim().toLowerCase();
+        const correct = word.en.toLowerCase().replace(/\s+/g, ' ') === userAnswer.replace(/\s+/g, ' ');
+
+        if (skip) {
+            // 超时
+            input.className = 'spell-input wrong';
+            wrongCount++;
+            wrongWords.push(word);
+            if (window.SFX) SFX.wrong();
+        } else if (correct) {
+            input.className = 'spell-input correct';
+            correctCount++;
+            if (window.SFX) SFX.correct();
+        } else {
+            input.className = 'spell-input wrong';
+            wrongCount++;
+            wrongWords.push(word);
+            if (window.SFX) SFX.wrong();
+        }
+
+        // 显示答案
+        document.getElementById('spellAnswer').textContent = word.en;
+        document.getElementById('spellAnswer').className = 'spell-answer ' + (correct ? 'spell-answer-correct' : 'spell-answer-wrong');
+        document.getElementById('spellDef').textContent = word.cn;
+
+        // 记录学习日志
+        if (window.StudyLog) StudyLog.record('spelling', { learned: 1 });
+
+        // 更新提示
+        document.getElementById('spellHint').textContent = 'Enter 下一词 · Tab 重播';
+
+        // 保存数据到 localStorage
+        saveSpellingData(correct, word);
+    }
+
+    function saveSpellingData(correct, word) {
+        try {
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            if (!data.spelling) data.spelling = { total: 0, correct: 0, history: {} };
+            data.spelling.total++;
+            if (correct) data.spelling.correct++;
+            const today = new Date().toISOString().slice(0, 10);
+            if (!data.spelling.history[today]) data.spelling.history[today] = { total: 0, correct: 0 };
+            data.spelling.history[today].total++;
+            if (correct) data.spelling.history[today].correct++;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch(e) {}
+    }
+
+    function nextWord() {
+        if (!answered && currentMode !== 'star') {
+            handleAnswer(false);
+            return;
+        }
+        currentIndex++;
+        if (currentIndex >= practiceWords.length) {
+            showResult();
+        } else {
+            showWord();
+        }
+    }
+
+    function toggleSpellStar() {
+        const btn = document.getElementById('starBtn');
+        const word = practiceWords[currentIndex];
+        if (btn.textContent === '☆') {
+            btn.textContent = '🌟';
+            if (window.SFX) SFX.correct();
+        } else if (btn.textContent === '🌟') {
+            btn.textContent = '🌟🌟';
+            if (window.SFX) SFX.master();
+        } else {
+            btn.textContent = '☆';
+            if (window.SFX) SFX.tick();
+        }
+    }
+
+    // ===== 结算 =====
+    function showResult() {
+        if (timerInterval) clearInterval(timerInterval);
+        document.getElementById('spellScreen').classList.remove('active');
+        document.getElementById('resultScreen').classList.add('active');
+
+        document.getElementById('resultCorrect').textContent = correctCount;
+        document.getElementById('resultWrong').textContent = wrongCount;
+        document.getElementById('resultTotal').textContent = practiceWords.length;
+
+        const accuracy = practiceWords.length > 0 ? Math.round(correctCount / practiceWords.length * 100) : 0;
+        if (accuracy >= 80) {
+            document.getElementById('resultTitle').textContent = '太棒了！';
+            if (window.SFX) SFX.mvp();
+        } else if (accuracy >= 50) {
+            document.getElementById('resultTitle').textContent = '继续加油！';
+            if (window.SFX) SFX.complete();
+        } else {
+            document.getElementById('resultTitle').textContent = '还需努力';
+        }
+
+        // 错词列表
+        const list = document.getElementById('wrongList');
+        if (wrongWords.length > 0) {
+            list.innerHTML = wrongWords.map(w =>
+                `<div class="wrong-item"><span class="wrong-en">${w.en}</span><span class="wrong-cn">${w.cn}</span></div>`
+            ).join('');
+            list.style.display = 'block';
+        } else {
+            list.style.display = 'none';
+        }
+    }
+
+    function retryWrong() {
+        if (wrongWords.length === 0) {
+            backToSetup();
+            return;
+        }
+        practiceWords = [...wrongWords];
+        // 打乱
+        for (let i = practiceWords.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [practiceWords[i], practiceWords[j]] = [practiceWords[j], practiceWords[i]];
+        }
+        currentIndex = 0;
+        correctCount = 0;
+        wrongCount = 0;
+        wrongWords = [];
+
+        document.getElementById('resultScreen').classList.remove('active');
+        document.getElementById('spellScreen').classList.add('active');
+        document.getElementById('spellTotal').textContent = practiceWords.length;
+        showWord();
+    }
+
+    function backToSetup() {
+        document.getElementById('resultScreen').classList.remove('active');
+        document.getElementById('spellScreen').classList.remove('active');
+        document.getElementById('setupScreen').style.display = 'flex';
+    }
+
+    function quitPractice() {
+        if (timerInterval) clearInterval(timerInterval);
+        document.getElementById('spellScreen').classList.remove('active');
+        document.getElementById('setupScreen').style.display = 'flex';
+    }
+
+    // ===== 键盘事件 =====
+    document.addEventListener('keydown', function(e) {
+        // 只在拼写界面响应
+        if (!document.getElementById('spellScreen').classList.contains('active')) return;
+        if (currentMode === 'star') {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                nextWord();
+            }
+            return;
+        }
+
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            replayPronunciation();
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!answered) {
+                handleAnswer(false);
+            } else {
+                nextWord();
+            }
+        }
+    });
+
+    // 自定义输入监听
+    document.getElementById('customInput').addEventListener('input', updateStartBtn);
+
+    // 保存词库弹窗回车确认
+    document.getElementById('saveBankName').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); confirmSaveBank(); }
+    });
+
+    // ===== 初始化 =====
+    document.addEventListener('DOMContentLoaded', function() {
+        initBankList();
+    });
+</script>
+</body>
+</html>

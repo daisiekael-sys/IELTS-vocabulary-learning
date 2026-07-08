@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>错词本 - 雅思词汇学习中心</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a2345">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IELTS词汇">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <!-- 自定义脚本 -->
+    <script src="config.js?v=3"></script>
+    <script src="firebase-config.js?v=3"></script>
+    <script src="auth.js?v=3"></script>
+    <script src="sfx.js?v=1"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", Arial, sans-serif; }
+        body {
+            background: #0a1028;
+            background-image: radial-gradient(circle at 50% 50%, #1a2345 0%, #050714 100%);
+            color: #e6edf7;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 880px; margin: 40px auto; background: rgba(18, 28, 58, 0.85); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 0 50px rgba(100, 120, 255, 0.2); padding: 40px; }
+        .back-btn { position: fixed; top: 20px; left: 20px; background: rgba(130,150,255,0.12); color: #c7d1ff; border: 1px solid rgba(130,150,255,0.3); border-radius: 12px; padding: 8px 16px; cursor: pointer; font-size: 14px; z-index: 9999; backdrop-filter: blur(8px); }
+        .back-btn:hover { background: rgba(130,150,255,0.25); }
+        .title { text-align: center; font-size: 1.8rem; color: #c7d1ff; margin-bottom: 8px; text-shadow: 0 0 20px rgba(130, 150, 255, 0.3); }
+        .subtitle { text-align: center; color: #8a94a6; font-size: 0.9rem; margin-bottom: 24px; }
+
+        /* 进度条 */
+        .progress-section { margin-bottom: 24px; }
+        .progress-bar { background: rgba(26,35,69,0.6); border-radius: 10px; height: 24px; overflow: hidden; position: relative; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff9a56, #ff6b9d); border-radius: 10px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; }
+        .progress-text { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 0.8rem; color: #e6edf7; white-space: nowrap; }
+
+        /* 筛选标签 */
+        .filter-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .filter-tab { background: rgba(26,35,69,0.6); border: 1px solid rgba(130,150,255,0.2); color: #8a94a6; border-radius: 10px; padding: 8px 16px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+        .filter-tab.active { background: rgba(130,150,255,0.2); color: #c7d1ff; border-color: rgba(130,150,255,0.5); }
+        .filter-tab:hover { background: rgba(130,150,255,0.12); }
+
+        /* 错词列表 */
+        .error-list { display: flex; flex-direction: column; gap: 8px; max-height: 500px; overflow-y: auto; }
+        .error-item { display: flex; justify-content: space-between; align-items: center; background: rgba(26,35,69,0.6); border: 1px solid rgba(130,150,255,0.12); border-radius: 12px; padding: 14px 18px; transition: all 0.2s; }
+        .error-item:hover { border-color: rgba(130,150,255,0.25); background: rgba(26,35,69,0.8); }
+        .error-item-text { color: #e6edf7; font-size: 0.95rem; }
+        .error-item-text b { color: #8299ff; }
+        .error-item-del { background: transparent; color: #ff7272; border: 1px solid rgba(255,114,114,0.3); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem; }
+        .error-item-del:hover { background: rgba(255,114,114,0.1); }
+        .empty-state { text-align: center; padding: 60px 20px; color: #5a6480; }
+        .empty-state svg { margin-bottom: 12px; }
+
+        /* 操作按钮 */
+        .action-bar { display: flex; gap: 12px; margin-top: 20px; }
+        .action-btn { flex: 1; border: none; border-radius: 12px; padding: 14px; cursor: pointer; font-size: 0.95rem; font-weight: 500; transition: all 0.2s; }
+        .btn-review { background: linear-gradient(135deg, rgba(130,150,255,0.25), rgba(78,201,176,0.15)); color: #c7d1ff; border: 1px solid rgba(130,150,255,0.4); }
+        .btn-review:hover { background: linear-gradient(135deg, rgba(130,150,255,0.4), rgba(78,201,176,0.25)); }
+        .btn-clear { background: rgba(255,114,114,0.08); color: #ff7272; border: 1px solid rgba(255,114,114,0.3); }
+        .btn-clear:hover { background: rgba(255,114,114,0.15); }
+
+        /* ===== MVP 结算弹窗 ===== */
+        .mvp-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 7, 20, 0.92);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 99999; opacity: 0; pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        .mvp-overlay.show {
+            opacity: 1; pointer-events: auto;
+        }
+        .mvp-card {
+            text-align: center; padding: 48px 36px;
+            background: linear-gradient(135deg, rgba(26,35,69,0.95), rgba(18,28,58,0.98));
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 24px;
+            box-shadow: 0 0 80px rgba(255,215,0,0.15), 0 0 200px rgba(130,150,255,0.1);
+            transform: scale(0.8); transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+            max-width: 400px; width: 90vw;
+        }
+        .mvp-overlay.show .mvp-card {
+            transform: scale(1);
+        }
+        .mvp-badge {
+            font-size: 4rem; margin-bottom: 12px;
+            animation: mvpFloat 2s ease-in-out infinite;
+        }
+        @keyframes mvpFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .mvp-title {
+            font-size: 1.6rem; font-weight: 700;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; margin-bottom: 8px;
+        }
+        .mvp-sub {
+            color: #8a94a6; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;
+        }
+        .mvp-stats {
+            display: flex; gap: 16px; justify-content: center; margin-bottom: 24px;
+        }
+        .mvp-stat {
+            background: rgba(130,150,255,0.08); border-radius: 12px; padding: 12px 16px;
+            border: 1px solid rgba(130,150,255,0.15); min-width: 80px;
+        }
+        .mvp-stat-val { font-size: 1.4rem; font-weight: 700; color: #4ec9b0; }
+        .mvp-stat-label { font-size: 0.7rem; color: #5a6480; margin-top: 2px; }
+        .mvp-close {
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,170,0,0.15));
+            color: #ffd700; border: 1px solid rgba(255,215,0,0.3); border-radius: 12px;
+            padding: 12px 32px; cursor: pointer; font-size: 1rem; font-weight: 500;
+            transition: all 0.2s;
+        }
+        .mvp-close:hover {
+            background: linear-gradient(135deg, rgba(255,215,0,0.35), rgba(255,170,0,0.25));
+        }
+
+        /* 粒子 */
+        .mvp-particles {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none; z-index: 99998; overflow: hidden;
+        }
+        .mvp-particle {
+            position: absolute; font-size: 1.2rem;
+            animation: particleFall linear forwards;
+            opacity: 0;
+        }
+        @keyframes particleFall {
+            0% { opacity: 1; transform: translateY(-20px) rotate(0deg); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+        }
+
+        @media (max-width: 640px) {
+            .container { margin: 20px auto; padding: 20px 16px; border-radius: 12px; }
+            .title { font-size: 1.3rem; }
+            .error-item { padding: 10px 12px; font-size: 0.85rem; }
+            .mvp-card { padding: 32px 20px; }
+            .mvp-badge { font-size: 3rem; }
+            .mvp-title { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="window.location.href='index.html'">← 返回</button>
+    <div class="container">
+        <h1 class="title">错词本</h1>
+        <p class="subtitle">答错过的短语自动收录 · 连续答对后自动移出</p>
+
+        <!-- 复习进度 -->
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="errorProgress" style="width:0%;">
+                </div>
+                <div class="progress-text" id="errorProgressText">0 个错词</div>
+            </div>
+        </div>
+
+        <!-- 筛选 -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">全部</button>
+            <button class="filter-tab" data-filter="ebbinghaus">艾宾浩斯</button>
+            <button class="filter-tab" data-filter="synonyms">同义替换</button>
+        </div>
+
+        <!-- 错词列表 -->
+        <div class="error-list" id="errorList"></div>
+
+        <!-- 操作 -->
+        <div class="action-bar">
+            <button class="action-btn btn-review" id="reviewBtn" onclick="startReview()">开始复习</button>
+            <button class="action-btn btn-clear" onclick="clearAll()">清空错词本</button>
+        </div>
+    </div>
+
+    <!-- MVP 结算弹窗 -->
+    <div class="mvp-overlay" id="mvpOverlay">
+        <div class="mvp-card">
+            <div class="mvp-badge" id="mvpBadge">🏆</div>
+            <div class="mvp-title" id="mvpTitle">错词全部攻克</div>
+            <div class="mvp-sub" id="mvpSub">所有曾经绊倒你的词，现在都被你踩在脚下</div>
+            <div class="mvp-stats" id="mvpStats"></div>
+            <button class="mvp-close" onclick="closeMVP()">继续前进</button>
+        </div>
+    </div>
+    <div class="mvp-particles" id="mvpParticles"></div>
+
+    <script>
+        const STORAGE_KEY = 'ielts_learning_system';
+        let currentFilter = 'all';
+        let prevErrorCount = 0; // 跟踪上次错词数量
+
+        function getStorageData() {
+            try {
+                let d = localStorage.getItem(STORAGE_KEY);
+                return d ? JSON.parse(d) : {};
+            } catch(e) { return {}; }
+        }
+
+        function getErrors() {
+            const data = getStorageData();
+            // 艾宾浩斯错词
+            const ebbErrors = data.ebbinghaus?.errors || [];
+            // 同义替换的星标词作为"需关注"
+            const synStarred = data.synonyms?.starred || {};
+            const synErrors = Object.entries(synStarred).map(([key, level]) => {
+                const parts = key.split('_');
+                return { cn: parts[1] || '', en: parts[0] || '', source: 'synonyms', level: level };
+            });
+
+            return {
+                ebbinghaus: ebbErrors.map(w => ({ ...w, source: 'ebbinghaus' })),
+                synonyms: synErrors,
+                all: [...ebbErrors.map(w => ({ ...w, source: 'ebbinghaus' })), ...synErrors]
+            };
+        }
+
+        function renderErrors() {
+            const errors = getErrors();
+            const list = errors[currentFilter] || [];
+            const el = document.getElementById('errorList');
+
+            // 更新进度条
+            const total = errors.all.length;
+            const pct = total > 0 ? 100 : 0;
+            document.getElementById('errorProgress').style.width = pct + '%';
+            document.getElementById('errorProgressText').textContent = total + ' 个错词';
+
+            // 检测从有→无：触发 MVP
+            if (prevErrorCount > 0 && total === 0) {
+                showMVP(prevErrorCount);
+            }
+            prevErrorCount = total;
+
+            if (list.length === 0) {
+                el.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="none" stroke="#4ec9b0" stroke-width="2" opacity="0.3"/><path d="M16 24l5 5 11-11" stroke="#4ec9b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.5"/></svg><div>错词收集中</div></div>';
+                document.getElementById('reviewBtn').style.opacity = '0.4';
+                document.getElementById('reviewBtn').style.pointerEvents = 'none';
+                return;
+            }
+
+            document.getElementById('reviewBtn').style.opacity = '1';
+            document.getElementById('reviewBtn').style.pointerEvents = 'auto';
+
+            el.innerHTML = list.map((w, i) => {
+                const sourceTag = w.source === 'ebbinghaus'
+                    ? '<span style="font-size:0.7rem;color:#7c5cff;background:rgba(124,92,255,0.12);padding:1px 6px;border-radius:4px;margin-right:8px;">艾宾浩斯</span>'
+                    : '<span style="font-size:0.7rem;color:#4ec9b0;background:rgba(78,201,176,0.12);padding:1px 6px;border-radius:4px;margin-right:8px;">同义替换</span>';
+                return '<div class="error-item"><div class="error-item-text">' + sourceTag + w.cn + ' → <b>' + w.en + '</b></div><button class="error-item-del" data-idx="' + i + '" data-source="' + w.source + '">移除</button></div>';
+            }).join('');
+
+            el.querySelectorAll('.error-item-del').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (window.SFX) SFX.tick();
+                    removeError(parseInt(btn.dataset.idx), btn.dataset.source);
+                });
+            });
+        }
+
+        function removeError(idx, source) {
+            const data = getStorageData();
+            if (source === 'ebbinghaus') {
+                const errors = data.ebbinghaus?.errors || [];
+                errors.splice(idx, 1);
+                if (!data.ebbinghaus) data.ebbinghaus = {};
+                data.ebbinghaus.errors = errors;
+            } else if (source === 'synonyms') {
+                const starred = data.synonyms?.starred || {};
+                const keys = Object.keys(starred);
+                if (keys[idx]) {
+                    delete starred[keys[idx]];
+                }
+                if (!data.synonyms) data.synonyms = {};
+                data.synonyms.starred = starred;
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            if (typeof syncDataWithCloud === 'function') syncDataWithCloud();
+            if (window.SFX) SFX.fly(); // 纸飞机飞出
+            renderErrors();
+        }
+
+        function startReview() {
+            const errors = getErrors();
+            const list = errors[currentFilter] || errors.all;
+            if (list.length === 0) { alert('错词本为空'); return; }
+
+            // 保存错词到 sessionStorage 供 ebbinghaus 页面读取
+            sessionStorage.setItem('errorbook_review', JSON.stringify(list.map(w => ({ cn: w.cn, en: w.en }))));
+            window.location.href = 'ebbinghaus.html?mode=errorbook';
+        }
+
+        function clearAll() {
+            if (!confirm('确定清空所有错词？此操作不可撤销。')) return;
+            if (typeof BackupManager !== 'undefined') BackupManager.createBackup('清空错词本前自动备份');
+            const data = getStorageData();
+            if (data.ebbinghaus) data.ebbinghaus.errors = [];
+            if (data.synonyms) data.synonyms.starred = {};
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            if (typeof syncDataWithCloud === 'function') syncDataWithCloud();
+            renderErrors();
+        }
+
+        // ===== MVP 结算 =====
+        function showMVP(clearedCount) {
+            // 音效
+            if (window.SFX) SFX.mvp();
+
+            // 填充数据
+            document.getElementById('mvpStats').innerHTML =
+                '<div class="mvp-stat"><div class="mvp-stat-val">' + clearedCount + '</div><div class="mvp-stat-label">错词攻克</div></div>' +
+                '<div class="mvp-stat"><div class="mvp-stat-val" style="color:#ffd700;">A+</div><div class="mvp-stat-label">评级</div></div>';
+
+            // 粒子特效
+            spawnParticles();
+
+            // 显示
+            document.getElementById('mvpOverlay').classList.add('show');
+        }
+
+        function closeMVP() {
+            document.getElementById('mvpOverlay').classList.remove('show');
+            document.getElementById('mvpParticles').innerHTML = '';
+        }
+
+        function spawnParticles() {
+            const container = document.getElementById('mvpParticles');
+            container.innerHTML = '';
+            const symbols = ['🌸', '⭐', '✨', '🌟', '💫', '🎉', '🎊', '🏅', '💖'];
+            for (let i = 0; i < 40; i++) {
+                const p = document.createElement('div');
+                p.className = 'mvp-particle';
+                p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = (2 + Math.random() * 3) + 's';
+                p.style.animationDelay = Math.random() * 1.5 + 's';
+                p.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
+                container.appendChild(p);
+            }
+            // 清理粒子
+            setTimeout(() => { container.innerHTML = ''; }, 6000);
+        }
+
+        // 筛选标签
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderErrors();
+            });
+        });
+
+        // 初始化时记录初始错词数
+        document.addEventListener('DOMContentLoaded', function() {
+            const errors = getErrors();
+            prevErrorCount = errors.all.length;
+            renderErrors();
+        });
+    </script>
+
+    <!-- 悬浮刷新按钮 -->
+    <button onclick="location.reload()" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,154,86,0.15);border:1px solid rgba(255,154,86,0.3);color:#ff9a56;cursor:pointer;z-index:9998;backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,154,86,0.3)'" onmouseout="this.style.background='rgba(255,154,86,0.15)'" title="刷新">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5" stroke="#ff9a56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </button>
+</body>
+</html>
