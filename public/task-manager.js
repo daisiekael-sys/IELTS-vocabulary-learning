@@ -210,16 +210,23 @@
          */
         calculateTodayReward: function() {
             const stats = this.getDayStats();
-            if (stats.iuTotal === 0) return { flowers: 0, aplus: false };
-            
+            if (stats.iuTotal === 0) return { flowers: 0, sFlower: 0, extraFlowers: 0 };
+              
             const iuAllDone = stats.iuDone >= stats.iuTotal;
-            if (!iuAllDone) return { flowers: 0, aplus: false };
 
+            if (!iuAllDone) {
+                // IU未全部完成：没有S级小红花，其他任务的小红花暂不发放
+                return { flowers: 0, sFlower: 0, extraFlowers: 0 };
+            }
+
+            // IU全部完成 → 获得1朵S级小红花
+            const sFlower = 1;
+
+            // 其他象限每完成1个任务 = 1朵额外小红花
             const beyondIU = stats.done - stats.iuDone;
-            const flowers = 1 + Math.max(0, beyondIU);
-            const aplus = beyondIU > 0;
+            const extraFlowers = Math.max(0, beyondIU);
 
-            return { flowers, aplus };
+            return { flowers: sFlower + extraFlowers, sFlower, extraFlowers };
         }
     };
 })();

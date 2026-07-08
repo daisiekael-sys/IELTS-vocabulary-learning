@@ -993,6 +993,66 @@
         }
         .wish-btn:hover { background: rgba(255, 183, 77, 0.25); }
 
+        /* ℹ 信息按钮 */
+        .info-circle-btn {
+            background: rgba(130,150,255,0.08);
+            border: 1px solid rgba(130,150,255,0.15);
+            border-radius: 50%;
+            width: 26px; height: 26px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.25s;
+            color: #5a6480; padding: 0;
+        }
+        .info-circle-btn:hover {
+            background: rgba(78,201,176,0.15);
+            border-color: rgba(78,201,176,0.35);
+            color: #4ec9b0;
+        }
+
+        /* S级小红花图标 */
+        .flower-s {
+            font-size: 0.9rem;
+        }
+
+        /* 规则卡片 */
+        .reward-info-card {
+            display: none;
+            margin-top: 8px;
+            background: rgba(26,35,69,0.7);
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            animation: cardSlideIn 0.25s ease;
+        }
+        .reward-info-card.open { display: block; }
+        @keyframes cardSlideIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .reward-info-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px;
+            background: rgba(255,215,0,0.06);
+            border-bottom: 1px solid rgba(255,215,0,0.08);
+            font-size: 0.85rem; color: #ffd700;
+        }
+        .reward-info-body { padding: 12px 16px; }
+        .reward-rule-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            margin-bottom: 10px;
+        }
+        .reward-rule-icon {
+            font-size: 1.1rem; flex-shrink: 0; margin-top: 1px;
+        }
+        .reward-rule-icon.s-flower-icon {
+            filter: drop-shadow(0 0 4px rgba(255,215,0,0.5));
+        }
+        .reward-rule-divider {
+            height: 1px;
+            background: rgba(130,150,255,0.06);
+            margin: 10px 0;
+        }
+
         /* 许愿弹窗 */
         .wish-overlay {
             display: none;
@@ -1188,11 +1248,45 @@
                 <!-- 奖励展示条 -->
                 <div class="reward-bar">
                     <div class="flower-count">
+                        <span class="flower-s" id="flowerS" title="S级小红花" style="display:none;">🏵️</span>
                         <span>🌸</span>
                         <span id="flowerCount">0</span>
                     </div>
                     <span id="aplusBadges"></span>
+                    <button class="info-circle-btn" id="rewardInfoBtn" onclick="toggleRewardInfo()" title="小红花规则">
+                        <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="12" y="16.5" text-anchor="middle" fill="currentColor" font-size="13" font-weight="700" font-family="Arial">i</text></svg>
+                    </button>
                     <button class="wish-btn" onclick="openWishPanel()">🎁 许愿兑换</button>
+                </div>
+
+                <!-- 小红花规则卡片 -->
+                <div class="reward-info-card" id="rewardInfoCard">
+                    <div class="reward-info-header">
+                        <span>🏵️ 小红花规则</span>
+                        <button onclick="toggleRewardInfo()" style="background:none;border:none;color:#5a6480;cursor:pointer;font-size:1.1rem;">✕</button>
+                    </div>
+                    <div class="reward-info-body">
+                        <div class="reward-rule-item">
+                            <span class="reward-rule-icon s-flower-icon">🏵️</span>
+                            <div><b style="color:#ffd700;">S级小红花</b><br><span style="color:#5a6480;">完成全部 🔴重要且紧急 任务后获得</span></div>
+                        </div>
+                        <div class="reward-rule-item">
+                            <span class="reward-rule-icon">🌸</span>
+                            <div><b style="color:#ffb74d;">额外小红花</b><br><span style="color:#5a6480;">S级获得后，每完成1个其他任务 +1朵</span></div>
+                        </div>
+                        <div class="reward-rule-divider"></div>
+                        <div class="reward-rule-item">
+                            <span style="color:#ff6b6b;font-size:0.85rem;">⚠️</span>
+                            <div><span style="color:#8a94a6;">先做不重要的任务不会获得小红花。<br>只有拿到 🏵️S级 后，已完成的其他任务才会<span style="color:#ffb74d;">同时发放</span>小花。</span></div>
+                        </div>
+                        <div class="reward-rule-divider"></div>
+                        <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
+                            <b style="color:#8a94a6;">许愿兑换</b><br>
+                            🌈 出去玩 · 1朵/60min<br>
+                            💪 运动 · 1朵/30min<br>
+                            📖 翻词典 · 1朵/3词
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 四象限任务 -->
@@ -1923,6 +2017,7 @@
             TaskManager.toggleTask(taskId);
             renderQuadrantTasks();
             renderCalendar();
+            if (window.RewardSystem) RewardSystem.recalculateToday();
             updateRewardBar();
         }
 
@@ -1953,15 +2048,31 @@
         function updateRewardBar() {
             if (!window.RewardSystem) return;
             const flowers = RewardSystem.getFlowers();
+            const sFlowers = RewardSystem.getSFlowers ? RewardSystem.getSFlowers() : 0;
             document.getElementById('flowerCount').textContent = flowers;
 
-            const aplusCount = RewardSystem.getWeekAplus();
+            // S级小红花图标显示
+            const sEl = document.getElementById('flowerS');
+            if (sFlowers > 0) {
+                sEl.style.display = 'inline';
+                sEl.textContent = '🏵️';
+                sEl.title = 'S级小红花 x' + sFlowers;
+            } else {
+                sEl.style.display = 'none';
+            }
+
+            const aplusCount = RewardSystem.getWeekAplus ? RewardSystem.getWeekAplus() : 0;
             const badgeEl = document.getElementById('aplusBadges');
             if (aplusCount > 0) {
                 badgeEl.innerHTML = '<span class="aplus-badge">A+<span style="font-size:0.65rem;margin-left:2px;">x' + aplusCount + '</span></span>';
             } else {
                 badgeEl.innerHTML = '';
             }
+        }
+
+        function toggleRewardInfo() {
+            const card = document.getElementById('rewardInfoCard');
+            card.classList.toggle('open');
         }
 
         // ===== 许愿兑换（两步流程：出发→回来登记）=====
@@ -2467,7 +2578,7 @@
 
             // 每日结算
             if (window.RewardSystem && window.TaskManager) {
-                RewardSystem.settleToday();
+                RewardSystem.recalculateToday();
             }
         });
     </script>

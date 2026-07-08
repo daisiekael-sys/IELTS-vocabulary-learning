@@ -3,10 +3,12 @@
  * 
  * 设计理念：把让我们健康的、变得更好的事情视为奖励
  * 
- * 奖励规则（按周结算）：
- *   - 每日IU全部完成 = 1朵小红花
- *   - 超出IU还完成其他象限 = 每超1个1朵 + A+标记
- *   - 仅IU完成 = 1朵
+ * 小红花规则（S级优先制）：
+ *   - 完成全部 🔴重要且紧急(IU) 任务 → 获得1朵 🏵️S级小红花
+ *   - S级获得后，每额外完成1个其他象限任务 → +1朵 🌸小红花
+ *   - 如果先完成了不重要的任务，小花暂不发放
+ *   - 当IU全部完成拿到S级后，之前已完成的其他任务的小花同时发放
+ *   - 如果IU始终未完成，其他任务的花朵不会发放
  * 
  * 许愿兑换（事件驱动，非时间凑数）：
  *   - 出去玩：1朵/h（1小时1朵），回来登记实际时长，余数≥15min补1朵
@@ -45,7 +47,7 @@
     }
 
     function _default() {
-        return { flowers: 0, history: [], wishes: [], pendingWishes: [] };
+        return { flowers: 0, sFlowers: 0, history: [], wishes: [], pendingWishes: [] };
     }
 
     function _save(rewards) {
@@ -173,35 +175,74 @@
         /**
          * 发放今日奖励
          */
-        award: function(count, reason, aplus) {
+        award: function(count, reason, sCount) {
             if (count <= 0) return;
             const rewards = _load();
             rewards.flowers += count;
+            if (sCount > 0) rewards.sFlowers = (rewards.sFlowers || 0) + sCount;
             rewards.history.push({
                 date: _todayKey(),
                 count: count,
-                reason: reason || '完成今日任务',
-                aplus: !!aplus
+                sFlower: sCount || 0,
+                reason: reason || '完成今日任务'
             });
             _save(rewards);
         },
 
         /**
-         * 尝试结算今日奖励（幂等）
+         * 获取S级小红花总数
          */
-        settleToday: function() {
+        getSFlowers: function() {
+            return _load().sFlowers || 0;
+        },
+
+        /**
+         * 重新计算今日奖励（可重复调用，自动修正差额）
+         * 核心逻辑：根据当前任务完成状态，实时计算应得小红花
+         * - IU全部完成 → 1朵S级 + 每个其他已完成任务1朵
+         * - IU未全部完成 → 0朵（先做其他任务不给花）
+         * - 如果IU后来完成，之前完成的其他任务的花朵同时发放
+         */
+        recalculateToday: function() {
             if (!window.TaskManager) return 0;
             const rewards = _load();
             const today = _todayKey();
 
-            const alreadySettled = rewards.history.some(h => h.date === today && h.reason === '每日任务结算');
-            if (alreadySettled) return 0;
-
+            // 计算当前任务状态应得的花朵
             const result = TaskManager.calculateTodayReward();
-            if (result.flowers <= 0) return 0;
+            const targetFlowers = result.flowers;
+            const targetSFlowers = result.sFlower;
 
-            this.award(result.flowers, '每日任务结算', result.aplus);
-            return result.flowers;
+            // 查找今日已有的结算记录
+            let settleEntry = rewards.history.find(h => h.date === today && h.reason === '每日任务结算');
+
+            const currentAwarded = settleEntry ? (settleEntry.count || 0) : 0;
+            const currentS = settleEntry ? (settleEntry.sFlower || 0) : 0;
+
+            const diff = targetFlowers - currentAwarded;
+            const sDiff = targetSFlowers - currentS;
+
+            if (diff === 0 && sDiff === 0) return 0; // 无变化
+
+            // 调整花朵余额
+            rewards.flowers += diff;
+            rewards.sFlowers = (rewards.sFlowers || 0) + sDiff;
+
+            // 更新或创建结算记录
+            if (settleEntry) {
+                settleEntry.count = targetFlowers;
+                settleEntry.sFlower = targetSFlowers;
+            } else {
+                rewards.history.push({
+                    date: today,
+                    count: targetFlowers,
+                    sFlower: targetSFlowers,
+                    reason: '每日任务结算'
+                });
+            }
+
+            _save(rewards);
+            return diff;
         },
 
         /**
@@ -373,7 +414,7 @@
 
             let count = 0;
             rewards.history.forEach(h => {
-                if (h.aplus) {
+                if (h.sFlower) {
                     const d = new Date(h.date);
                     if (d >= monday) count++;
                 }
