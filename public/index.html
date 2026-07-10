@@ -638,6 +638,81 @@
             color: #8a94a6;
             font-size: 0.8rem;
         }
+        .section-label .section-hint {
+            color: #5a6480;
+            font-size: 0.68rem;
+            margin-left: auto;
+            font-weight: 400;
+        }
+
+        /* 模块星标（设为目标） */
+        .mp-goal-star {
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: rgba(130,150,255,0.25);
+            transition: all 0.2s;
+            margin-left: 4px;
+            user-select: none;
+        }
+        .mp-goal-star:hover { color: rgba(255,215,0,0.6); }
+        .mp-goal-star.active {
+            color: #ffd700;
+            text-shadow: 0 0 6px rgba(255,215,0,0.4);
+        }
+
+        /* 紧凑目标条 */
+        .goal-compact {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(26,35,69,0.4);
+            border: 1px solid rgba(130,150,255,0.1);
+            border-radius: 12px;
+            padding: 10px 14px;
+        }
+        .goal-compact-ring {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+        .goal-compact-pct {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8299ff;
+        }
+        .goal-compact-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .goal-compact-today {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            color: #c7d1ff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .goal-compact-sep {
+            color: #3a4260;
+        }
+        .goal-compact-ctrl {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        /* 目标模块高亮 */
+        .mp-grid .module-progress-item.is-goal-module {
+            border: 1px solid rgba(255,215,0,0.25);
+            background: rgba(255,215,0,0.04);
+        }
 
         /* 2x2 紧凑网格 */
         .mp-grid {
@@ -1448,44 +1523,8 @@
                 <svg class="chevron" width="16" height="16" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
             </div>
             <div class="dashboard-body" id="dashboardBody">
-                <!-- 目标设定区（最上方优先可见） -->
-                <div class="goal-top" style="margin-bottom:16px;">
-                    <div class="goal-top-row">
-                        <div class="goal-selectors">
-                            <label>板块</label>
-                            <select id="goalModule" onchange="onGoalModuleChange()">
-                                <option value="ebbinghaus">艾宾浩斯</option>
-                                <option value="synonyms">同义替换</option>
-                                <option value="errorbook">错词本</option>
-                            </select>
-                            <label>单元</label>
-                            <select id="goalUnit" onchange="onGoalUnitChange()">
-                                <option value="all">全部</option>
-                            </select>
-                            <label>每天</label>
-                            <input type="number" id="dailyGoalInput" value="10" min="1" max="50" style="width:50px;text-align:center;">
-                            <label>个</label>
-                            <button id="saveGoalBtn" onclick="saveGoalSettings()" style="background:rgba(130,150,255,0.12);color:#c7d1ff;border:1px solid rgba(130,150,255,0.3);border-radius:8px;padding:4px 12px;cursor:pointer;font-size:0.8rem;">保存</button>
-                        </div>
-                        <div class="goal-ring-container">
-                            <svg width="52" height="52" style="transform:rotate(-90deg);">
-                                <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(130,150,255,0.12)" stroke-width="5"/>
-                                <circle id="goalRing" cx="26" cy="26" r="22" fill="none" stroke="#8299ff" stroke-width="5" stroke-dasharray="138.23" stroke-dashoffset="138.23" stroke-linecap="round" style="transition:stroke-dashoffset 0.6s ease;"/>
-                            </svg>
-                            <div class="goal-ring-info">
-                                <div class="pct" id="goalPercent">0%</div>
-                                <div class="sub" id="goalTodayText">0 / 10</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="goal-share-bar" id="goalShareBar">
-                        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#4ec9b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                        <span id="goalShareText">每天 10 个 = 完成 1 天份额 · 剩余 475 天</span>
-                    </div>
-                </div>
-
-                <!-- 统计卡片 -->
-                <div class="stat-cards">
+                <!-- ========== 概览统计 ========== -->
+                <div class="stat-cards" style="margin-top:16px;">
                     <div class="stat-card">
                         <div class="stat-card-value" id="statTodayLearned">0</div>
                         <div class="stat-card-label">今日学习</div>
@@ -1500,79 +1539,21 @@
                     </div>
                 </div>
 
-                <!-- 奖励展示条 -->
-                <div class="reward-bar">
-                    <div class="flower-group">
-                        <div class="flower-item" id="flowerSItem">
-                            <span class="f-icon gold" id="flowerS">🏵️</span>
-                            <span class="f-num gold" id="flowerSCount">0</span>
-                        </div>
-                        <div class="flower-item">
-                            <span class="f-icon">🌸</span>
-                            <span class="f-num pink" id="flowerCount">0</span>
-                        </div>
-                        <span id="aplusBadges"></span>
-                    </div>
-                    <div class="btn-area">
-                        <div class="btn-row">
-                            <button class="wish-btn" onclick="openWishPanel()">🎁 许愿兑换</button>
-                            <button class="info-circle-btn" id="rewardInfoBtn" onclick="toggleRewardInfo()" title="小红花规则">
-                                <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="12" y="16.5" text-anchor="middle" fill="currentColor" font-size="13" font-weight="700" font-family="Arial">i</text></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 小红花规则卡片 -->
-                <div class="reward-info-card" id="rewardInfoCard">
-                    <div class="reward-info-header">
-                        <span>🏵️ 小红花规则</span>
-                        <button onclick="toggleRewardInfo()" style="background:none;border:none;color:#5a6480;cursor:pointer;font-size:1.1rem;">✕</button>
-                    </div>
-                    <div class="reward-info-body">
-                        <div class="reward-rule-item">
-                            <span class="reward-rule-icon s-flower-icon">🏵️</span>
-                            <div><b style="color:#ffd700;">S级小红花</b><br><span style="color:#5a6480;">完成全部 🔴重要且紧急 任务后获得</span></div>
-                        </div>
-                        <div class="reward-rule-item">
-                            <span class="reward-rule-icon">🌸</span>
-                            <div><b style="color:#ffb74d;">额外小红花</b><br><span style="color:#5a6480;">S级获得后，每完成1个其他任务 +1朵</span></div>
-                        </div>
-                        <div class="reward-rule-divider"></div>
-                        <div class="reward-rule-item">
-                            <span style="color:#ff6b6b;font-size:0.85rem;">⚠️</span>
-                            <div><span style="color:#8a94a6;">先做不重要的任务不会获得小红花。<br>只有拿到 🏵️S级 后，已完成的其他任务才会<span style="color:#ffb74d;">同时发放</span>小花。</span></div>
-                        </div>
-                        <div class="reward-rule-divider"></div>
-                        <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
-                            <b style="color:#8a94a6;">许愿兑换（普通小花 🌸）</b><br>
-                            🌈 出去玩 · 1朵/60min<br>
-                            💪 运动 · 1朵/30min<br>
-                            📖 翻词典 · 1朵/3词<br>
-                            😴 睡觉休息 · 1朵/60min
-                        </div>
-                        <div class="reward-rule-divider"></div>
-                        <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
-                            <b style="color:#ffd700;">S级专属（🏵️ 3朵 = 1个创造空间）</b><br>
-                            创造主题式/项目制空间，设定世界法则<br>
-                            <span style="color:#96c8ff;">❄️ 板块冻结中 · 集齐3🏵️后冰块融化解锁</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ========== 学习区 ========== -->
+                <!-- ========== 学习模块 ========== -->
                 <div style="margin-top:16px;">
                     <div class="section-label">
                         <svg width="14" height="14" viewBox="0 0 24 24"><path d="M3 12h4l3-9 4 18 3-9h4" stroke="#8299ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                         <span>学习模块</span>
+                        <span class="section-hint">点击进入 · 点星标设为每日目标</span>
                     </div>
                     <div class="mp-grid">
                         <!-- 艾宾浩斯 -->
-                        <div class="module-progress-item" onclick="location.href='ebbinghaus.html'" style="cursor:pointer;">
+                        <div class="module-progress-item" data-module="ebbinghaus" onclick="location.href='ebbinghaus.html'" style="cursor:pointer;">
                             <div class="mp-header">
                                 <span class="mp-icon">📘</span>
                                 <span class="mp-name">艾宾浩斯</span>
                                 <span class="mp-count" id="mpEbbCount">0 / 475</span>
+                                <span class="mp-goal-star" id="mpStar-ebbinghaus" onclick="event.stopPropagation();setGoalModule('ebbinghaus')" title="设为每日目标">☆</span>
                             </div>
                             <div class="mp-bar">
                                 <div class="mp-fill mp-fill-ebb" id="mpEbbFill" style="width:0%"></div>
@@ -1580,11 +1561,12 @@
                             <div class="mp-sub" id="mpEbbSub"></div>
                         </div>
                         <!-- 同义替换 -->
-                        <div class="module-progress-item" onclick="location.href='synonyms.html'" style="cursor:pointer;">
+                        <div class="module-progress-item" data-module="synonyms" onclick="location.href='synonyms.html'" style="cursor:pointer;">
                             <div class="mp-header">
                                 <span class="mp-icon">🔄</span>
                                 <span class="mp-name">同义替换</span>
                                 <span class="mp-count" id="mpSynCount">0 / 80</span>
+                                <span class="mp-goal-star" id="mpStar-synonyms" onclick="event.stopPropagation();setGoalModule('synonyms')" title="设为每日目标">☆</span>
                             </div>
                             <div class="mp-bar">
                                 <div class="mp-fill mp-fill-syn" id="mpSynFill" style="width:0%"></div>
@@ -1592,11 +1574,12 @@
                             <div class="mp-sub" id="mpSynSub"></div>
                         </div>
                         <!-- 错词本 -->
-                        <div class="module-progress-item" onclick="location.href='errorbook.html'" style="cursor:pointer;">
+                        <div class="module-progress-item" data-module="errorbook" onclick="location.href='errorbook.html'" style="cursor:pointer;">
                             <div class="mp-header">
                                 <span class="mp-icon">📝</span>
                                 <span class="mp-name">错词本</span>
                                 <span class="mp-count" id="mpErrCount">0 个错词</span>
+                                <span class="mp-goal-star" id="mpStar-errorbook" onclick="event.stopPropagation();setGoalModule('errorbook')" title="设为每日目标">☆</span>
                             </div>
                             <div class="mp-bar">
                                 <div class="mp-fill mp-fill-err" id="mpErrFill" style="width:0%"></div>
@@ -1604,7 +1587,7 @@
                             <div class="mp-sub" id="mpErrSub">答错自动收录 · 连续答对自动移出</div>
                         </div>
                         <!-- 拼写练习 -->
-                        <div class="module-progress-item" onclick="location.href='spelling.html'" style="cursor:pointer;">
+                        <div class="module-progress-item" data-module="spelling" onclick="location.href='spelling.html'" style="cursor:pointer;">
                             <div class="mp-header">
                                 <span class="mp-icon">✍️</span>
                                 <span class="mp-name">拼写练习</span>
@@ -1618,31 +1601,32 @@
                     </div>
                 </div>
 
-                <!-- ========== 激励区 ========== -->
+                <!-- ========== 每日目标 ========== -->
                 <div style="margin-top:16px;">
                     <div class="section-label">
-                        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z" stroke="#ffb74d" stroke-width="2" stroke-linejoin="round" fill="none"/></svg>
-                        <span>奖励与创造</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#8299ff" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="5" stroke="#8299ff" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="1.5" fill="#8299ff"/></svg>
+                        <span>每日目标</span>
+                        <span class="section-hint" id="goalModuleLabel">艾宾浩斯 · 每天 10 个</span>
                     </div>
-                    <div class="quick-grid">
-                        <div class="quick-tile" id="dreamSpaceCard" onclick="openDreamSpaceOrWish()" style="position:relative;overflow:hidden;">
-                            <!-- 冰封覆盖层 -->
-                            <div class="ice-overlay" id="dreamIce">
-                                <div class="ice-texture"></div>
-                                <div class="ice-label">❄️ 集齐 3 🏵️ 解冻</div>
-                            </div>
-                            <!-- 融化动画层 -->
-                            <div class="melt-overlay" id="dreamMelt" style="display:none;">
-                                <div class="melt-water"></div>
-                            </div>
-                            <span class="quick-tile-icon">🏵️</span>
-                            <span class="quick-tile-name">创造空间</span>
-                            <span class="quick-tile-badge" id="qtDreamBadge">3🏵️=1空间</span>
+                    <div class="goal-compact">
+                        <div class="goal-compact-ring">
+                            <svg width="44" height="44" style="transform:rotate(-90deg);">
+                                <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(130,150,255,0.12)" stroke-width="4"/>
+                                <circle id="goalRing" cx="22" cy="22" r="18" fill="none" stroke="#8299ff" stroke-width="4" stroke-dasharray="113.1" stroke-dashoffset="113.1" stroke-linecap="round" style="transition:stroke-dashoffset 0.6s ease;"/>
+                            </svg>
+                            <div class="goal-compact-pct" id="goalPercent">0%</div>
                         </div>
-                        <div class="quick-tile" onclick="location.href='plaza.html'">
-                            <span class="quick-tile-icon">🌐</span>
-                            <span class="quick-tile-name">项目广场</span>
-                            <span class="quick-tile-badge">开发中</span>
+                        <div class="goal-compact-info">
+                            <div class="goal-compact-today">
+                                <span id="goalTodayText">0 / 10</span>
+                                <span class="goal-compact-sep">·</span>
+                                <span id="goalShareText" style="color:#5a6480;font-size:0.7rem;">每天 10 个 = 1 天份额</span>
+                            </div>
+                        </div>
+                        <div class="goal-compact-ctrl">
+                            <input type="number" id="dailyGoalInput" value="10" min="1" max="50" style="width:40px;text-align:center;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.3);border-radius:6px;padding:3px 4px;color:#e6edf7;font-size:0.8rem;" title="每天目标个数">
+                            <span style="color:#5a6480;font-size:0.7rem;">个/天</span>
+                            <button onclick="saveGoalSettings()" style="background:rgba(130,150,255,0.12);color:#c7d1ff;border:1px solid rgba(130,150,255,0.3);border-radius:6px;padding:3px 10px;cursor:pointer;font-size:0.75rem;">保存</button>
                         </div>
                     </div>
                 </div>
@@ -1652,6 +1636,7 @@
                     <div class="section-label">
                         <svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#ff8a8a" stroke-width="2" fill="none"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#8299ff" stroke-width="2" fill="none"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#ffb74d" stroke-width="2" fill="none"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="#8899aa" stroke-width="2" fill="none"/></svg>
                         <span>今日任务</span>
+                        <span class="section-hint">先做 🔴 重要且紧急 · 解锁小红花</span>
                     </div>
                     <div class="quadrant-grid">
                         <div class="quadrant-cell q-IU" onclick="focusQuadrantInput('IU')">
@@ -1677,11 +1662,101 @@
                     </div>
                 </div>
 
-                <!-- ========== 回顾区 ========== -->
+                <!-- ========== 奖励与创造 ========== -->
+                <div style="margin-top:16px;">
+                    <div class="section-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z" stroke="#ffb74d" stroke-width="2" stroke-linejoin="round" fill="none"/></svg>
+                        <span>奖励与创造</span>
+                        <span class="section-hint">完成任务赚花 · 兑换愿望</span>
+                    </div>
+                    <!-- 小红花余额 + 许愿按钮 -->
+                    <div class="reward-bar">
+                        <div class="flower-group">
+                            <div class="flower-item" id="flowerSItem">
+                                <span class="f-icon gold" id="flowerS">🏵️</span>
+                                <span class="f-num gold" id="flowerSCount">0</span>
+                            </div>
+                            <div class="flower-item">
+                                <span class="f-icon">🌸</span>
+                                <span class="f-num pink" id="flowerCount">0</span>
+                            </div>
+                            <span id="aplusBadges"></span>
+                        </div>
+                        <div class="btn-area">
+                            <div class="btn-row">
+                                <button class="wish-btn" onclick="openWishPanel()">🎁 许愿兑换</button>
+                                <button class="info-circle-btn" id="rewardInfoBtn" onclick="toggleRewardInfo()" title="小红花规则">
+                                    <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="12" y="16.5" text-anchor="middle" fill="currentColor" font-size="13" font-weight="700" font-family="Arial">i</text></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 小红花规则卡片 -->
+                    <div class="reward-info-card" id="rewardInfoCard">
+                        <div class="reward-info-header">
+                            <span>🏵️ 小红花规则</span>
+                            <button onclick="toggleRewardInfo()" style="background:none;border:none;color:#5a6480;cursor:pointer;font-size:1.1rem;">✕</button>
+                        </div>
+                        <div class="reward-info-body">
+                            <div class="reward-rule-item">
+                                <span class="reward-rule-icon s-flower-icon">🏵️</span>
+                                <div><b style="color:#ffd700;">S级小红花</b><br><span style="color:#5a6480;">完成全部 🔴重要且紧急 任务后获得</span></div>
+                            </div>
+                            <div class="reward-rule-item">
+                                <span class="reward-rule-icon">🌸</span>
+                                <div><b style="color:#ffb74d;">额外小红花</b><br><span style="color:#5a6480;">S级获得后，每完成1个其他任务 +1朵</span></div>
+                            </div>
+                            <div class="reward-rule-divider"></div>
+                            <div class="reward-rule-item">
+                                <span style="color:#ff6b6b;font-size:0.85rem;">⚠️</span>
+                                <div><span style="color:#8a94a6;">先做不重要的任务不会获得小红花。<br>只有拿到 🏵️S级 后，已完成的其他任务才会<span style="color:#ffb74d;">同时发放</span>小花。</span></div>
+                            </div>
+                            <div class="reward-rule-divider"></div>
+                            <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
+                                <b style="color:#8a94a6;">许愿兑换（普通小花 🌸）</b><br>
+                                🌈 出去玩 · 1朵/60min<br>
+                                💪 运动 · 1朵/30min<br>
+                                📖 翻词典 · 1朵/3词<br>
+                                😴 睡觉休息 · 1朵/60min
+                            </div>
+                            <div class="reward-rule-divider"></div>
+                            <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
+                                <b style="color:#ffd700;">S级专属（🏵️ 3朵 = 1个创造空间）</b><br>
+                                创造主题式/项目制空间，设定世界法则<br>
+                                <span style="color:#96c8ff;">❄️ 板块冻结中 · 集齐3🏵️后冰块融化解锁</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 创造空间 + 项目广场 -->
+                    <div class="quick-grid" style="margin-top:8px;">
+                        <div class="quick-tile" id="dreamSpaceCard" onclick="openDreamSpaceOrWish()" style="position:relative;overflow:hidden;">
+                            <!-- 冰封覆盖层 -->
+                            <div class="ice-overlay" id="dreamIce">
+                                <div class="ice-texture"></div>
+                                <div class="ice-label">❄️ 集齐 3 🏵️ 解冻</div>
+                            </div>
+                            <!-- 融化动画层 -->
+                            <div class="melt-overlay" id="dreamMelt" style="display:none;">
+                                <div class="melt-water"></div>
+                            </div>
+                            <span class="quick-tile-icon">🏵️</span>
+                            <span class="quick-tile-name">创造空间</span>
+                            <span class="quick-tile-badge" id="qtDreamBadge">3🏵️=1空间</span>
+                        </div>
+                        <div class="quick-tile" onclick="location.href='plaza.html'">
+                            <span class="quick-tile-icon">🌐</span>
+                            <span class="quick-tile-name">项目广场</span>
+                            <span class="quick-tile-badge">开发中</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== 数据回顾 ========== -->
                 <div style="margin-top:16px;">
                     <div class="section-label">
                         <svg width="14" height="14" viewBox="0 0 24 24"><path d="M3 3v18h18" stroke="#4ec9b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M7 14l3-4 3 2 4-6" stroke="#4ec9b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                         <span>数据回顾</span>
+                        <span class="section-hint">小红花趋势 · 打卡日历</span>
                     </div>
                     <!-- 小红花折线图 -->
                     <div class="chart-container">
@@ -2214,32 +2289,60 @@
         }
 
         function saveGoalSettings() {
+            const oldSettings = getGoalSettings();
             const settings = {
-                module: document.getElementById('goalModule').value,
-                unit: document.getElementById('goalUnit').value,
+                module: oldSettings.module,
+                unit: 'all',
                 daily: Math.max(1, Math.min(50, parseInt(document.getElementById('dailyGoalInput').value) || 10))
             };
             document.getElementById('dailyGoalInput').value = settings.daily;
             localStorage.setItem(GOAL_SETTINGS_KEY, JSON.stringify(settings));
             updateGoalRing();
+            updateGoalModuleDisplay();
+        }
+
+        // 点星标设为目标模块
+        function setGoalModule(mod) {
+            const settings = getGoalSettings();
+            settings.module = mod;
+            settings.unit = 'all';
+            localStorage.setItem(GOAL_SETTINGS_KEY, JSON.stringify(settings));
+            updateGoalRing();
+            updateGoalModuleDisplay();
+            if (window.SFX && SFX.play) SFX.play('click');
+        }
+
+        // 更新目标模块标签 + 星标高亮
+        function updateGoalModuleDisplay() {
+            const settings = getGoalSettings();
+            const config = MODULE_CONFIG[settings.module];
+            const label = document.getElementById('goalModuleLabel');
+            if (label && config) {
+                label.textContent = config.name + ' · 每天 ' + settings.daily + ' 个';
+            }
+            // 更新星标
+            ['ebbinghaus','synonyms','errorbook'].forEach(function(mod) {
+                var star = document.getElementById('mpStar-' + mod);
+                if (!star) return;
+                if (mod === settings.module) {
+                    star.classList.add('active');
+                    star.textContent = '★';
+                } else {
+                    star.classList.remove('active');
+                    star.textContent = '☆';
+                }
+                // 高亮目标模块卡片
+                var card = star.closest('.module-progress-item');
+                if (card) card.classList.toggle('is-goal-module', mod === settings.module);
+            });
         }
 
         function onGoalModuleChange() {
-            const mod = document.getElementById('goalModule').value;
-            const unitSelect = document.getElementById('goalUnit');
-            const config = MODULE_CONFIG[mod];
-            unitSelect.innerHTML = '';
-            Object.keys(config.units).forEach(k => {
-                const opt = document.createElement('option');
-                opt.value = k;
-                opt.textContent = config.units[k];
-                unitSelect.appendChild(opt);
-            });
-            updateGoalRing();
+            // Deprecated: kept for compatibility
         }
 
         function onGoalUnitChange() {
-            updateGoalRing();
+            // Deprecated: kept for compatibility
         }
 
         function getModuleTotal(module, unit) {
@@ -2294,13 +2397,13 @@
             const today = (window.StudyLog && StudyLog.getRecent) ? StudyLog.getRecent(1)[0] : null;
             const todayLearned = today ? today.total.learned : 0;
 
-            // 进度环 — 显示总旅程进度（已掌握/总量），一份一份地填充
+            // 进度环 — 显示总旅程进度（已掌握/总量）
             const journeyPct = (total > 0) ? Math.min(100, Math.round(mastered / total * 100)) : 0;
-            const circumference = 2 * Math.PI * 22;
+            const circumference = 2 * Math.PI * 18;
             const offset = circumference - (journeyPct / 100) * circumference;
             document.getElementById('goalRing').style.strokeDashoffset = offset;
             document.getElementById('goalPercent').textContent = journeyPct + '%';
-            document.getElementById('goalTodayText').textContent = mastered + ' / ' + total;
+            document.getElementById('goalTodayText').textContent = todayLearned + ' / ' + goal + ' · 已掌握 ' + mastered;
 
             // 份额提示
             const sharesDone = Math.floor(todayLearned / goal);
@@ -2309,9 +2412,9 @@
             if (remaining <= 0) {
                 document.getElementById('goalShareText').textContent = '所有内容已掌握，太棒了！';
             } else if (sharesDone >= 1) {
-                document.getElementById('goalShareText').textContent = '已完成 ' + sharesDone + ' 天份额 · 每天目标 ' + goal + ' 个 · 剩余约 ' + daysLeft + ' 天';
+                document.getElementById('goalShareText').textContent = '已完成 ' + sharesDone + ' 天份额 · 剩余约 ' + daysLeft + ' 天';
             } else {
-                document.getElementById('goalShareText').textContent = '每天 ' + goal + ' 个 = 完成 1 天份额 · 还差 ' + (goal - todayLearned) + ' 个完成今天';
+                document.getElementById('goalShareText').textContent = '还差 ' + (goal - todayLearned) + ' 个完成今天';
             }
         }
 
@@ -3262,10 +3365,9 @@
         // ===== 初始化 =====
         function initGoalTracker() {
             const settings = getGoalSettings();
-            document.getElementById('goalModule').value = settings.module;
-            onGoalModuleChange();
-            document.getElementById('goalUnit').value = settings.unit;
-            document.getElementById('dailyGoalInput').value = settings.daily;
+            const input = document.getElementById('dailyGoalInput');
+            if (input) input.value = settings.daily;
+            updateGoalModuleDisplay();
             updateGoalRing();
         }
 
