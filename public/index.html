@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -449,10 +449,8 @@
             inset: 0;
             background: rgba(5, 7, 20, 0.75);
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
-            overflow-y: auto;
-            padding: 5vh 0;
             z-index: 10000;
         }
 
@@ -627,6 +625,45 @@
             border-radius: 12px;
             padding: 14px 16px;
         }
+        .module-progress-item {
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(26, 35, 69, 0.4);
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+        .module-progress-item:last-child { margin-bottom: 0; }
+        .module-progress-item:hover {
+            background: rgba(26, 35, 69, 0.7);
+        }
+
+        /* 快速入口方块 */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
+        }
+        .quick-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 8px;
+            border-radius: 12px;
+            background: rgba(26, 35, 69, 0.4);
+            border: 1px solid rgba(130, 150, 255, 0.08);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .quick-tile:hover {
+            background: rgba(26, 35, 69, 0.7);
+            border-color: rgba(130, 150, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        .quick-tile-icon { font-size: 1.4rem; margin-bottom: 4px; }
+        .quick-tile-name { font-size: 0.75rem; color: #c7d1ff; font-weight: 500; }
+        .quick-tile-badge { font-size: 0.6rem; color: #5a6480; margin-top: 2px; }
         .module-progress-item {
             padding: 10px 12px;
             border-radius: 10px;
@@ -983,9 +1020,7 @@
             background: rgba(5, 7, 20, 0.7);
             z-index: 1000;
             justify-content: center;
-            align-items: flex-start;
-            overflow-y: auto;
-            padding: 5vh 0;
+            align-items: center;
         }
         .day-detail-overlay.show { display: flex; }
         .day-detail-panel {
@@ -1058,22 +1093,38 @@
         .reward-bar {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
             padding: 10px 16px;
             background: rgba(26, 35, 69, 0.4);
             border: 1px solid rgba(255, 183, 77, 0.15);
             border-radius: 10px;
             margin-top: 12px;
-            flex-wrap: wrap;
         }
-        .reward-bar .flower-count {
+        .reward-bar .flower-group {
             display: flex;
             align-items: center;
-            gap: 4px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #ffb74d;
+            gap: 16px;
         }
+        .reward-bar .flower-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+        .reward-bar .flower-item .f-icon {
+            font-size: 1rem;
+            line-height: 1.2;
+        }
+        .reward-bar .flower-item .f-icon.gold { filter: drop-shadow(0 0 3px rgba(255,215,0,0.4)); }
+        .reward-bar .flower-item .f-num {
+            font-size: 0.85rem;
+            font-weight: 700;
+            line-height: 1.2;
+            min-width: 0.6rem;
+            text-align: center;
+        }
+        .reward-bar .flower-item .f-num.gold { color: #ffd700; }
+        .reward-bar .flower-item .f-num.pink { color: #ffb0c8; }
         .reward-bar .aplus-badge {
             display: inline-flex;
             align-items: center;
@@ -1086,8 +1137,18 @@
             font-weight: 600;
             color: #4ec9b0;
         }
-        .wish-btn {
+        .reward-bar .btn-area {
             margin-left: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .reward-bar .btn-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .wish-btn {
             background: rgba(255, 183, 77, 0.12);
             border: 1px solid rgba(255, 183, 77, 0.3);
             color: #ffb74d;
@@ -1096,6 +1157,7 @@
             font-size: 0.78rem;
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap;
         }
         .wish-btn:hover { background: rgba(255, 183, 77, 0.25); }
 
@@ -1108,6 +1170,7 @@
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.25s;
             color: #5a6480; padding: 0;
+            flex-shrink: 0;
         }
         .info-circle-btn:hover {
             background: rgba(78,201,176,0.15);
@@ -1115,25 +1178,39 @@
             color: #4ec9b0;
         }
 
-        /* S级小红花图标 */
-        .flower-s {
-            font-size: 0.9rem;
+        /* 规则卡片 - 抽屉弹出 */
+        .reward-info-mask {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 7, 20, 0.6);
+            z-index: 1002;
         }
-
-        /* 规则卡片 */
+        .reward-info-mask.open { display: block; }
         .reward-info-card {
             display: none;
-            margin-top: 8px;
-            background: rgba(26,35,69,0.7);
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(18, 28, 58, 0.98);
             border: 1px solid rgba(255,215,0,0.15);
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            animation: cardSlideIn 0.25s ease;
+            max-width: 380px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1003;
+            animation: drawerPopIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .reward-info-card.open { display: block; }
-        @keyframes cardSlideIn {
-            from { opacity: 0; transform: translateY(-6px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes drawerPopIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        @keyframes wishPanelIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
         }
         .reward-info-header {
             display: flex; align-items: center; justify-content: space-between;
@@ -1167,9 +1244,7 @@
             background: rgba(5, 7, 20, 0.7);
             z-index: 1001;
             justify-content: center;
-            align-items: flex-start;
-            overflow-y: auto;
-            padding: 5vh 0;
+            align-items: center;
         }
         .wish-overlay.show { display: flex; }
         .wish-panel {
@@ -1182,6 +1257,7 @@
             max-height: 85vh;
             overflow-y: auto;
             margin: auto;
+            animation: wishPanelIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .wish-panel h3 { color: #ffb74d; font-size: 1rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
         .wish-panel .close-btn { margin-left: auto; background: none; border: none; color: #8a94a6; font-size: 1.2rem; cursor: pointer; }
@@ -1358,52 +1434,26 @@
 
                 <!-- 奖励展示条 -->
                 <div class="reward-bar">
-                    <div class="flower-count">
-                        <span class="flower-s" id="flowerS" title="S级小红花" style="display:none;">🏵️</span>
-                        <span>🌸</span>
-                        <span id="flowerCount">0</span>
+                    <div class="flower-group">
+                        <div class="flower-item" id="flowerSItem">
+                            <span class="f-icon gold" id="flowerS">🏵️</span>
+                            <span class="f-num gold" id="flowerSCount">0</span>
+                        </div>
+                        <div class="flower-item">
+                            <span class="f-icon">🌸</span>
+                            <span class="f-num pink" id="flowerCount">0</span>
+                        </div>
+                        <span id="aplusBadges"></span>
                     </div>
-                    <span id="aplusBadges"></span>
-                    <button class="info-circle-btn" id="rewardInfoBtn" onclick="toggleRewardInfo()" title="小红花规则">
-                        <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="12" y="16.5" text-anchor="middle" fill="currentColor" font-size="13" font-weight="700" font-family="Arial">i</text></svg>
-                    </button>
-                    <button class="wish-btn" onclick="openWishPanel()">🎁 许愿兑换</button>
-                    <button class="wish-btn" style="background:rgba(255,215,0,0.1);border-color:rgba(255,215,0,0.25);color:#ffd700;" onclick="openDreamSpaceOrWish()">🏵️ 创造空间</button>
-                </div>
-
-                <!-- 小红花规则卡片 -->
-                <div class="reward-info-card" id="rewardInfoCard">
-                    <div class="reward-info-header">
-                        <span>🏵️ 小红花规则</span>
-                        <button onclick="toggleRewardInfo()" style="background:none;border:none;color:#5a6480;cursor:pointer;font-size:1.1rem;">✕</button>
-                    </div>
-                    <div class="reward-info-body">
-                        <div class="reward-rule-item">
-                            <span class="reward-rule-icon s-flower-icon">🏵️</span>
-                            <div><b style="color:#ffd700;">S级小红花</b><br><span style="color:#5a6480;">完成全部 🔴重要且紧急 任务后获得</span></div>
+                    <div class="btn-area">
+                        <div class="btn-row">
+                            <button class="wish-btn" onclick="openWishPanel()">🎁 许愿兑换</button>
+                            <button class="info-circle-btn" id="rewardInfoBtn" onclick="toggleRewardInfo()" title="小红花规则">
+                                <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="12" y="16.5" text-anchor="middle" fill="currentColor" font-size="13" font-weight="700" font-family="Arial">i</text></svg>
+                            </button>
                         </div>
-                        <div class="reward-rule-item">
-                            <span class="reward-rule-icon">🌸</span>
-                            <div><b style="color:#ffb74d;">额外小红花</b><br><span style="color:#5a6480;">S级获得后，每完成1个其他任务 +1朵</span></div>
-                        </div>
-                        <div class="reward-rule-divider"></div>
-                        <div class="reward-rule-item">
-                            <span style="color:#ff6b6b;font-size:0.85rem;">⚠️</span>
-                            <div><span style="color:#8a94a6;">先做不重要的任务不会获得小红花。<br>只有拿到 🏵️S级 后，已完成的其他任务才会<span style="color:#ffb74d;">同时发放</span>小花。</span></div>
-                        </div>
-                        <div class="reward-rule-divider"></div>
-                        <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
-                            <b style="color:#8a94a6;">许愿兑换（普通小花 🌸）</b><br>
-                            🌈 出去玩 · 1朵/60min<br>
-                            💪 运动 · 1朵/30min<br>
-                            📖 翻词典 · 1朵/3词<br>
-                            😴 睡觉休息 · 1朵/60min
-                        </div>
-                        <div class="reward-rule-divider"></div>
-                        <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
-                            <b style="color:#ffd700;">S级专属（🏵️ 3朵 = 1个创造空间）</b><br>
-                            创造主题式/项目制空间，设定世界法则<br>
-                            <span style="color:#96c8ff;">❄️ 板块冻结中 · 集齐3🏵️后冰块融化解锁</span>
+                        <div class="btn-row">
+                            <button class="wish-btn" style="background:rgba(255,215,0,0.1);border-color:rgba(255,215,0,0.25);color:#ffd700;" onclick="location.href='dreamspace.html'">🏵️ 创造空间</button>
                         </div>
                     </div>
                 </div>
@@ -1496,27 +1546,21 @@
                         </div>
                         <div class="mp-sub" id="mpSpellSub">导入词库 · 三种模式 · 沉浸拼写</div>
                     </div>
+                </div>
 
-                    <!-- 创造空间 -->
-                    <div class="module-progress-item" id="dreamSpaceCard" style="cursor:pointer;position:relative;overflow:hidden;">
-                        <!-- 冰封覆盖层 -->
-                        <div class="ice-overlay" id="dreamIce">
-                            <div class="ice-texture"></div>
-                            <div class="ice-label">❄️ 集齐 3 🏵️ 解冻</div>
+                <!-- 快速入口 -->
+                <div style="margin-top:12px;">
+                    <div class="quick-grid">
+                        <div class="quick-tile" onclick="location.href='dreamspace.html'">
+                            <span class="quick-tile-icon">🏵️</span>
+                            <span class="quick-tile-name">创造空间</span>
+                            <span class="quick-tile-badge" id="qtDreamBadge">3🏵️=1空间</span>
                         </div>
-                        <!-- 融化动画层 -->
-                        <div class="melt-overlay" id="dreamMelt" style="display:none;">
-                            <div class="melt-water"></div>
+                        <div class="quick-tile" onclick="location.href='plaza.html'">
+                            <span class="quick-tile-icon">🌐</span>
+                            <span class="quick-tile-name">项目广场</span>
+                            <span class="quick-tile-badge">开发中</span>
                         </div>
-                        <div class="mp-header">
-                            <span class="mp-icon">🏵️</span>
-                            <span class="mp-name">创造空间</span>
-                            <span class="mp-count" id="mpDreamCount">3 🏵️ = 1空间</span>
-                        </div>
-                        <div class="mp-bar">
-                            <div class="mp-fill" id="mpDreamFill" style="width:0%;background:linear-gradient(90deg,#ffd700,#ff9a56);"></div>
-                        </div>
-                        <div class="mp-sub" id="mpDreamSub">S级小红花专属 · 创造你的世界</div>
                     </div>
                 </div>
 
@@ -1576,138 +1620,6 @@
             </div>
          </div>
 
-        <!-- 日历详情弹窗 -->
-        <div class="day-detail-overlay" id="dayDetailOverlay" onclick="if(event.target===this)closeDayDetail()">
-            <div class="day-detail-panel">
-                <h3>
-                    <svg width="16" height="16" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#8299ff" stroke-width="2" fill="none"/><path d="M3 9h18M8 3v4M16 3v4" stroke="#8299ff" stroke-width="2" stroke-linecap="round"/></svg>
-                    <span id="dayDetailTitle">2026-07-08</span>
-                    <button class="close-btn" onclick="closeDayDetail()">✕</button>
-                </h3>
-                <div class="detail-task-list" id="dayDetailTasks"></div>
-                <div class="day-meta">
-                    <label>心情
-                        <select id="dayMood" onchange="saveDayMeta()">
-                            <option value="">--</option>
-                            <option value="😊">😊 开心</option>
-                            <option value="😌">😌 平静</option>
-                            <option value="😤">😤 加油</option>
-                            <option value="😢">😢 低落</option>
-                            <option value="🤯">🤯 爆炸</option>
-                        </select>
-                    </label>
-                </div>
-                <div class="day-meta" style="flex-direction:column;">
-                    <label>今日总结（选填）</label>
-                    <textarea id="daySummary" placeholder="写点什么…" onblur="saveDayMeta()"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- 许愿兑换弹窗 -->
-        <div class="wish-overlay" id="wishOverlay" onclick="if(event.target===this)closeWishPanel()">
-            <div class="wish-panel">
-                <h3>🎁 许愿兑换<span style="font-size:0.8rem;color:#8a94a6;font-weight:400;margin-left:8px;">余额: <span id="wishFlowerBalance">0</span> 🌸</span><button class="close-btn" onclick="closeWishPanel()">✕</button></h3>
-
-                <!-- 待登记区 -->
-                <div id="pendingSection" style="margin-bottom:12px;"></div>
-
-                <!-- 愿望类型卡片 -->
-                <div class="wish-type-card" onclick="selectWishType('outing')">
-                    <span class="wish-icon">🌈</span>
-                    <div class="wish-info">
-                        <h4>出去玩</h4>
-                        <p>1朵/h · 出去探索，感受什么在召唤你</p>
-                    </div>
-                </div>
-                <div class="wish-redeem-row" id="wishRedeem-outing">
-                    <label style="color:#8a94a6;font-size:0.8rem;">预计几小时</label>
-                    <input type="number" id="wishUnits-outing" min="1" max="12" value="1" step="0.5">
-                    <span style="color:#ffb74d;font-size:0.8rem;" id="wishCost-outing">= 1朵</span>
-                    <button class="confirm-btn" onclick="departWish('outing')">出发</button>
-                </div>
-
-                <div class="wish-type-card" onclick="selectWishType('exercise')">
-                    <span class="wish-icon">💪</span>
-                    <div class="wish-info">
-                        <h4>运动</h4>
-                        <p>1朵/30min · 闭眼感知，哪个部位最需要被照顾</p>
-                    </div>
-                </div>
-                <div class="wish-redeem-row" id="wishRedeem-exercise">
-                    <label style="color:#8a94a6;font-size:0.8rem;">预计几分钟</label>
-                    <input type="number" id="wishUnits-exercise" min="30" max="600" value="30" step="15">
-                    <span style="color:#ffb74d;font-size:0.8rem;" id="wishCost-exercise">= 1朵</span>
-                    <button class="confirm-btn" onclick="departWish('exercise')">出发</button>
-                </div>
-
-                <div class="wish-type-card" onclick="selectWishType('dictionary')">
-                    <span class="wish-icon">📖</span>
-                    <div class="wish-info">
-                        <h4>翻词典</h4>
-                        <p>1朵/3词 · 随机翻三页，像塔罗牌一样选出最有感觉的词</p>
-                    </div>
-                </div>
-                <div class="wish-redeem-row" id="wishRedeem-dictionary">
-                    <label style="color:#8a94a6;font-size:0.8rem;">预计几个词</label>
-                    <input type="number" id="wishUnits-dictionary" min="3" max="99" value="3" step="3">
-                    <span style="color:#ffb74d;font-size:0.8rem;" id="wishCost-dictionary">= 1朵</span>
-                    <button class="confirm-btn" onclick="departWish('dictionary')">出发</button>
-                </div>
-
-                <div class="wish-type-card" onclick="selectWishType('sleep')">
-                    <span class="wish-icon">😴</span>
-                    <div class="wish-info">
-                        <h4>睡觉休息</h4>
-                        <p>1朵/h · 放下一切，让身体自己决定要休息多久</p>
-                    </div>
-                </div>
-                <div class="wish-redeem-row" id="wishRedeem-sleep">
-                    <label style="color:#8a94a6;font-size:0.8rem;">预计几小时</label>
-                    <input type="number" id="wishUnits-sleep" min="1" max="12" value="1" step="0.5">
-                    <span style="color:#ffb74d;font-size:0.8rem;" id="wishCost-sleep">= 1朵</span>
-                    <button class="confirm-btn" onclick="departWish('sleep')">出发</button>
-                </div>
-
-                <!-- S级专属：创造空间 -->
-                <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,215,0,0.15);">
-                    <div style="font-size:0.75rem;color:#ffd700;margin-bottom:8px;font-weight:600;">🏵️ S级专属兑换</div>
-                    <div class="wish-type-card" style="border-color:rgba(255,215,0,0.2);background:rgba(255,215,0,0.04);" onclick="selectWishType('dreamspace')">
-                        <span class="wish-icon">🏵️</span>
-                        <div class="wish-info">
-                            <h4 style="color:#ffd700;">创造空间</h4>
-                            <p>3朵🏵️ = 1个 · 创造主题式或项目制空间，设定世界法则</p>
-                        </div>
-                    </div>
-                    <div class="wish-redeem-row" id="wishRedeem-dreamspace">
-                        <span style="color:#ffd700;font-size:0.8rem;" id="wishSFlowerBalance">当前 🏵️ 0 朵</span>
-                        <button class="confirm-btn" style="background:linear-gradient(135deg,#ffd700,#ff9a56);" onclick="redeemDreamSpace()">解锁创造空间</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 回来登记弹窗 -->
-        <div class="wish-overlay" id="registerOverlay" onclick="if(event.target===this)closeRegister()">
-            <div class="wish-panel">
-                <h3>📝 回来登记<span style="font-size:0.8rem;color:#8a94a6;font-weight:400;margin-left:8px;" id="registerTitle"></span><button class="close-btn" onclick="closeRegister()">✕</button></h3>
-                <div id="registerGuide" style="color:#8a94a6;font-size:0.82rem;margin-bottom:14px;padding:10px 12px;background:rgba(26,35,69,0.5);border-radius:8px;border-left:3px solid rgba(255,183,77,0.4);"></div>
-                <div style="margin-bottom:12px;">
-                    <label style="color:#8a94a6;font-size:0.8rem;display:block;margin-bottom:4px;" id="registerInputLabel"></label>
-                    <input type="number" id="registerActual" min="0" value="0" style="width:100%;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.3);border-radius:8px;padding:8px 12px;color:#e6edf7;font-size:0.9rem;">
-                </div>
-                <div style="margin-bottom:12px;">
-                    <label style="color:#8a94a6;font-size:0.8rem;display:block;margin-bottom:4px;">感受记录（选填）</label>
-                    <textarea id="registerReflection" placeholder="这次经历了什么？有什么感觉？" style="width:100%;min-height:60px;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.3);border-radius:8px;padding:8px 12px;color:#e6edf7;font-size:0.85rem;resize:vertical;"></textarea>
-                </div>
-                <div id="registerCostPreview" style="color:#ffb74d;font-size:0.8rem;margin-bottom:12px;"></div>
-                <div style="display:flex;gap:8px;">
-                    <button class="confirm-btn" style="flex:1;" onclick="confirmRegister()">完成登记</button>
-                    <button onclick="cancelRegisterWish()" style="background:transparent;border:1px solid rgba(255,114,114,0.3);color:#ff7272;border-radius:8px;padding:6px 14px;font-size:0.8rem;cursor:pointer;">取消并退款</button>
-                </div>
-            </div>
-        </div>
-
         <div class="footer">
              © 2026 雅思词汇学习中心 | 架构设计：艾宾浩斯宇宙版
              <span class="update-check-btn" onclick="forceUpdate()" title="检查更新"><svg width="14" height="14" viewBox="0 0 24 24" style="opacity:0.4;"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5" stroke="#8299ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span>
@@ -1721,8 +1633,151 @@
                 <button id="dismissInstall" style="background: transparent; color: #aabbff; border: 1px solid rgba(130, 150, 255, 0.3); padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 14px;">稍后再说</button>
             </div>
         </div>
+    </div>
 
-        <script>
+    <!-- ====== 以下弹窗放在 body 层级，避免 backdrop-filter 影响 fixed 定位 ====== -->
+
+    <!-- 小红花规则抽屉 -->
+    <div class="reward-info-mask" id="rewardInfoMask" onclick="toggleRewardInfo()"></div>
+    <div class="reward-info-card" id="rewardInfoCard">
+        <div class="reward-info-header">
+            <span>🏵️ 小红花规则</span>
+            <button onclick="toggleRewardInfo()" style="background:none;border:none;color:#5a6480;cursor:pointer;font-size:1.1rem;">✕</button>
+        </div>
+        <div class="reward-info-body">
+            <div class="reward-rule-item">
+                <span class="reward-rule-icon s-flower-icon">🏵️</span>
+                <div><b style="color:#ffd700;">S级</b> <span style="color:#6a7a96;">完成全部🔴重要紧急 → 获得1朵，之后每1个任务=1朵🌸</span></div>
+            </div>
+            <div class="reward-rule-item">
+                <span class="reward-rule-icon">🌸</span>
+                <div><b style="color:#ffb74d;">基础</b> <span style="color:#6a7a96;">每完成2个其他任务=1朵🌸</span></div>
+            </div>
+            <div class="reward-rule-divider"></div>
+            <div style="color:#6a7a96;font-size:0.72rem;line-height:1.5;">
+                <b style="color:#8a94a6;">许愿兑换</b> 用🌸换想要做的事，如运动30min=1朵🌸
+            </div>
+        </div>
+    </div>
+
+    <!-- 日历详情弹窗 -->
+    <div class="day-detail-overlay" id="dayDetailOverlay" onclick="if(event.target===this)closeDayDetail()">
+        <div class="day-detail-panel">
+            <h3>
+                <svg width="16" height="16" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#8299ff" stroke-width="2" fill="none"/><path d="M3 9h18M8 3v4M16 3v4" stroke="#8299ff" stroke-width="2" stroke-linecap="round"/></svg>
+                <span id="dayDetailTitle">2026-07-08</span>
+                <button class="close-btn" onclick="closeDayDetail()">✕</button>
+            </h3>
+            <div class="detail-task-list" id="dayDetailTasks"></div>
+            <div class="day-meta">
+                <label>心情
+                    <select id="dayMood" onchange="saveDayMeta()">
+                        <option value="">--</option>
+                        <option value="😊">😊 开心</option>
+                        <option value="😌">😌 平静</option>
+                        <option value="😤">😤 加油</option>
+                        <option value="😢">😢 低落</option>
+                        <option value="🤯">🤯 爆炸</option>
+                    </select>
+                </label>
+            </div>
+            <div class="day-meta" style="flex-direction:column;">
+                <label>今日总结（选填）</label>
+                <textarea id="daySummary" placeholder="写点什么…" onblur="saveDayMeta()"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- 许愿兑换弹窗 -->
+    <div class="wish-overlay" id="wishOverlay" onclick="if(event.target===this)closeWishPanel()">
+        <div class="wish-panel">
+            <h3>🎁 许愿兑换<span style="font-size:0.8rem;color:#8a94a6;font-weight:400;margin-left:8px;">余额: <span id="wishSFlowerBalanceTop" style="color:#ffd700;">0</span> 🏵️ · <span id="wishFlowerBalance" style="color:#ffb0c8;">0</span> 🌸</span><button class="close-btn" onclick="closeWishPanel()">✕</button></h3>
+
+            <!-- 待登记区 -->
+            <div id="pendingSection" style="margin-bottom:12px;"></div>
+
+            <!-- 愿望类型卡片（动态渲染，含创造空间） -->
+            <div id="wishTypeCards"></div>
+
+            <!-- 愿望库管理 -->
+            <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(130,150,255,0.1);">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <span style="font-size:0.75rem;color:#8a94a6;font-weight:600;">📚 愿望库</span>
+                    <div style="display:flex;gap:6px;align-items:center;">
+                        <!-- 展示模式切换 -->
+                        <button id="modeSelectedBtn" onclick="switchDisplayMode('selected')" style="background:rgba(255,183,77,0.15);border:1px solid rgba(255,183,77,0.35);color:#ffb74d;border-radius:6px;padding:3px 8px;font-size:0.7rem;cursor:pointer;">勾选</button>
+                        <button id="modeRandomBtn" onclick="switchDisplayMode('random')" style="background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.15);color:#5a6480;border-radius:6px;padding:3px 8px;font-size:0.7rem;cursor:pointer;">🎲 随机</button>
+                        <button onclick="openAddCustomWish()" style="background:rgba(78,201,176,0.1);border:1px solid rgba(78,201,176,0.25);color:#4ec9b0;border-radius:6px;padding:3px 8px;font-size:0.7rem;cursor:pointer;">+ 新增</button>
+                    </div>
+                </div>
+                <div id="wishManageList" style="max-height:200px;overflow-y:auto;"></div>
+                <div id="hiddenDefaultsRow" style="margin-top:4px;"></div>
+                <div id="randomRefreshRow" style="display:none;text-align:center;margin-top:6px;">
+                    <button onclick="refreshRandomAndRender()" style="background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.2);color:#8299ff;border-radius:6px;padding:4px 12px;font-size:0.7rem;cursor:pointer;">🔄 换一批</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义愿望添加弹窗 -->
+    <div class="wish-overlay" id="addCustomWishOverlay" onclick="if(event.target===this)closeAddCustomWish()">
+        <div class="wish-panel" style="max-width:360px;">
+            <h3>✏️ 自定义愿望<button class="close-btn" onclick="closeAddCustomWish()">✕</button></h3>
+            <div style="margin-bottom:10px;">
+                <label style="color:#8a94a6;font-size:0.8rem;display:block;margin-bottom:4px;">名称</label>
+                <input type="text" id="customWishName" placeholder="如：画画" maxlength="8" style="width:100%;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.3);border-radius:8px;padding:8px 12px;color:#e6edf7;font-size:0.9rem;">
+            </div>
+            <div style="display:flex;gap:10px;margin-bottom:10px;">
+                <div style="flex:1;">
+                    <label style="color:#8a94a6;font-size:0.8rem;display:block;margin-bottom:4px;">图标</label>
+                    <input type="text" id="customWishIcon" placeholder="🎨" maxlength="2" style="width:100%;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.3);border-radius:8px;padding:8px 12px;color:#e6edf7;font-size:0.9rem;text-align:center;">
+                </div>
+                <div style="flex:1;">
+                    <label style="color:#8a94a6;font-size:0.8rem;display:block;margin-bottom:4px;">计量单位</label>
+                    <select id="customWishUnit" style="width:100%;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.3);border-radius:8px;padding:8px 12px;color:#e6edf7;font-size:0.9rem;">
+                        <option value="h">小时 (h)</option>
+                        <option value="min">分钟 (min)</option>
+                        <option value="词">个 (词/次/…)</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="color:#8a94a6;font-size:0.8rem;display:block;margin-bottom:4px;">1朵花 = 几个单位</label>
+                <input type="number" id="customWishCost" value="1" min="1" max="99" style="width:80px;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.3);border-radius:8px;padding:8px 12px;color:#e6edf7;font-size:0.9rem;">
+                <span style="color:#8a94a6;font-size:0.75rem;margin-left:4px;">如 1朵=1h, 1朵=30min, 1朵=3词</span>
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="color:#8a94a6;font-size:0.8rem;display:block;margin-bottom:4px;">一句话描述（选填）</label>
+                <input type="text" id="customWishDesc" placeholder="随心，让这个词打动你" maxlength="30" style="width:100%;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.3);border-radius:8px;padding:8px 12px;color:#e6edf7;font-size:0.9rem;">
+            </div>
+            <button class="confirm-btn" style="width:100%;" onclick="saveCustomWish()">添加愿望</button>
+        </div>
+    </div>
+
+    <!-- 回来登记弹窗 -->
+    <div class="wish-overlay" id="registerOverlay" onclick="if(event.target===this)closeRegister()">
+        <div class="wish-panel">
+            <h3>📝 回来登记<span style="font-size:0.8rem;color:#8a94a6;font-weight:400;margin-left:8px;" id="registerTitle"></span><button class="close-btn" onclick="closeRegister()">✕</button></h3>
+            <div id="registerGuide" style="color:#8a94a6;font-size:0.82rem;margin-bottom:14px;padding:10px 12px;background:rgba(26,35,69,0.5);border-radius:8px;border-left:3px solid rgba(255,183,77,0.4);"></div>
+            <div style="margin-bottom:12px;">
+                <label style="color:#8a94a6;font-size:0.8rem;display:block;margin-bottom:4px;" id="registerInputLabel"></label>
+                <input type="number" id="registerActual" min="0" value="0" style="width:100%;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.3);border-radius:8px;padding:8px 12px;color:#e6edf7;font-size:0.9rem;">
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="color:#8a94a6;font-size:0.8rem;display:block;margin-bottom:4px;">感受记录（选填）</label>
+                <textarea id="registerReflection" placeholder="这次经历了什么？有什么感觉？" style="width:100%;min-height:60px;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.3);border-radius:8px;padding:8px 12px;color:#e6edf7;font-size:0.85rem;resize:vertical;"></textarea>
+            </div>
+            <div id="registerCostPreview" style="color:#ffb74d;font-size:0.8rem;margin-bottom:12px;"></div>
+            <div style="display:flex;gap:8px;">
+                <button class="confirm-btn" style="flex:1;" onclick="confirmRegister()">完成登记</button>
+                <button onclick="cancelRegisterWish()" style="background:transparent;border:1px solid rgba(255,114,114,0.3);color:#ff7272;border-radius:8px;padding:6px 14px;font-size:0.8rem;cursor:pointer;">取消并退款</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创造空间解锁弹窗（已移至dreamspace.html） -->
+
+    <script>
             // 数据管理功能
             function exportData() {
                 try {
@@ -1942,7 +1997,7 @@
                 <button class="backup-manual" onclick="manualBackup()">+ 立即创建一个备份</button>
             </div>
         </div>
-    </div>
+
     <!-- PWA Service Worker 注册和安装提示 -->
     <script>
         // Service Worker 注册
@@ -2218,19 +2273,14 @@
         // ===== 奖励 =====
         function updateRewardBar() {
             if (!window.RewardSystem) return;
-            const flowers = RewardSystem.getFlowers();
-            const sFlowers = RewardSystem.getSFlowers ? RewardSystem.getSFlowers() : 0;
+            const flowers = RewardSystem.getFlowers() || 0;
+            const sFlowers = (RewardSystem.getSFlowers ? RewardSystem.getSFlowers() : 0) || 0;
             document.getElementById('flowerCount').textContent = flowers;
 
-            // S级小红花图标显示
-            const sEl = document.getElementById('flowerS');
-            if (sFlowers > 0) {
-                sEl.style.display = 'inline';
-                sEl.textContent = '🏵️';
-                sEl.title = 'S级小红花 x' + sFlowers;
-            } else {
-                sEl.style.display = 'none';
-            }
+            // S级小红花始终显示
+            const sItem = document.getElementById('flowerSItem');
+            const sCountEl = document.getElementById('flowerSCount');
+            sCountEl.textContent = sFlowers;
 
             const aplusCount = RewardSystem.getWeekAplus ? RewardSystem.getWeekAplus() : 0;
             const badgeEl = document.getElementById('aplusBadges');
@@ -2243,72 +2293,129 @@
 
         function toggleRewardInfo() {
             const card = document.getElementById('rewardInfoCard');
+            const mask = document.getElementById('rewardInfoMask');
             card.classList.toggle('open');
+            mask.classList.toggle('open');
         }
 
-        // ===== 许愿兑换（两步流程：出发→回来登记）=====
+        // ===== 许愿兑换（两步流程 + 愿望库 + 展示模式）=====
         let currentRegisterId = null;
 
         function openWishPanel() {
             if (!window.RewardSystem) return;
-            document.getElementById('wishFlowerBalance').textContent = RewardSystem.getFlowers();
+            document.getElementById('wishFlowerBalance').textContent = RewardSystem.getFlowers() || 0;
+            var sEl = document.getElementById('wishSFlowerBalanceTop');
+            if (sEl) sEl.textContent = (RewardSystem.getSFlowers ? RewardSystem.getSFlowers() : 0) || 0;
             document.getElementById('wishOverlay').classList.add('show');
-            ['outing','exercise','dictionary','sleep','dreamspace'].forEach(t => {
-                const el = document.getElementById('wishRedeem-' + t);
-                if (el) el.classList.remove('show');
-            });
+            renderWishTypeCards();
             renderPendingSection();
-            // 刷新各类型花费预览
-            ['outing','exercise','dictionary','sleep'].forEach(t => updateWishCostPreview(t));
-            // 刷新S级余额
             updateSFlowerBalance();
+            renderWishManageList();
+            updateModeButtons();
         }
 
         function closeWishPanel() {
             document.getElementById('wishOverlay').classList.remove('show');
         }
 
+        // 动态渲染愿望类型卡片（根据展示模式）
+        function renderWishTypeCards() {
+            if (!window.RewardSystem) return;
+            var allTypes = RewardSystem.getWishTypes();
+            var displayKeys = RewardSystem.getDisplayWishKeys();
+            var container = document.getElementById('wishTypeCards');
+            var html = '';
+
+            displayKeys.forEach(function(key) {
+                var def = allTypes[key];
+                if (!def) return;
+
+                // 普通愿望类型
+                var unitText = def.costPerUnit >= 1
+                    ? '1朵/' + def.unit
+                    : '1朵/' + Math.round(1/def.costPerUnit) + def.unit;
+                html += '<div class="wish-type-card" onclick="selectWishType(\'' + key + '\')">' +
+                    '<span class="wish-icon">' + def.icon + '</span>' +
+                    '<div class="wish-info">' +
+                    '<h4>' + def.name + '</h4>' +
+                    '<p>' + unitText + (def.description ? ' · ' + def.description.slice(0, 18) : '') + '</p>' +
+                    '</div></div>';
+
+                // 兑换行
+                var step, min, max, val, label;
+                if (def.unit === 'h') {
+                    step = 0.5; min = 1; max = 12; val = 1; label = '预计几小时';
+                } else if (def.unit === 'min') {
+                    step = def.minUnit || 15; min = def.minUnit || 15; max = 600; val = min; label = '预计几分钟';
+                } else {
+                    step = def.minUnit || 1; min = def.minUnit || 1; max = 99; val = min; label = '预计几个' + def.unit;
+                }
+                html += '<div class="wish-redeem-row" id="wishRedeem-' + key + '">' +
+                    '<label style="color:#8a94a6;font-size:0.8rem;">' + label + '</label>' +
+                    '<input type="number" id="wishUnits-' + key + '" min="' + min + '" max="' + max + '" value="' + val + '" step="' + step + '">' +
+                    '<span style="color:#ffb74d;font-size:0.8rem;" id="wishCost-' + key + '">= 1朵</span>' +
+                    '<button class="confirm-btn" onclick="departWish(\'' + key + '\')">出发</button>' +
+                    '</div>';
+            });
+
+            container.innerHTML = html;
+
+            // 绑定 input 事件 + 隐藏兑换行
+            displayKeys.forEach(function(key) {
+                var input = document.getElementById('wishUnits-' + key);
+                if (input) {
+                    input.addEventListener('input', function() { updateWishCostPreview(key); });
+                    updateWishCostPreview(key);
+                }
+                var row = document.getElementById('wishRedeem-' + key);
+                if (row) row.classList.remove('show');
+            });
+        }
+
         function selectWishType(type) {
-            ['outing','exercise','dictionary','sleep','dreamspace'].forEach(t => {
-                const el = document.getElementById('wishRedeem-' + t);
+            var displayKeys = RewardSystem.getDisplayWishKeys();
+            displayKeys.forEach(function(t) {
+                var el = document.getElementById('wishRedeem-' + t);
                 if (el) el.classList.toggle('show', t === type);
             });
         }
 
         // 出发
         function departWish(type) {
-            const units = parseFloat(document.getElementById('wishUnits-' + type).value) || 0;
-            const result = RewardSystem.depart(type, units);
+            var unitsEl = document.getElementById('wishUnits-' + type);
+            var units = unitsEl ? parseFloat(unitsEl.value) || 0 : 0;
+            var result = RewardSystem.depart(type, units);
             alert(result.message);
             if (result.success) {
                 updateRewardBar();
-                document.getElementById('wishFlowerBalance').textContent = RewardSystem.getFlowers();
+                document.getElementById('wishFlowerBalance').textContent = RewardSystem.getFlowers() || 0;
                 renderPendingSection();
-                // 收起展开的行
-                document.getElementById('wishRedeem-' + type).classList.remove('show');
+                var el = document.getElementById('wishRedeem-' + type);
+                if (el) el.classList.remove('show');
             }
         }
 
         // 渲染待登记区
         function renderPendingSection() {
             if (!window.RewardSystem) return;
-            const pending = RewardSystem.getPendingWishes();
-            const el = document.getElementById('pendingSection');
-            if (pending.length === 0) {
-                el.innerHTML = '';
-                return;
-            }
-            const types = RewardSystem.getWishTypes();
+            var pending = RewardSystem.getPendingWishes();
+            var el = document.getElementById('pendingSection');
+            if (pending.length === 0) { el.innerHTML = ''; return; }
+            var types = RewardSystem.getWishTypes();
             el.innerHTML = '<div style="font-size:0.75rem;color:#ffb74d;margin-bottom:6px;font-weight:600;">⏳ 待登记</div>' +
-                pending.map(p => {
-                    const def = types[p.type];
-                    let unitText;
-                    if (p.type === 'outing' || p.type === 'sleep') unitText = p.estUnits + 'h';
-                    else if (p.type === 'exercise') unitText = p.estUnits + 'min';
-                    else unitText = p.estUnits + '词';
+                pending.map(function(p) {
+                    var def = types[p.type];
+                    var unitText;
+                    if (def) {
+                        if (def.unit === 'h') unitText = p.estUnits + 'h';
+                        else if (def.unit === 'min') unitText = p.estUnits + 'min';
+                        else unitText = p.estUnits + def.unit;
+                    } else {
+                        unitText = p.estUnits;
+                    }
                     return '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,183,77,0.08);border:1px solid rgba(255,183,77,0.2);border-radius:8px;margin-bottom:6px;">' +
-                        '<span style="font-size:1.1rem;">' + def.icon + '</span>' +
-                        '<div style="flex:1;"><div style="font-size:0.8rem;color:#c7d1ff;">' + def.name + ' · ' + unitText + '</div>' +
+                        '<span style="font-size:1.1rem;">' + (def ? def.icon : '🎁') + '</span>' +
+                        '<div style="flex:1;"><div style="font-size:0.8rem;color:#c7d1ff;">' + (def ? def.name : p.type) + ' · ' + unitText + '</div>' +
                         '<div style="font-size:0.7rem;color:#8a94a6;">预扣 ' + p.estCost + ' 朵</div></div>' +
                         '<button onclick="openRegister(\'' + p.id + '\')" style="background:rgba(78,201,176,0.15);border:1px solid rgba(78,201,176,0.3);color:#4ec9b0;border-radius:6px;padding:4px 10px;font-size:0.75rem;cursor:pointer;">回来登记</button>' +
                         '</div>';
@@ -2317,33 +2424,33 @@
 
         // 打开回来登记
         function openRegister(pendingId) {
-            const pending = RewardSystem.getPendingWishes().find(p => p.id === pendingId);
+            var pending = RewardSystem.getPendingWishes().find(function(p) { return p.id === pendingId; });
             if (!pending) return;
-            const types = RewardSystem.getWishTypes();
-            const def = types[pending.type];
+            var types = RewardSystem.getWishTypes();
+            var def = types[pending.type];
             currentRegisterId = pendingId;
 
-            let estText;
-            if (pending.type === 'outing' || pending.type === 'sleep') estText = '预计 ' + pending.estUnits + ' 小时';
-            else if (pending.type === 'exercise') estText = '预计 ' + pending.estUnits + ' 分钟';
-            else estText = '预计 ' + pending.estUnits + ' 个词';
+            var estText;
+            if (def) {
+                if (def.unit === 'h') estText = '预计 ' + pending.estUnits + ' 小时';
+                else if (def.unit === 'min') estText = '预计 ' + pending.estUnits + ' 分钟';
+                else estText = '预计 ' + pending.estUnits + ' ' + def.unitLabel;
+            } else {
+                estText = '预计 ' + pending.estUnits;
+            }
 
-            document.getElementById('registerTitle').textContent = def.icon + ' ' + def.name + ' · ' + estText + ' · 预扣 ' + pending.estCost + '朵';
-            document.getElementById('registerGuide').textContent = def.guide;
-            document.getElementById('registerInputLabel').textContent = def.registerLabel;
-            // outing/sleep 的 estUnits 是小时，登记时用分钟
-            if (pending.type === 'outing' || pending.type === 'sleep') {
+            document.getElementById('registerTitle').textContent = (def ? def.icon + ' ' + def.name : pending.type) + ' · ' + estText + ' · 预扣 ' + pending.estCost + '朵';
+            document.getElementById('registerGuide').textContent = def ? def.guide : '';
+            document.getElementById('registerInputLabel').textContent = def ? def.registerLabel : '实际值';
+            if (def && def.unit === 'h') {
                 document.getElementById('registerActual').value = pending.estUnits * 60;
             } else {
                 document.getElementById('registerActual').value = pending.estUnits;
             }
             document.getElementById('registerReflection').value = '';
 
-            // 设置 input 属性
-            const input = document.getElementById('registerActual');
-            if (pending.type === 'outing' || pending.type === 'sleep') { input.step = '15'; input.min = '0'; }
-            else if (pending.type === 'exercise') { input.step = '15'; input.min = '0'; }
-            else { input.step = '1'; input.min = '0'; }
+            var input = document.getElementById('registerActual');
+            input.step = '15'; input.min = '0';
 
             updateRegisterCostPreview();
             document.getElementById('registerOverlay').classList.add('show');
@@ -2356,37 +2463,39 @@
 
         // 实时预览登记花费
         document.addEventListener('DOMContentLoaded', function() {
-            const regInput = document.getElementById('registerActual');
+            var regInput = document.getElementById('registerActual');
             if (regInput) {
                 regInput.addEventListener('input', updateRegisterCostPreview);
             }
         });
 
         function updateRegisterCostPreview() {
-            if (!currentRegisterId) return;
-            const pending = RewardSystem.getPendingWishes().find(p => p.id === currentRegisterId);
+            if (!currentRegisterId || !window.RewardSystem) return;
+            var pending = RewardSystem.getPendingWishes().find(function(p) { return p.id === currentRegisterId; });
             if (!pending) return;
-            const actual = parseFloat(document.getElementById('registerActual').value) || 0;
+            var actual = parseFloat(document.getElementById('registerActual').value) || 0;
 
-            let actualCost = 0;
-            if (pending.type === 'dictionary') {
-                const fullSets = Math.floor(actual / 3);
-                const rem = actual % 3;
-                actualCost = fullSets + (rem >= 2 ? 1 : 0);
-            } else if (pending.type === 'outing' || pending.type === 'sleep') {
-                // actual 是分钟，60min=1朵，余≥30min补1朵
-                const fullUnits = Math.floor(actual / 60);
-                const rem = actual % 60;
-                actualCost = fullUnits + (rem >= 30 ? 1 : 0);
-            } else {
-                // exercise: actual 是分钟，30min=1朵，余≥15min补1朵
-                const fullUnits = Math.floor(actual / 30);
-                const rem = actual % 30;
-                actualCost = fullUnits + (rem >= 15 ? 1 : 0);
+            var types = RewardSystem.getWishTypes();
+            var def = types[pending.type];
+            var actualCost = 0;
+
+            if (def) {
+                if (def.registerRounding === -1) {
+                    var perSet = Math.round(1 / def.costPerRegisterUnit);
+                    var fullSets = Math.floor(actual / perSet);
+                    var rem = actual % perSet;
+                    actualCost = fullSets + (rem === perSet - 1 ? 1 : 0);
+                } else {
+                    var divisor = Math.round(1 / def.costPerRegisterUnit);
+                    var rounding = def.registerRounding || Math.round(divisor / 2);
+                    var fullUnits = Math.floor(actual / divisor);
+                    var remainder = actual % divisor;
+                    actualCost = fullUnits + (remainder >= rounding ? 1 : 0);
+                }
             }
 
-            const diff = pending.estCost - actualCost;
-            let msg = '实际花费: ' + actualCost + ' 朵';
+            var diff = pending.estCost - actualCost;
+            var msg = '实际花费: ' + actualCost + ' 朵';
             if (diff > 0) msg += ' · 退还 ' + diff + ' 朵';
             else if (diff < 0) msg += ' · 补扣 ' + (-diff) + ' 朵';
             document.getElementById('registerCostPreview').textContent = msg;
@@ -2394,15 +2503,14 @@
 
         function confirmRegister() {
             if (!currentRegisterId) return;
-            const actual = parseFloat(document.getElementById('registerActual').value) || 0;
-            const reflection = document.getElementById('registerReflection').value.trim();
-            const result = RewardSystem.register(currentRegisterId, actual, reflection);
+            var actual = parseFloat(document.getElementById('registerActual').value) || 0;
+            var reflection = document.getElementById('registerReflection').value.trim();
+            var result = RewardSystem.register(currentRegisterId, actual, reflection);
             alert(result.message);
             if (result.success) {
                 updateRewardBar();
                 closeRegister();
-                // 刷新许愿面板
-                document.getElementById('wishFlowerBalance').textContent = RewardSystem.getFlowers();
+                document.getElementById('wishFlowerBalance').textContent = RewardSystem.getFlowers() || 0;
                 renderPendingSection();
             }
         }
@@ -2410,146 +2518,251 @@
         function cancelRegisterWish() {
             if (!currentRegisterId) return;
             if (!confirm('取消并退还预扣的花朵？')) return;
-            const result = RewardSystem.cancelPending(currentRegisterId);
+            var result = RewardSystem.cancelPending(currentRegisterId);
             alert(result.message);
             if (result.success) {
                 updateRewardBar();
                 closeRegister();
-                document.getElementById('wishFlowerBalance').textContent = RewardSystem.getFlowers();
+                document.getElementById('wishFlowerBalance').textContent = RewardSystem.getFlowers() || 0;
                 renderPendingSection();
             }
         }
 
         // 动态计算兑换花费预览（出发前）
         function updateWishCostPreview(type) {
-            const input = document.getElementById('wishUnits-' + type);
-            if (!input) return;
-            const val = parseFloat(input.value) || 0;
-            let cost;
-            if (type === 'outing' || type === 'sleep') {
-                const hours = val;
-                const fullUnits = Math.floor(hours);
-                const remMin = (hours - fullUnits) * 60;
-                cost = fullUnits + (remMin >= 30 ? 1 : 0);
-                cost = Math.max(1, cost);
-            } else if (type === 'exercise') {
-                const fullUnits = Math.floor(val / 30);
-                const rem = val % 30;
-                cost = fullUnits + (rem >= 15 ? 1 : 0);
-                cost = Math.max(1, cost);
+            var input = document.getElementById('wishUnits-' + type);
+            if (!input || !window.RewardSystem) return;
+            var val = parseFloat(input.value) || 0;
+            var types = RewardSystem.getWishTypes();
+            var def = types[type];
+            if (!def) return;
+
+            var cost;
+            if (def.costPerUnit >= 1) {
+                cost = Math.max(1, Math.ceil(val * def.costPerUnit));
             } else {
-                const fullSets = Math.floor(val / 3);
-                const rem = val % 3;
-                cost = fullSets + (rem >= 2 ? 1 : 0);
+                var perSet = Math.round(1 / def.costPerUnit);
+                var fullSets = Math.floor(val / perSet);
+                var rem = val % perSet;
+                cost = fullSets;
+                if (def.registerRounding === -1) {
+                    if (rem === perSet - 1) cost += 1;
+                } else if (def.unit === 'h') {
+                    var remMin = (val - Math.floor(val)) * 60;
+                    var roundMin = def.registerRounding || 30;
+                    cost += (remMin >= roundMin ? 1 : 0);
+                } else {
+                    var roundVal = def.registerRounding || Math.round(perSet / 2);
+                    cost += (rem >= roundVal ? 1 : 0);
+                }
                 cost = Math.max(1, cost);
             }
-            document.getElementById('wishCost-' + type).textContent = '= ' + cost + '朵';
+            var costEl = document.getElementById('wishCost-' + type);
+            if (costEl) costEl.textContent = '= ' + cost + '朵';
         }
 
-        ['outing','exercise','dictionary','sleep'].forEach(type => {
-            const input = document.getElementById('wishUnits-' + type);
-            if (input) {
-                input.addEventListener('input', function() { updateWishCostPreview(type); });
-            }
-        });
+        // ===== 展示模式切换 =====
 
-        // 创造空间按钮：已解锁则跳转，未解锁则打开兑换面板并滚动到S级区
-        function openDreamSpaceOrWish() {
-            try {
-                const d = JSON.parse(localStorage.getItem('ielts_learning_system') || '{}');
-                const dreamSpaces = d.dreamSpaces || [];
-                if (dreamSpaces.length > 0) {
-                    location.href = 'dreamspace.html';
-                } else {
-                    openWishPanel();
-                    setTimeout(function() {
-                        selectWishType('dreamspace');
-                        var dreamSection = document.getElementById('wishRedeem-dreamspace');
-                        if (dreamSection) dreamSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 150);
-                }
-            } catch(e) {
-                location.href = 'dreamspace.html';
+        function switchDisplayMode(mode) {
+            if (!window.RewardSystem) return;
+            RewardSystem.setDisplayMode(mode);
+            updateModeButtons();
+            renderWishTypeCards();
+            renderWishManageList();
+        }
+
+        function updateModeButtons() {
+            if (!window.RewardSystem) return;
+            var config = RewardSystem.getWishConfig();
+            var isRandom = config.displayMode === 'random';
+            var selBtn = document.getElementById('modeSelectedBtn');
+            var rndBtn = document.getElementById('modeRandomBtn');
+            var refreshRow = document.getElementById('randomRefreshRow');
+
+            if (isRandom) {
+                selBtn.style.background = 'rgba(130,150,255,0.08)';
+                selBtn.style.borderColor = 'rgba(130,150,255,0.15)';
+                selBtn.style.color = '#5a6480';
+                rndBtn.style.background = 'rgba(255,183,77,0.15)';
+                rndBtn.style.borderColor = 'rgba(255,183,77,0.35)';
+                rndBtn.style.color = '#ffb74d';
+                if (refreshRow) refreshRow.style.display = 'block';
+            } else {
+                selBtn.style.background = 'rgba(255,183,77,0.15)';
+                selBtn.style.borderColor = 'rgba(255,183,77,0.35)';
+                selBtn.style.color = '#ffb74d';
+                rndBtn.style.background = 'rgba(130,150,255,0.08)';
+                rndBtn.style.borderColor = 'rgba(130,150,255,0.15)';
+                rndBtn.style.color = '#5a6480';
+                if (refreshRow) refreshRow.style.display = 'none';
             }
+        }
+
+        function refreshRandomAndRender() {
+            if (!window.RewardSystem) return;
+            RewardSystem.refreshRandomWishes();
+            renderWishTypeCards();
+        }
+
+        // ===== 愿望库管理 =====
+
+        function renderWishManageList() {
+            if (!window.RewardSystem) return;
+            var config = RewardSystem.getWishConfig();
+            var allTypes = RewardSystem.getWishTypes();
+            var defaults = RewardSystem.getDefaultWishTypes();
+            var selectedKeys = config.selectedKeys || [];
+            var isRandom = config.displayMode === 'random';
+
+            var el = document.getElementById('wishManageList');
+
+            // 获取库里所有愿望（默认+自定义），按默认优先排序
+            var poolKeys = Object.keys(defaults).concat(
+                Object.keys(config.customTypes || {}).filter(function(k) { return !defaults[k]; })
+            );
+
+            if (poolKeys.length === 0) {
+                el.innerHTML = '<div style="color:#5a6480;font-size:0.7rem;text-align:center;padding:8px;">愿望库为空，点「+ 新增」添加</div>';
+                return;
+            }
+
+            var html = '';
+            poolKeys.forEach(function(key) {
+                var def = allTypes[key] || defaults[key] || (config.customTypes || {})[key];
+                if (!def) return;
+                var isDefault = !!defaults[key];
+                var isSelected = selectedKeys.indexOf(key) !== -1;
+                var isRandomlyPicked = isRandom && config.randomSeed && config.randomSeed.indexOf(key) !== -1;
+
+                // 勾选状态：随机模式下显示是否被抽中；手动模式下显示是否勾选
+                var checkState = isRandom ? isRandomlyPicked : isSelected;
+                var checkIcon = checkState ? '☑' : '☐';
+                var checkColor = checkState ? '#ffb74d' : '#5a6480';
+
+                html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;margin-bottom:4px;border-radius:6px;background:rgba(26,35,69,0.4);">' +
+                    '<span style="font-size:0.85rem;color:' + checkColor + ';cursor:pointer;" ' +
+                    'onclick="toggleWishInPool(\'' + key + '\')" ' +
+                    '>' + checkIcon + '</span>' +
+                    '<span style="font-size:0.9rem;">' + def.icon + '</span>' +
+                    '<span style="flex:1;font-size:0.8rem;color:#c7d1ff;">' + def.name + '</span>' +
+                    (isDefault ? '<span style="font-size:0.6rem;color:#5a6480;">内置</span>' : '') +
+                    (!isDefault ? '<button onclick="deleteCustomWishFromUI(\'' + key + '\')" style="background:none;border:1px solid rgba(255,114,114,0.2);color:#ff7272;border-radius:4px;padding:2px 6px;font-size:0.65rem;cursor:pointer;">删除</button>' : '') +
+                    '</div>';
+            });
+
+            el.innerHTML = html;
+
+            // 渲染被隐藏的默认愿望恢复区
+            var hiddenRow = document.getElementById('hiddenDefaultsRow');
+            if (hiddenRow) {
+                var hiddenDefaults = RewardSystem.getHiddenDefaultWishes ? RewardSystem.getHiddenDefaultWishes() : [];
+                if (hiddenDefaults.length > 0) {
+                    var restoreHtml = '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(130,150,255,0.1);">' +
+                        '<span style="font-size:0.65rem;color:#5a6480;">已隐藏的内置愿望：</span>';
+                    hiddenDefaults.forEach(function(k) {
+                        var d = defaults[k];
+                        if (!d) return;
+                        restoreHtml += '<button onclick="restoreHiddenWish(\'' + k + '\')" style="background:rgba(78,201,176,0.08);border:1px solid rgba(78,201,176,0.2);color:#4ec9b0;border-radius:4px;padding:2px 8px;font-size:0.65rem;cursor:pointer;margin:2px;">' + d.icon + ' ' + d.name + ' ↩</button>';
+                    });
+                    restoreHtml += '</div>';
+                    hiddenRow.innerHTML = restoreHtml;
+                } else {
+                    hiddenRow.innerHTML = '';
+                }
+            }
+        }
+
+        function toggleWishInPool(key) {
+            if (!window.RewardSystem) return;
+            RewardSystem.toggleWishSelection(key);
+            renderWishTypeCards();
+            renderWishManageList();
+        }
+
+        function restoreHiddenWish(key) {
+            if (!window.RewardSystem) return;
+            if (RewardSystem.restoreDefaultWish) RewardSystem.restoreDefaultWish(key);
+            renderWishTypeCards();
+            renderWishManageList();
+        }
+
+        function deleteCustomWishFromUI(key) {
+            if (!window.RewardSystem) return;
+            if (!confirm('确定删除这个自定义愿望？')) return;
+            RewardSystem.removeCustomWishType(key);
+            renderWishTypeCards();
+            renderWishManageList();
+        }
+
+        // ===== 自定义愿望添加弹窗 =====
+        function openAddCustomWish() {
+            document.getElementById('addCustomWishOverlay').classList.add('show');
+            // 清空上次输入
+            document.getElementById('customWishName').value = '';
+            document.getElementById('customWishIcon').value = '';
+            document.getElementById('customWishUnit').value = 'h';
+            document.getElementById('customWishCost').value = '1';
+            document.getElementById('customWishDesc').value = '';
+            setTimeout(function() { document.getElementById('customWishName').focus(); }, 100);
+        }
+
+        function closeAddCustomWish() {
+            document.getElementById('addCustomWishOverlay').classList.remove('show');
+        }
+
+        function saveCustomWish() {
+            if (!window.RewardSystem) return;
+            var name = document.getElementById('customWishName').value.trim();
+            var icon = document.getElementById('customWishIcon').value.trim() || '⭐';
+            var unit = document.getElementById('customWishUnit').value;
+            var cost = parseInt(document.getElementById('customWishCost').value) || 1;
+            var desc = document.getElementById('customWishDesc').value.trim();
+
+            if (!name) { alert('请输入愿望名称'); return; }
+            if (cost < 1) cost = 1;
+
+            // 生成唯一 key
+            var key = 'custom_' + Date.now();
+
+            // cost 的含义：1朵花可以兑换多少个单位
+            // 例如 unit=h, cost=1 → 1朵/1h → costPerUnit=1
+            //      unit=min, cost=30 → 1朵/30min → costPerUnit=1/30
+            //      unit=词, cost=3 → 1朵/3词 → costPerUnit=1/3
+            var costPerUnit = 1 / cost;
+
+            var def = {
+                name: name,
+                icon: icon,
+                unit: unit,
+                unitLabel: unit === 'h' ? '小时' : unit === 'min' ? '分钟' : unit,
+                costPerUnit: costPerUnit,
+                minUnit: unit === 'h' ? cost : unit === 'min' ? cost : cost,
+                description: desc || ('自定义愿望：' + name),
+                guide: desc || ('去享受你的 ' + name + ' 吧'),
+                registerLabel: '实际' + (unit === 'h' ? '多久（分钟）' : unit === 'min' ? '多久（分钟）' : '几个'),
+                registerUnit: (unit === 'h' || unit === 'min') ? 'min' : unit,
+                costPerRegisterUnit: unit === 'h' ? 1 / 60 : costPerUnit,
+                registerRounding: unit === 'h' ? 30 : (unit === 'min' ? Math.ceil(cost / 2) : 0)
+            };
+
+            RewardSystem.addCustomWishType(key, def);
+            closeAddCustomWish();
+            renderWishTypeCards();
+            renderWishManageList();
+        }
+
+        // 创造空间按钮：直接跳转dreamspace.html
+        function openDreamSpaceOrWish() {
+            location.href = 'dreamspace.html';
         }
 
         // S级花朵余额刷新
         function updateSFlowerBalance() {
-            const el = document.getElementById('wishSFlowerBalance');
-            if (el && window.RewardSystem) {
-                const sFlowers = RewardSystem.getSFlowers();
-                el.textContent = '当前 🏵️ ' + sFlowers + ' 朵' + (sFlowers >= 3 ? ' ✅ 可兑换' : '（还需 ' + (3 - sFlowers) + ' 朵）');
-            }
-        }
-
-        // 创造空间S级兑换
-        function redeemDreamSpace() {
             if (!window.RewardSystem) return;
             const sFlowers = RewardSystem.getSFlowers();
-            if (sFlowers < 3) {
-                alert('S级小红花不足，需要 3 🏵️，当前 ' + sFlowers + ' 🏵️');
-                return;
-            }
-            const name = prompt('给你的创造空间取个名字吧：');
-            if (!name || !name.trim()) {
-                alert('需要给空间命名才能解锁哦');
-                return;
-            }
-            // 扣除3个S级花朵
-            const rewards = JSON.parse(localStorage.getItem('ielts_learning_system'));
-            rewards.rewards.sFlowers -= 3;
-            // 创建空间数据
-            if (!rewards.dreamSpaces) rewards.dreamSpaces = [];
-            rewards.dreamSpaces.push({
-                id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-                name: name.trim(),
-                type: 'theme',
-                laws: '',
-                creations: [],
-                team: [],
-                vision: '',
-                createdAt: new Date().toISOString()
-            });
-            localStorage.setItem('ielts_learning_system', JSON.stringify(rewards));
-            if (typeof syncDataWithCloud === 'function') syncDataWithCloud();
-
-            // 关闭面板
-            closeWishPanel();
-
-            // 播放冰块融化动画
-            playMeltAnimation();
-        }
-
-        // 冰块融化动画
-        function playMeltAnimation() {
-            const iceOverlay = document.getElementById('dreamIce');
-            const meltOverlay = document.getElementById('dreamMelt');
-            const card = document.getElementById('dreamSpaceCard');
-
-            if (!iceOverlay || !meltOverlay) return;
-
-            // 播放音效
-            if (window.SFX && SFX.play) {
-                SFX.play('complete');
-            }
-
-            // 显示融化层
-            meltOverlay.style.display = 'block';
-            // 冰封层开始淡出
-            iceOverlay.classList.add('unlocked');
-            // 卡片发光
-            card.classList.add('unlocked-glow');
-
-            // 动画结束后恢复状态
-            setTimeout(function() {
-                meltOverlay.style.display = 'none';
-                card.classList.remove('unlocked-glow');
-                // 解锁点击
-                card.onclick = function() { location.href = 'dreamspace.html'; };
-                card.style.cursor = 'pointer';
-                // 刷新模块进度
-                if (typeof updateModuleProgress === 'function') updateModuleProgress();
-            }, 2200);
+            // 标题栏的S级余额
+            const topEl = document.getElementById('wishSFlowerBalanceTop');
+            if (topEl) topEl.textContent = sFlowers;
         }
 
         // ===== 日历详情 =====
@@ -2755,51 +2968,15 @@
                 document.getElementById('mpSpellSub').textContent =
                     todaySpell.total > 0 ? '正确率 ' + (todaySpell.total > 0 ? Math.round(todaySpell.correct / todaySpell.total * 100) : 0) + '%' : '导入词库 · 三种模式 · 沉浸拼写';
 
-                // 创造空间
+                // 创造空间（快速入口方块）
                 const sFlowers = d.rewards?.sFlowers || 0;
                 const dreamSpaces = d.dreamSpaces || [];
-                const iceOverlay = document.getElementById('dreamIce');
-                const meltOverlay = document.getElementById('dreamMelt');
-                const dreamCard = document.getElementById('dreamSpaceCard');
-
-                if (dreamSpaces.length > 0) {
-                    // 已解锁：隐藏冰封层，恢复点击
-                    if (iceOverlay) { iceOverlay.style.display = 'none'; iceOverlay.classList.add('unlocked'); }
-                    if (meltOverlay) meltOverlay.style.display = 'none';
-                    dreamCard.onclick = function() { location.href = 'dreamspace.html'; };
-                    dreamCard.style.cursor = 'pointer';
-                    document.getElementById('mpDreamCount').textContent = dreamSpaces.length + ' 个空间';
-                    document.getElementById('mpDreamSub').textContent = '🏵️ ' + sFlowers + ' · 可再创 ' + Math.floor(sFlowers / 3) + ' 个';
-                } else {
-                    // 未解锁：显示冰封层，禁止跳转
-                    if (iceOverlay) { iceOverlay.style.display = ''; iceOverlay.classList.remove('unlocked'); }
-                    if (meltOverlay) meltOverlay.style.display = 'none';
-                    dreamCard.onclick = null;
-                    dreamCard.style.cursor = 'not-allowed';
-                    // 点击冰封层提示
-                    if (iceOverlay) {
-                        iceOverlay.onclick = function() {
-                            if (sFlowers >= 3) {
-                                openWishPanel();
-                                setTimeout(function() {
-                                    selectWishType('dreamspace');
-                                    // 滚动到S级专属区域
-                                    var dreamSection = document.getElementById('wishRedeem-dreamspace');
-                                    if (dreamSection) dreamSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }, 150);
-                            } else {
-                                const need = 3 - sFlowers;
-                                iceOverlay.style.animation = 'none';
-                                iceOverlay.offsetHeight; // force reflow
-                                iceOverlay.style.animation = '';
-                                alert('❄️ 还需要 ' + need + ' 朵 🏵️S级小红花 才能解冻创造空间');
-                            }
-                        };
-                    }
-                    document.getElementById('mpDreamCount').textContent = '3 🏵️ = 1空间';
-                    document.getElementById('mpDreamSub').textContent = 'S级小红花专属 · 创造你的世界';
+                var qtBadge = document.getElementById('qtDreamBadge');
+                if (qtBadge) {
+                    qtBadge.textContent = dreamSpaces.length > 0
+                        ? dreamSpaces.length + '个空间 · 🏵️' + sFlowers
+                        : '3🏵️=1空间 · ' + sFlowers + '朵';
                 }
-                document.getElementById('mpDreamFill').style.width = Math.min(100, (sFlowers / 3) * 100) + '%';
             } catch(e) {
                 console.error('[moduleProgress] error:', e);
             }

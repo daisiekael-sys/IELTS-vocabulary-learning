@@ -3,19 +3,19 @@
  * 
  * 设计理念：把让我们健康的、变得更好的事情视为奖励
  * 
- * 小红花规则（S级优先制）：
+ * 小红花规则（S级翻倍制）：
  *   - 完成全部 🔴重要且紧急(IU) 任务 → 获得1朵 🏵️S级小红花
- *   - S级获得后，每额外完成1个其他象限任务 → +1朵 🌸小红花
- *   - 如果先完成了不重要的任务，小花暂不发放
- *   - 当IU全部完成拿到S级后，之前已完成的其他任务的小花同时发放
- *   - 如果IU始终未完成，其他任务的花朵不会发放
+ *   - 基础倍率：每完成2个其他任务 = 1朵 🌸（向下取整）
+ *   - S级翻倍：拿到S级后，每完成1个其他任务 = 1朵 🌸
+ *   - 没完成IU也有花，只是S级后翻倍增值
+ *   - 如果IU后来完成，之前完成的其他任务的花朵差额补发
  * 
  * 许愿兑换（事件驱动，非时间凑数）：
  *   - 出去玩：1朵/h（1小时1朵），回来登记实际时长，余数≥30min补1朵
  *   - 运动：1朵/30min，回来登记实际时长，余数≥15min补1朵
- *   - 翻词典：1朵/3词（余2词扣1朵，余1不扣）
+ *   - 日常积累单词：1朵/3词（余2词扣1朵，余1不扣）
  *   - 睡觉休息：1朵/h，回来登记实际时长，余数≥30min补1朵
- *   - 创造空间：3朵🏵️S级 = 1个空间（直接兑换，无两步流程）
+ *   - 以上为默认愿望，可隐藏/恢复，也可完全自定义新增
  * 
  * 两步流程：
  *   1. 出发：预扣花朵，记录 pending wish
@@ -57,6 +57,7 @@
             let d = localStorage.getItem(STORAGE_KEY);
             let data = d ? JSON.parse(d) : {};
             data.rewards = rewards;
+            data._lastModified = new Date().toISOString();
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             if (typeof syncDataWithCloud === 'function') {
                 syncDataWithCloud();
@@ -77,100 +78,148 @@
         return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     }
 
-    // 许愿类型定义
-    const WISH_TYPES = {
+    // 默认许愿类型定义（不可变基线，全删也能恢复）
+    const DEFAULT_WISH_TYPES = {
         outing: {
-            name: '出去玩',
-            icon: '🌈',
-            unit: 'h',
-            unitLabel: '小时',
-            costPerUnit: 1,   // 1朵/h
-            minUnit: 1,
+            name: '出去玩', icon: '🌈', unit: 'h', unitLabel: '小时',
+            costPerUnit: 1, minUnit: 1,
             description: '出去探索，感受这个世界最能带给你感觉的某种东西',
             guide: '出去走走，探索一点什么，或者感受什么在召唤你',
-            registerLabel: '实际出去了多久（分钟）',
-            registerUnit: 'min',
-            costPerRegisterUnit: 1/60,  // 60min=1朵
-            registerRounding: 30        // 余数≥30min进1朵
+            registerLabel: '实际出去了多久（分钟）', registerUnit: 'min',
+            costPerRegisterUnit: 1/60, registerRounding: 30
         },
         exercise: {
-            name: '运动',
-            icon: '💪',
-            unit: 'min',
-            unitLabel: '分钟',
-            costPerUnit: 1/30,  // 30min=1朵
-            minUnit: 30,
+            name: '运动', icon: '💪', unit: '部位', unitLabel: '个部位',
+            costPerUnit: 1, minUnit: 1,
             description: '闭眼感知全身，哪个部位最需要运动，就去练它',
-            guide: '闭上眼睛感受一下，哪个部位最堵塞、最需要被照顾？',
-            registerLabel: '实际运动了多久（分钟）',
-            registerUnit: 'min',
-            costPerRegisterUnit: 1/30,
-            registerRounding: 15
+            guide: '闭上眼睛感受一下，哪个部位最堵塞、最需要被照顾？每练一个部位=1朵',
+            registerLabel: '实际练了几个部位', registerUnit: '部位',
+            costPerRegisterUnit: 1, registerRounding: 0
         },
         dictionary: {
-            name: '翻词典',
-            icon: '📖',
-            unit: '词',
-            unitLabel: '个词',
-            costPerUnit: 1/3,  // 3词=1朵
-            minUnit: 3,
-            description: '随机翻开三页，找到今日最有感觉的三个词——像塔罗牌一样，它们代表此刻的你',
+            name: '日常积累单词', icon: '📖', unit: '词', unitLabel: '个词',
+            costPerUnit: 1/3, minUnit: 3,
+            description: '随机翻三页，找到今日最有感觉的三个词——像塔罗牌一样',
             guide: '随机翻三次，选最有感觉的词。这不是背诵，是相遇',
-            registerLabel: '实际翻到几个词',
-            registerUnit: '词',
-            costPerRegisterUnit: 1/3,
-            registerRounding: -1  // 特殊：余2词扣1朵，余1不扣
+            registerLabel: '实际翻到几个词', registerUnit: '词',
+            costPerRegisterUnit: 1/3, registerRounding: -1
         },
         sleep: {
-            name: '睡觉休息',
-            icon: '😴',
-            unit: 'h',
-            unitLabel: '小时',
-            costPerUnit: 1,   // 1朵/h
-            minUnit: 1,
+            name: '睡觉休息', icon: '😴', unit: 'h', unitLabel: '小时',
+            costPerUnit: 1, minUnit: 1,
             description: '躺床上休息，什么都不想，身体会感谢你的',
             guide: '放下一切，躺平，让身体自己决定要休息多久',
-            registerLabel: '实际躺了多久（分钟）',
-            registerUnit: 'min',
-            costPerRegisterUnit: 1/60,
-            registerRounding: 30
+            registerLabel: '实际躺了多久（分钟）', registerUnit: 'min',
+            costPerRegisterUnit: 1/60, registerRounding: 30
         }
     };
 
     /**
-     * 根据实际时长/数量计算最终花费
+     * 获取用户自定义愿望配置（从 localStorage 读取）
+     * 结构: {
+     *   displayMode: 'selected' | 'random',   // 展示模式
+     *   selectedKeys: ['outing','exercise',...], // 手动模式下勾选展示的愿望
+     *   customTypes: { key: {name,icon,...} },   // 用户自定义的愿望类型
+     *   randomSeed: [key,key,key]               // 随机模式下当前抽中的3个（缓存，刷新不变）
+     * }
+     */
+    function _loadWishConfig() {
+        try {
+            let d = localStorage.getItem(STORAGE_KEY);
+            if (!d) return _defaultWishConfig();
+            let data = JSON.parse(d);
+            if (!data.wishConfig) return _defaultWishConfig();
+            var cfg = data.wishConfig;
+            // 兼容旧格式：如果没有 displayMode，迁移旧 activeTypes
+            if (!cfg.displayMode) {
+                cfg.displayMode = 'selected';
+                cfg.selectedKeys = cfg.activeTypes || Object.keys(DEFAULT_WISH_TYPES);
+                delete cfg.activeTypes;
+            }
+            if (!cfg.selectedKeys) cfg.selectedKeys = Object.keys(DEFAULT_WISH_TYPES);
+            if (!cfg.customTypes) cfg.customTypes = {};
+            if (!cfg.hiddenDefaults) cfg.hiddenDefaults = [];
+            // 数据迁移：移除旧版 dreamspace key（已从默认类型中删除）
+            cfg.selectedKeys = cfg.selectedKeys.filter(function(k) { return k !== 'dreamspace'; });
+            if (cfg.hiddenDefaults) cfg.hiddenDefaults = cfg.hiddenDefaults.filter(function(k) { return k !== 'dreamspace'; });
+            return cfg;
+        } catch (e) {
+            return _defaultWishConfig();
+        }
+    }
+
+    function _defaultWishConfig() {
+        return {
+            displayMode: 'selected',
+            selectedKeys: Object.keys(DEFAULT_WISH_TYPES),
+            hiddenDefaults: [],
+            customTypes: {},
+            randomSeed: []
+        };
+    }
+
+    function _saveWishConfig(config) {
+        try {
+            let d = localStorage.getItem(STORAGE_KEY);
+            let data = d ? JSON.parse(d) : {};
+            data.wishConfig = config;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+            console.error('[reward] save wish config error:', e);
+        }
+    }
+
+    // 兼容旧代码的别名
+    var WISH_TYPES = DEFAULT_WISH_TYPES;
+
+    /**
+     * 根据实际时长/数量计算最终花费（通用版）
      * @param {string} type - wish type
      * @param {number} actualUnits - 实际值（分钟/词数）
      * @returns {number} 花费花朵数
      */
     function _calcActualCost(type, actualUnits) {
-        const def = WISH_TYPES[type];
+        const allTypes = _getMergedTypes();
+        const def = allTypes[type];
         if (!def) return 0;
 
-        if (type === 'dictionary') {
-            // 翻词典特殊规则：每3词1朵，余2扣1，余1不扣
-            const fullSets = Math.floor(actualUnits / 3);
-            const remainder = actualUnits % 3;
+        // 词典类特殊规则（registerRounding === -1）：余2扣1，余1不扣
+        if (def.registerRounding === -1) {
+            const perSet = def.costPerRegisterUnit ? Math.round(1 / def.costPerRegisterUnit) : 3;
+            const fullSets = Math.floor(actualUnits / perSet);
+            const remainder = actualUnits % perSet;
             let cost = fullSets;
-            if (remainder === 2) cost += 1;
+            if (remainder === perSet - 1) cost += 1;
             return cost;
         }
 
-        // 出去玩 / 运动 / 睡觉：时间制，actualUnits 是分钟
-        let minutes = actualUnits;
-        let divisor, rounding;
-        if (type === 'outing' || type === 'sleep') {
-            divisor = 60;   // 60min=1朵
-            rounding = 30;  // 余数≥30min进1朵
-        } else {
-            divisor = 30;   // 30min=1朵
-            rounding = 15;  // 余数≥15min进1朵
-        }
-        const fullUnits = Math.floor(minutes / divisor);
-        const remainder = minutes % divisor;
+        // 时间类：actualUnits 是分钟
+        const divisor = def.costPerRegisterUnit ? Math.round(1 / def.costPerRegisterUnit) : 60;
+        const rounding = def.registerRounding || Math.round(divisor / 2);
+        const fullUnits = Math.floor(actualUnits / divisor);
+        const remainder = actualUnits % divisor;
         let cost = fullUnits;
         if (remainder >= rounding) cost += 1;
         return cost;
+    }
+
+    /**
+     * 合并所有愿望类型：默认 + 自定义
+     */
+    function _getMergedTypes() {
+        const config = _loadWishConfig();
+        var merged = {};
+        // 默认类型（排除被用户隐藏的）
+        for (var k in DEFAULT_WISH_TYPES) {
+            if (config.hiddenDefaults && config.hiddenDefaults.indexOf(k) === -1) {
+                merged[k] = DEFAULT_WISH_TYPES[k];
+            }
+        }
+        // 自定义类型覆盖/新增
+        for (var k in config.customTypes) {
+            merged[k] = config.customTypes[k];
+        }
+        return merged;
     }
 
     window.RewardSystem = {
@@ -178,7 +227,7 @@
          * 获取当前小红花余额
          */
         getFlowers: function() {
-            return _load().flowers;
+            return _load().flowers || 0;
         },
 
         /**
@@ -214,10 +263,10 @@
 
         /**
          * 重新计算今日奖励（可重复调用，自动修正差额）
-         * 核心逻辑：根据当前任务完成状态，实时计算应得小红花
-         * - IU全部完成 → 1朵S级 + 每个其他已完成任务1朵
-         * - IU未全部完成 → 0朵（先做其他任务不给花）
-         * - 如果IU后来完成，之前完成的其他任务的花朵同时发放
+         * 核心逻辑：S级翻倍制
+         * - IU未全部完成 → 基础倍率：每2个其他任务=1朵
+         * - IU全部完成 → 1朵S级 + 翻倍：每1个其他任务=1朵
+         * - IU后来完成时，差额自动补发
          */
         recalculateToday: function() {
             if (!window.TaskManager) return 0;
@@ -262,10 +311,168 @@
         },
 
         /**
-         * 获取许愿类型定义
+         * 获取所有许愿类型定义（默认+自定义）
          */
         getWishTypes: function() {
-            return WISH_TYPES;
+            return _getMergedTypes();
+        },
+
+        /**
+         * 获取当前应展示的愿望类型列表
+         * - selected 模式：返回 selectedKeys
+         * - random 模式：返回 randomSeed（如无缓存则重新抽取）
+         */
+        getDisplayWishKeys: function() {
+            var config = _loadWishConfig();
+            if (config.displayMode === 'random') {
+                if (!config.randomSeed || config.randomSeed.length === 0) {
+                    config.randomSeed = this._drawRandom();
+                    _saveWishConfig(config);
+                }
+                return config.randomSeed.slice();
+            }
+            // selected 模式：返回 selectedKeys 中未被隐藏的
+            var sel = config.selectedKeys || Object.keys(DEFAULT_WISH_TYPES);
+            var hidden = config.hiddenDefaults || [];
+            return sel.filter(function(k) { return hidden.indexOf(k) === -1; });
+        },
+
+        /**
+         * 随机从库中抽取3个愿望
+         */
+        _drawRandom: function() {
+            var allTypes = _getMergedTypes();
+            var keys = Object.keys(allTypes);
+            // Fisher-Yates 洗牌取前3
+            for (var i = keys.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var tmp = keys[i]; keys[i] = keys[j]; keys[j] = tmp;
+            }
+            return keys.slice(0, Math.min(3, keys.length));
+        },
+
+        /**
+         * 重新抽取随机愿望（用户手动刷新）
+         */
+        refreshRandomWishes: function() {
+            var config = _loadWishConfig();
+            config.randomSeed = this._drawRandom();
+            _saveWishConfig(config);
+            return config.randomSeed;
+        },
+
+        /**
+         * 获取被隐藏的默认愿望列表
+         */
+        getHiddenDefaultWishes: function() {
+            var config = _loadWishConfig();
+            return config.hiddenDefaults || [];
+        },
+
+        /**
+         * 恢复被隐藏的默认愿望
+         */
+        restoreDefaultWish: function(key) {
+            var config = _loadWishConfig();
+            if (!DEFAULT_WISH_TYPES[key]) return;
+            config.hiddenDefaults = (config.hiddenDefaults || []).filter(function(k) { return k !== key; });
+            if (config.selectedKeys.indexOf(key) === -1) {
+                config.selectedKeys.push(key);
+            }
+            _saveWishConfig(config);
+        },
+
+        /**
+         * 获取默认愿望类型（不可删除的基线）
+         */
+        getDefaultWishTypes: function() {
+            return DEFAULT_WISH_TYPES;
+        },
+
+        /**
+         * 获取当前愿望配置
+         */
+        getWishConfig: function() {
+            return _loadWishConfig();
+        },
+
+        /**
+         * 更新愿望配置
+         */
+        saveWishConfig: function(config) {
+            _saveWishConfig(config);
+        },
+
+        /**
+         * 设置展示模式 'selected' | 'random'
+         */
+        setDisplayMode: function(mode) {
+            var config = _loadWishConfig();
+            config.displayMode = mode;
+            if (mode === 'random') {
+                config.randomSeed = this._drawRandom();
+            }
+            _saveWishConfig(config);
+        },
+
+        /**
+         * 切换某个愿望的勾选状态（selected 模式下）
+         * 默认类型：从展示中隐藏/恢复（hiddenDefaults 机制，可恢复）
+         * 自定义类型：从 selectedKeys 中移除/添加
+         */
+        toggleWishSelection: function(key) {
+            var config = _loadWishConfig();
+            if (DEFAULT_WISH_TYPES[key]) {
+                // 默认类型：切换 hiddenDefaults
+                var hIdx = config.hiddenDefaults.indexOf(key);
+                var sIdx = config.selectedKeys.indexOf(key);
+                if (sIdx !== -1) {
+                    // 当前在展示中 → 隐藏
+                    config.selectedKeys.splice(sIdx, 1);
+                    if (hIdx === -1) config.hiddenDefaults.push(key);
+                } else {
+                    // 当前隐藏 → 恢复
+                    if (hIdx !== -1) config.hiddenDefaults.splice(hIdx, 1);
+                    config.selectedKeys.push(key);
+                }
+            } else {
+                // 自定义类型：从 selectedKeys 中移除/添加
+                var idx = config.selectedKeys.indexOf(key);
+                if (idx === -1) {
+                    config.selectedKeys.push(key);
+                } else {
+                    config.selectedKeys.splice(idx, 1);
+                }
+            }
+            _saveWishConfig(config);
+        },
+
+        /**
+         * 添加自定义愿望类型（同时加入 selectedKeys）
+         */
+        addCustomWishType: function(key, def) {
+            const config = _loadWishConfig();
+            config.customTypes[key] = def;
+            if (config.selectedKeys.indexOf(key) === -1) {
+                config.selectedKeys.push(key);
+            }
+            _saveWishConfig(config);
+        },
+
+        /**
+         * 删除自定义愿望类型（默认类型不可删除）
+         */
+        removeCustomWishType: function(key) {
+            var config = _loadWishConfig();
+            // 默认类型不可删除
+            if (DEFAULT_WISH_TYPES[key]) return false;
+            delete config.customTypes[key];
+            config.selectedKeys = config.selectedKeys.filter(function(t) { return t !== key; });
+            if (config.randomSeed) {
+                config.randomSeed = config.randomSeed.filter(function(t) { return t !== key; });
+            }
+            _saveWishConfig(config);
+            return true;
         },
 
         /**
@@ -277,33 +484,45 @@
 
         /**
          * 第一步：出发兑换（预扣花朵）
-         * @param {string} type - 'outing'|'exercise'|'dictionary'
+         * @param {string} type - wish type key
          * @param {number} estUnits - 预估数量（小时/分钟/词数）
          * @returns {{ success, id, cost, message }}
          */
         depart: function(type, estUnits) {
-            const def = WISH_TYPES[type];
+            const allTypes = _getMergedTypes();
+            const def = allTypes[type];
             if (!def) return { success: false, id: null, cost: 0, message: '未知愿望类型' };
 
-            estUnits = Math.max(def.minUnit, (type === 'outing' || type === 'sleep') ? Math.round(estUnits * 2) / 2 : Math.round(estUnits));
-            let cost;
+            // 时间类（unit=h/min）：estUnits 可能是小时或分钟
+            if (def.unit === 'h') {
+                estUnits = Math.max(def.minUnit, Math.round(estUnits * 2) / 2);
+            } else {
+                estUnits = Math.max(def.minUnit, Math.round(estUnits));
+            }
 
-            if (type === 'dictionary') {
-                const fullSets = Math.floor(estUnits / 3);
-                const rem = estUnits % 3;
-                cost = fullSets + (rem >= 2 ? 1 : 0);
-                cost = Math.max(1, cost);
-            } else if (type === 'outing' || type === 'sleep') {
-                // estUnits 是小时，0.5h 步进
-                const fullHours = Math.floor(estUnits);
-                const remMin = (estUnits - fullHours) * 60;
-                cost = fullHours + (remMin >= 30 ? 1 : 0);
-                cost = Math.max(1, cost);
-            } else if (type === 'exercise') {
-                // estUnits 是分钟
-                const fullUnits = Math.floor(estUnits / 30);
-                const rem = estUnits % 30;
-                cost = fullUnits + (rem >= 15 ? 1 : 0);
+            // 通用花费计算
+            var cost;
+            if (def.costPerUnit >= 1) {
+                // 1朵/1单位，直接取整
+                cost = Math.max(1, Math.ceil(estUnits * def.costPerUnit));
+            } else {
+                // 1朵/N单位
+                var perSet = Math.round(1 / def.costPerUnit);
+                var fullSets = Math.floor(estUnits / perSet);
+                var rem = estUnits % perSet;
+                cost = fullSets;
+                // 词典类 registerRounding === -1: 余2扣1，余1不扣
+                if (def.registerRounding === -1) {
+                    if (rem === perSet - 1) cost += 1;
+                } else if (def.unit === 'h') {
+                    // 小时制：余数转分钟判断
+                    var remMin = (estUnits - Math.floor(estUnits)) * 60;
+                    var roundMin = def.registerRounding || 30;
+                    cost += (remMin >= roundMin ? 1 : 0);
+                } else {
+                    var roundVal = def.registerRounding || Math.round(perSet / 2);
+                    cost += (rem >= roundVal ? 1 : 0);
+                }
                 cost = Math.max(1, cost);
             }
 
@@ -340,7 +559,8 @@
             if (!pending) return { success: false, refund: 0, finalCost: 0, message: '找不到这条待登记记录' };
 
             actualUnits = Math.max(0, Math.round(actualUnits));
-            const def = WISH_TYPES[pending.type];
+            const allTypes = _getMergedTypes();
+            const def = allTypes[pending.type];
             const actualCost = _calcActualCost(pending.type, actualUnits);
 
             let refund = pending.estCost - actualCost;
@@ -375,7 +595,7 @@
             });
             _save(rewards);
 
-            let msg = def.name + '登记完成！';
+            let msg = (def ? def.name : pending.type) + '登记完成！';
             if (refund > 0) msg += ' 退还 ' + refund + ' 朵';
             else if (refund < 0) msg += ' 补扣 ' + (-refund) + ' 朵';
             else msg += ' 花费正好 ' + actualCost + ' 朵';

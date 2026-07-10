@@ -202,9 +202,12 @@ async function syncDataWithCloud(force) {
 
     try {
         const data = JSON.parse(localData);
+        // 记录本地最后修改时间
+        data._lastModified = new Date().toISOString();
+        localStorage.setItem('ielts_learning_system', JSON.stringify(data));
         await window.db.collection('users').doc(user.uid).set({
             data: data,
-            lastSync: new Date().toISOString()
+            lastSync: data._lastModified
         });
         console.log('[Auth] Data synced to cloud');
         showToast('数据已同步到云端 ✓', '#4CAF50');
@@ -214,7 +217,7 @@ async function syncDataWithCloud(force) {
 }
 
 /**
- * 从云端 Firestore 拉取数据
+ * 从云端 Firestore 拉取数据（合并模式，不覆盖更新的本地数据）
  */
 async function syncDataFromCloud() {
     if (!window.firebaseInitialized || !window.auth || !window.auth.currentUser) return;
@@ -223,9 +226,37 @@ async function syncDataFromCloud() {
     try {
         const doc = await window.db.collection('users').doc(user.uid).get();
         if (doc.exists && doc.data().data) {
-            localStorage.setItem('ielts_learning_system', JSON.stringify(doc.data().data));
+            const cloudData = doc.data().data;
+            const cloudSyncTime = doc.data().lastSync ? new Date(doc.data().lastSync).getTime() : 0;
+            const localRaw = localStorage.getItem('ielts_learning_system');
+            const localData = localRaw ? JSON.parse(localRaw) : null;
+            const localModifyTime = (localData && localData._lastModified) ? new Date(localData._lastModified).getTime() : 0;
+
+            // 如果本地有更新的数据，不覆盖
+            if (localData && localModifyTime > cloudSyncTime) {
+                console.log('[Auth] Local data is newer than cloud, keeping local');
+                // 反向同步：把本地新数据推到云端
+                syncDataWithCloud(true);
+                return;
+            }
+
+            // 合并策略：云端有的字段覆盖本地，本地有但云端没有的保留
+            if (localData) {
+                const merged = Object.assign({}, localData);
+                for (const key in cloudData) {
+                    // 只在云端有值时覆盖
+                    if (cloudData[key] !== null && cloudData[key] !== undefined) {
+                        merged[key] = cloudData[key];
+                    }
+                }
+                // 保留本地 _lastModified
+                if (localData._lastModified) merged._lastModified = localData._lastModified;
+                localStorage.setItem('ielts_learning_system', JSON.stringify(merged));
+            } else {
+                localStorage.setItem('ielts_learning_system', JSON.stringify(cloudData));
+            }
             document.dispatchEvent(new CustomEvent('dataSynced'));
-            console.log('[Auth] Data synced from cloud');
+            console.log('[Auth] Data synced from cloud (merged)');
         }
     } catch (err) {
         console.error('[Auth] Sync from cloud failed:', err);

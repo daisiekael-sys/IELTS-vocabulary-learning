@@ -26,10 +26,9 @@
         try {
             let d = localStorage.getItem(STORAGE_KEY);
             let data = d ? JSON.parse(d) : {};
-            if (!data.studyLog) data.studyLog = {};
             data.studyLog = log;
+            data._lastModified = new Date().toISOString();
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            // 同步到云端
             if (typeof syncDataWithCloud === 'function') {
                 syncDataWithCloud();
             }

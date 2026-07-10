@@ -39,6 +39,7 @@
             let d = localStorage.getItem(STORAGE_KEY);
             let data = d ? JSON.parse(d) : {};
             data.tasks = tasks;
+            data._lastModified = new Date().toISOString();
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             if (typeof syncDataWithCloud === 'function') {
                 syncDataWithCloud();
@@ -213,18 +214,17 @@
             if (stats.iuTotal === 0) return { flowers: 0, sFlower: 0, extraFlowers: 0 };
               
             const iuAllDone = stats.iuDone >= stats.iuTotal;
+            const beyondIU = Math.max(0, stats.done - stats.iuDone);
 
             if (!iuAllDone) {
-                // IU未全部完成：没有S级小红花，其他任务的小红花暂不发放
-                return { flowers: 0, sFlower: 0, extraFlowers: 0 };
+                // IU未全部完成：基础倍率，每2个其他任务=1朵（向下取整）
+                const extraFlowers = Math.floor(beyondIU / 2);
+                return { flowers: extraFlowers, sFlower: 0, extraFlowers };
             }
 
-            // IU全部完成 → 获得1朵S级小红花
+            // IU全部完成 → 1朵S级 + 翻倍倍率（每1个其他任务=1朵）
             const sFlower = 1;
-
-            // 其他象限每完成1个任务 = 1朵额外小红花
-            const beyondIU = stats.done - stats.iuDone;
-            const extraFlowers = Math.max(0, beyondIU);
+            const extraFlowers = beyondIU; // 翻倍：1:1
 
             return { flowers: sFlower + extraFlowers, sFlower, extraFlowers };
         }

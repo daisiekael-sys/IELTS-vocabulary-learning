@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>数据诊断</title>
+<style>
+body { background:#0a1028; color:#e6edf7; font-family:Arial,sans-serif; padding:20px; }
+.box { background:rgba(26,35,69,0.6); border:1px solid rgba(130,150,255,0.2); border-radius:12px; padding:16px; margin-bottom:16px; }
+h3 { color:#ffd700; margin-bottom:8px; }
+pre { background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; overflow-x:auto; font-size:12px; color:#c7d1ff; max-height:300px; overflow-y:auto; }
+button { background:rgba(255,215,0,0.15); color:#ffd700; border:1px solid rgba(255,215,0,0.3); border-radius:8px; padding:8px 16px; cursor:pointer; margin:4px; }
+button:hover { background:rgba(255,215,0,0.25); }
+.warn { color:#ff6b6b; }
+.ok { color:#4ec9b0; }
+</style>
+</head>
+<body>
+<h1 style="color:#ffd700;">🔍 数据诊断工具</h1>
+
+<div class="box">
+    <h3>1. localStorage 当前数据</h3>
+    <pre id="localData">加载中...</pre>
+</div>
+
+<div class="box">
+    <h3>2. 备份记录 (ielts_backups)</h3>
+    <pre id="backupData">加载中...</pre>
+</div>
+
+<div class="box">
+    <h3>3. 云端数据 (需登录)</h3>
+    <button onclick="checkCloud()">检查云端数据</button>
+    <pre id="cloudData">点击按钮检查</pre>
+</div>
+
+<div class="box">
+    <h3>4. 恢复操作</h3>
+    <p style="color:#8a94a6;font-size:14px;">如果备份中有含 dreamSpaces 的记录，可以恢复：</p>
+    <div id="restoreList"></div>
+</div>
+
+<div class="box">
+    <h3>5. 🧪 注入测试数据</h3>
+    <p style="color:#8a94a6;font-size:14px;">给你刷几朵金色花 + 创建一个测试创造空间，方便查看系统效果：</p>
+    <button onclick="injectTestData()" style="background:rgba(255,215,0,0.2);border-color:rgba(255,215,0,0.4);color:#ffd700;font-size:14px;padding:10px 24px;">🚀 注入 5 朵🏵️ + 10 朵🌸 + 测试空间</button>
+    <pre id="injectResult" style="margin-top:8px;"></pre>
+</div>
+
+<script>
+const DATA_KEY = 'ielts_learning_system';
+const BACKUP_KEY = 'ielts_backups';
+
+// 1. Show localStorage
+function showLocal() {
+    const raw = localStorage.getItem(DATA_KEY);
+    if (!raw) {
+        document.getElementById('localData').textContent = '❌ localStorage 中没有数据!';
+        return;
+    }
+    try {
+        const data = JSON.parse(raw);
+        let summary = {
+            _lastModified: data._lastModified || '无',
+            hasDreamSpaces: !!(data.dreamSpaces && data.dreamSpaces.length > 0),
+            dreamSpacesCount: data.dreamSpaces ? data.dreamSpaces.length : 0,
+            dreamSpaceNames: data.dreamSpaces ? data.dreamSpaces.map(s => s.name) : [],
+            sFlowers: data.rewards ? data.rewards.sFlowers : '无rewards',
+            flowers: data.rewards ? data.rewards.flowers : '无',
+            hasTasks: !!(data.tasks),
+            taskCount: data.tasks ? data.tasks.length : 0,
+            hasStudyLog: !!(data.studyLog)
+        };
+        document.getElementById('localData').textContent = JSON.stringify(summary, null, 2) + '\n\n--- 完整数据 ---\n' + raw.substring(0, 5000);
+    } catch(e) {
+        document.getElementById('localData').textContent = '解析错误: ' + e.message + '\n原始: ' + raw.substring(0, 2000);
+    }
+}
+
+// 2. Show backups
+function showBackups() {
+    const raw = localStorage.getItem(BACKUP_KEY);
+    if (!raw) {
+        document.getElementById('backupData').textContent = '❌ 没有备份记录';
+        return;
+    }
+    try {
+        const list = JSON.parse(raw);
+        let html = '备份数量: ' + list.length + '\n\n';
+        list.forEach((b, i) => {
+            const hasDream = b.data && b.data.dreamSpaces && b.data.dreamSpaces.length > 0;
+            const sFlowers = b.data && b.data.rewards ? b.data.rewards.sFlowers : '无';
+            html += '[' + i + '] ' + b.timestamp + ' | ' + b.label + ' | dreamSpaces:' + (hasDream ? b.data.dreamSpaces.length : 0) + ' | sFlowers:' + sFlowers;
+            if (hasDream) {
+                html += ' | 空间名: ' + b.data.dreamSpaces.map(s=>s.name).join(', ');
+                html += ' <<<< 有空间数据!';
+            }
+            html += '\n';
+        });
+        document.getElementById('backupData').textContent = html;
+        
+        // Build restore buttons
+        let restoreHtml = '';
+        list.forEach((b, i) => {
+            const hasDream = b.data && b.data.dreamSpaces && b.data.dreamSpaces.length > 0;
+            if (hasDream) {
+                restoreHtml += '<button onclick="restoreBackup(' + i + ')" style="background:rgba(78,201,176,0.15);border-color:rgba(78,201,176,0.3);color:#4ec9b0;">恢复备份[' + i + '] ' + b.timestamp + ' (含' + b.data.dreamSpaces.length + '个空间)</button>';
+            }
+        });
+        if (restoreHtml === '') {
+            restoreHtml = '<span class="warn">没有包含 dreamSpaces 的备份</span>';
+        }
+        document.getElementById('restoreList').innerHTML = restoreHtml;
+    } catch(e) {
+        document.getElementById('backupData').textContent = '解析错误: ' + e.message;
+    }
+}
+
+// 3. Check cloud
+async function checkCloud() {
+    document.getElementById('cloudData').textContent = '正在查询云端...';
+    if (!window.auth || !window.auth.currentUser) {
+        document.getElementById('cloudData').textContent = '❌ 未登录，无法查询云端数据';
+        return;
+    }
+    try {
+        const user = window.auth.currentUser;
+        const doc = await window.db.collection('users').doc(user.uid).get();
+        if (!doc.exists) {
+            document.getElementById('cloudData').textContent = '❌ 云端没有数据文档';
+            return;
+        }
+        const cloudData = doc.data();
+        let summary = {
+            lastSync: cloudData.lastSync || '无',
+            hasData: !!cloudData.data,
+            hasDreamSpaces: !!(cloudData.data && cloudData.data.dreamSpaces && cloudData.data.dreamSpaces.length > 0),
+            dreamSpacesCount: cloudData.data && cloudData.data.dreamSpaces ? cloudData.data.dreamSpaces.length : 0,
+            dreamSpaceNames: cloudData.data && cloudData.data.dreamSpaces ? cloudData.data.dreamSpaces.map(s=>s.name) : [],
+            sFlowers: cloudData.data && cloudData.data.rewards ? cloudData.data.rewards.sFlowers : '无',
+            flowers: cloudData.data && cloudData.data.rewards ? cloudData.data.rewards.flowers : '无'
+        };
+        document.getElementById('cloudData').textContent = JSON.stringify(summary, null, 2);
+    } catch(err) {
+        document.getElementById('cloudData').textContent = '查询失败: ' + err.message;
+    }
+}
+
+// 4. Restore
+function restoreBackup(idx) {
+    const raw = localStorage.getItem(BACKUP_KEY);
+    if (!raw) return;
+    const list = JSON.parse(raw);
+    const b = list[idx];
+    if (!b) return;
+    if (!confirm('确认恢复备份[' + idx + ']？\n时间: ' + b.timestamp + '\n这将覆盖当前数据。')) return;
+    
+    // Save current as backup first
+    const currentRaw = localStorage.getItem(DATA_KEY);
+    if (currentRaw) {
+        const currentBackup = {
+            id: 'b_pre_restore_' + Date.now(),
+            timestamp: new Date().toISOString(),
+            label: '恢复前自动备份',
+            data: JSON.parse(currentRaw)
+        };
+        list.unshift(currentBackup);
+        localStorage.setItem(BACKUP_KEY, JSON.stringify(list));
+    }
+    
+    // Restore
+    localStorage.setItem(DATA_KEY, JSON.stringify(b.data));
+    alert('恢复成功！请刷新页面。');
+    location.reload();
+}
+
+// Init
+showLocal();
+showBackups();
+
+// 5. Inject test data
+function injectTestData() {
+    var raw = localStorage.getItem(DATA_KEY);
+    var data = raw ? JSON.parse(raw) : {};
+    
+    // Ensure rewards exist
+    if (!data.rewards) data.rewards = {};
+    data.rewards.sFlowers = 5;
+    data.rewards.flowers = 10;
+    
+    // Create a test dream space with creations that have fragments + rounds
+    var spaceId = 'ds_test_' + Date.now();
+    if (!data.dreamSpaces) data.dreamSpaces = [];
+    data.dreamSpaces = [{
+        id: spaceId,
+        name: '测试宇宙',
+        type: 'theme',
+        laws: ['每天写500字', '每周迭代一次', '保持好奇心'],
+        blueprint: '',
+        vision: '一个用于探索和实验的创意空间',
+        createdAt: new Date().toISOString(),
+        creations: [
+            {
+                name: '短篇小说集',
+                type: 'novel',
+                description: '三个月内完成5篇短篇',
+                details: { genre: '科幻', synopsis: 'AI觉醒后的日常', characters: '小K, 老张' },
+                elements: ['世界观设定', '角色设计', '章节大纲'],
+                elementContents: {
+                    '世界观设定': '近未来，AI已融入日常生活',
+                    '角色设计': '小K是初代觉醒AI，老张是它的室友',
+                    '章节大纲': '1.觉醒 2.适应 3.冲突 4.和解 5.新生'
+                },
+                vision: '完成5篇短篇小说，每篇3000字',
+                blueprintText: '',
+                blueprintImg: '',
+                completed: false,
+                fragments: [
+                    {
+                        name: '世界观设定',
+                        assignee: 'me',
+                        done: false,
+                        rounds: [
+                            {
+                                roundId: 'r1',
+                                roundNum: 1,
+                                publishedAt: new Date().toISOString(),
+                                tasks: [
+                                    { name: '确定AI觉醒的时间线', done: true },
+                                    { name: '设计社会反应体系', done: true },
+                                    { name: '写500字设定文档', done: false }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: '角色设计',
+                        assignee: 'me',
+                        done: false,
+                        rounds: [
+                            {
+                                roundId: 'r1',
+                                roundNum: 1,
+                                publishedAt: new Date().toISOString(),
+                                tasks: [
+                                    { name: '小K的性格画像', done: true },
+                                    { name: '老张的背景故事', done: false },
+                                    { name: '两人关系设定', done: false }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: '章节大纲',
+                        assignee: null,
+                        done: false,
+                        rounds: []
+                    },
+                    {
+                        name: '插图绘制',
+                        assignee: null,
+                        done: false,
+                        rounds: []
+                    }
+                ]
+            },
+            {
+                name: '创意发明记录',
+                type: 'invention',
+                description: '记录日常灵感闪现的发明点子',
+                details: { function: '捕捉灵感', structure: '卡片式', cost: '0', price: '0' },
+                elements: [],
+                elementContents: {},
+                vision: '积累100个发明点子',
+                blueprintText: '',
+                blueprintImg: '',
+                completed: false,
+                fragments: []
+            }
+        ],
+        team: [
+            { role: '创作者', emoji: '🧑', responsibility: '负责世界观和角色' },
+            { role: '插画师', emoji: '🎨', responsibility: '负责插图（待招募）' }
+        ]
+    }];
+    
+    data._lastModified = new Date().toISOString();
+    localStorage.setItem(DATA_KEY, JSON.stringify(data));
+    
+    document.getElementById('injectResult').textContent = 
+        '✅ 注入成功！\n' +
+        '  🏵️ S级花朵: 5\n' +
+        '  🌸 基础花朵: 10\n' +
+        '  创造空间: 测试宇宙\n' +
+        '  创造物: 短篇小说集 (4碎片, 2个已认领, 含任务轮次)\n' +
+        '  创造物: 创意发明记录\n\n' +
+        '点击下方按钮去首页查看 →';
+    
+    showLocal();
+}
+</script>
+<script src="firebase-config.js?v=3"></script>
+<script src="auth.js?v=3"></script>
+</body>
+</html>
