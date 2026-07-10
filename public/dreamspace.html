@@ -680,9 +680,35 @@
             transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 0 0 10px 10px;
         }
+        .frag-liquid-fill::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: 0; right: 0;
+            height: 4px;
+            background: rgba(180,220,255,0.4);
+            border-radius: 50%;
+            animation: liquidWave 2s ease-in-out infinite;
+        }
+        @keyframes liquidWave {
+            0%, 100% { transform: scaleX(0.85) translateX(0); opacity: 0.3; }
+            50% { transform: scaleX(1) translateX(1px); opacity: 0.6; }
+        }
+        .frag-liquid-starlight {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            z-index: 1;
+            animation: starTwinkle 1.5s ease-in-out infinite;
+            box-shadow: 0 0 3px rgba(255,255,255,0.8);
+        }
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.6); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
         .frag-liquid-text {
             position: relative;
-            z-index: 1;
+            z-index: 2;
             font-size: 0.55rem;
             color: #e6edf7;
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
@@ -1560,6 +1586,19 @@
         return { total: totalTasks, done: doneTasks, pct: pct };
     }
 
+    function generateStarlights(pct) {
+        if (pct <= 0) return '';
+        var count = Math.min(4, Math.ceil(pct / 25));
+        var html = '';
+        for (var i = 0; i < count; i++) {
+            var left = 15 + Math.round(Math.random() * 70);
+            var bottom = Math.round(Math.random() * Math.max(15, pct - 5));
+            var delay = (Math.random() * 1.5).toFixed(2);
+            html += '<span class="frag-liquid-starlight" style="left:' + left + '%;bottom:' + bottom + '%;animation-delay:' + delay + 's;"></span>';
+        }
+        return html;
+    }
+
     // ===== 创造物蓝图 =====
     let blueprintEditIdx = -1;
 
@@ -2255,6 +2294,7 @@
                 if (prog.total > 0) {
                     progressHtml = '<div class="frag-liquid-container" title="' + prog.done + '/' + prog.total + ' (' + prog.pct + '%)">' +
                         '<div class="frag-liquid-fill" style="height:' + prog.pct + '%;"></div>' +
+                        generateStarlights(prog.pct) +
                         '<span class="frag-liquid-text">' + prog.done + '/' + prog.total + '</span>' +
                     '</div>';
                 }
@@ -2372,110 +2412,6 @@
                     <button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;" onclick="openBlueprintEditModal(${idx})">📋 蓝图</button>
                     ${frags.length > 0 ? '<button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;" onclick="openSplitModal(' + idx + ')">管理碎片</button>' : ''}
                     <button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;background:rgba(255,215,0,0.08);color:#ffd700;border-color:rgba(255,215,0,0.15);" onclick="completeCreation(${idx})">⭐ 竣工</button>
-                    <button class="law-del" onclick="removeCreation(${idx})">删除</button>
-                </div>
-            </div>
-        `;
-    }
-            detailHtml += '</div>';
-        }
-
-        // 碎片拼图渲染
-        let fragmentHtml = '';
-        const frags = c.fragments || [];
-        if (frags.length > 0) {
-            const claimed = frags.filter(f => f.assignee);
-            const done = frags.filter(f => f.done);
-            const claimedByMe = frags.filter(f => f.assignee === 'me');
-            fragmentHtml = '<div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(130,150,255,0.1);">' +
-                '<div style="font-size:0.68rem;color:#8a94a6;margin-bottom:4px;">🧩 碎片拼图</div>' +
-                '<div class="fragment-summary">' +
-                    '<span>共 <b>' + frags.length + '</b> 块</span>' +
-                    '<span>已认领 <b>' + claimed.length + '</b></span>' +
-                    '<span>已完成 <b style="color:#4ec9b0;">' + done.length + '</b></span>' +
-                '</div>';
-            for (var fi = 0; fi < frags.length; fi++) {
-                var f = frags[fi];
-                var dotClass = 'fragment-dot';
-                if (f.done) dotClass += ' done';
-                else if (f.assignee === 'me') dotClass += ' claimed-by-me';
-                else if (f.assignee) dotClass += ' claimed';
-
-                var assigneeText = '';
-                if (f.done) assigneeText = '<span class="fragment-assignee">✓ 已完成</span>';
-                else if (f.assignee === 'me') assigneeText = '<span class="fragment-assignee me">我</span>';
-                else if (f.assignee) assigneeText = '<span class="fragment-assignee">' + esc(f.assignee) + '</span>';
-                else assigneeText = '<span class="fragment-assignee">未认领</span>';
-
-                var actions = '<div class="fragment-actions">';
-                if (!f.assignee) {
-                    actions += '<button class="frag-btn claim" onclick="claimFragment(' + idx + ',' + fi + ')">认领</button>';
-                } else if (f.assignee === 'me' && !f.done) {
-                    actions += '<button class="frag-btn done-btn" onclick="completeFragment(' + idx + ',' + fi + ')">完成</button>';
-                    actions += '<button class="frag-btn release" onclick="releaseFragment(' + idx + ',' + fi + ')">释放</button>';
-                } else if (f.done && f.assignee === 'me') {
-                    actions += '<button class="frag-btn" onclick="uncompleteFragment(' + idx + ',' + fi + ')">撤销</button>';
-                }
-                actions += '</div>';
-
-                fragmentHtml += '<div class="fragment-row">' +
-                    '<span class="' + dotClass + '"></span>' +
-                    '<span class="fragment-name">' + esc(f.name) + '</span>' +
-                    assigneeText +
-                    actions +
-                '</div>';
-            }
-            fragmentHtml += '</div>';
-        } else {
-            fragmentHtml = '<div style="margin-top:8px;">' +
-                '<button class="frag-btn" style="font-size:0.68rem;padding:3px 8px;" onclick="openSplitModal(' + idx + ')">🧩 拆分碎片</button>' +
-            '</div>';
-        }
-
-        // 蓝图渲染
-        var bpText = c.blueprintText || '';
-        var bpImg = c.blueprintImg || '';
-        // Auto-fill from creation info if blueprint text is empty
-        if (!bpText) {
-            var autoParts = [];
-            if (c.description) autoParts.push(c.description);
-            if (c.details) {
-                for (var dk in c.details) {
-                    var fieldDef = (t.fields || []).find(function(f){ return f.split(':')[0] === dk; });
-                    var fieldLabel = fieldDef ? fieldDef.split(':')[1] : dk;
-                    autoParts.push(fieldLabel + ': ' + c.details[dk]);
-                }
-            }
-            bpText = autoParts.join('\n');
-        }
-        var hasBlueprint = (c.blueprintText !== undefined && c.blueprintText !== null) || bpImg;
-        var blueprintHtml = '<div class="creation-blueprint">' +
-            '<div style="font-size:0.68rem;color:#8a94a6;margin-bottom:2px;">📋 蓝图</div>';
-        if (bpImg) {
-            blueprintHtml += '<img class="creation-blueprint-img" src="' + esc(bpImg) + '" onerror="this.style.display=\'none\'" loading="lazy">';
-        }
-        if (bpText) {
-            blueprintHtml += '<div class="creation-blueprint-text">' + esc(bpText) + '</div>';
-        }
-        if (!bpText && !bpImg) {
-            blueprintHtml += '<div class="creation-blueprint-text"></div>';
-        }
-        blueprintHtml += '</div>';
-
-        return `
-            <div class="creation-card">
-                <div class="creation-name">
-                    <span class="creation-type ${cls}" style="background:rgba(130,150,255,0.1);color:#8299ff;">${t.icon || '⭐'} ${t.label || c.type}</span>
-                    ${esc(c.name)}
-                </div>
-                <div class="creation-desc">${esc(c.description || '')}</div>
-                ${detailHtml}
-                ${blueprintHtml}
-                ${fragmentHtml}
-                <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
-                    <button class="add-btn" style="font-size:0.7rem;padding:4px 8px;" onclick="editCreation(${idx})">编辑</button>
-                    <button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;" onclick="openBlueprintEditModal(${idx})">📋 蓝图</button>
-                    ${frags.length > 0 ? '<button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;" onclick="openSplitModal(' + idx + ')">管理碎片</button>' : ''}
                     <button class="law-del" onclick="removeCreation(${idx})">删除</button>
                 </div>
             </div>
@@ -2790,6 +2726,7 @@
                 if (prog.total > 0) {
                     progHtml = '<span class="frag-liquid-container" style="margin-left:6px;">' +
                         '<span class="frag-liquid-fill" style="height:' + prog.pct + '%;"></span>' +
+                        generateStarlights(prog.pct) +
                         '<span class="frag-liquid-text">' + prog.done + '/' + prog.total + '</span>' +
                     '</span>';
                     // Show round count

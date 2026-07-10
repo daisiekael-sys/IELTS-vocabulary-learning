@@ -1,5 +1,5 @@
 // Service Worker for IELTS Vocabulary Learning System
-const CACHE_NAME = 'ielts-vocab-v21';
+const CACHE_NAME = 'ielts-vocab-v22';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
