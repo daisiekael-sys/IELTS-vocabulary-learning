@@ -117,11 +117,11 @@
         .module-card {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
             background: rgba(26, 35, 69, 0.6);
-            border: 1px solid rgba(130, 150, 255, 0.2);
+            border: 1px solid rgba(130, 150, 255, 0.15);
             border-radius: 14px;
-            padding: 16px 20px;
+            padding: 14px 18px;
             text-decoration: none;
             color: inherit;
             transition: all 0.25s ease;
@@ -138,29 +138,70 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
         }
 
         .module-card .card-body {
-            flex: 1;
+            flex: 0 0 auto;
             min-width: 0;
         }
 
         .module-card h3 {
-            margin: 0 0 4px;
+            margin: 0 0 2px;
             color: #c7d1ff;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .module-card p {
             color: #8a94a6;
-            font-size: 0.82rem;
+            font-size: 0.75rem;
             line-height: 1.4;
             margin: 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .module-card .card-progress {
+            flex: 1;
+            min-width: 0;
+            margin-left: 8px;
+        }
+        .module-card .card-bar {
+            height: 5px;
+            background: rgba(130, 150, 255, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+        .module-card .card-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+        .module-card .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+        .module-card .card-meta span:first-child {
+            font-size: 0.7rem;
+            color: #8a94a6;
+            font-variant-numeric: tabular-nums;
+        }
+        .module-card .card-sub {
+            font-size: 0.62rem;
+            color: #5a6480;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .module-card.is-goal-module {
+            border-color: rgba(255,215,0,0.25);
+            background: rgba(255,215,0,0.03);
         }
 
         .module-card .card-arrow {
@@ -172,11 +213,12 @@
 
         @media (max-width: 640px) {
             .module-grid { gap: 10px; margin-top: 16px; }
-            .module-card { padding: 12px 14px; gap: 12px; }
-            .module-card .icon { width: 36px; height: 36px; }
-            .module-card .icon svg { width: 36px; height: 36px; }
-            .module-card h3 { font-size: 1rem; }
-            .module-card p { font-size: 0.75rem; }
+            .module-card { padding: 10px 12px; gap: 10px; }
+            .module-card .icon { width: 32px; height: 32px; }
+            .module-card .icon svg { width: 32px; height: 32px; }
+            .module-card h3 { font-size: 0.9rem; }
+            .module-card p { font-size: 0.7rem; }
+            .module-card .card-progress { display: none; }
         }
         .btn-start {
             margin-top: 18px;
@@ -1484,34 +1526,61 @@
         </div>
 
         <div class="module-grid">
-            <a href="ebbinghaus.html" class="module-card">
-                <div class="icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#4d7fff"/></linearGradient></defs><rect x="6" y="6" width="36" height="36" rx="8" fill="url(#g1)" opacity="0.2"/><path d="M12 14c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v22c0-1.1-.9-2-2-2h-8c-1.1 0-2-.9-2-2V14z" fill="url(#g1)"/><path d="M36 14c0-1.1-.9-2-2-2h-8c-1.1 0-2 .9-2 2v22c0-1.1.9-2 2-2h8c1.1 0 2-.9 2-2V14z" fill="url(#g1)" opacity="0.7"/><circle cx="24" cy="24" r="3" fill="#ffd700"/></svg></div>
+            <a href="ebbinghaus.html" class="module-card" data-module="ebbinghaus">
+                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8299ff"/><stop offset="100%" stop-color="#5b6eff"/></linearGradient></defs><path d="M8 10c0-1.1.9-2 2-2h7c1.1 0 2 .9 2 2v20c0-1.1-.9-2-2-2h-7c-1.1 0-2-.9-2-2V10z" fill="url(#g1)"/><path d="M32 10c0-1.1-.9-2-2-2h-7c-1.1 0-2 .9-2 2v20c0-1.1.9-2 2-2h7c1.1 0 2-.9 2-2V10z" fill="url(#g1)" opacity="0.65"/><path d="M14 14h4M14 18h4M22 14h4M22 18h4" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/></svg></div>
                 <div class="card-body">
                     <h3>艾宾浩斯宇宙版</h3>
                     <p>遗忘曲线智能记忆 · 雅思5.5→7.0核心词</p>
                 </div>
-                <div class="card-arrow"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+                <div class="card-progress">
+                    <div class="card-bar"><div class="card-bar-fill mp-fill-ebb" id="mpEbbFill" style="width:0%"></div></div>
+                    <div class="card-meta"><span id="mpEbbCount">0 / 475</span><span class="mp-goal-star" id="mpStar-ebbinghaus" onclick="event.preventDefault();event.stopPropagation();setGoalModule('ebbinghaus')" title="设为每日目标">☆</span></div>
+                    <div class="card-sub" id="mpEbbSub"></div>
+                </div>
+                <div class="card-arrow"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
             </a>
 
-            <a href="synonyms.html" class="module-card">
-                <div class="icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4ec9b0"/><stop offset="100%" stop-color="#36a3d4"/></linearGradient></defs><rect x="6" y="6" width="36" height="36" rx="8" fill="url(#g2)" opacity="0.2"/><path d="M24 10l2.5 6.5L33 19l-5 4.5L29.5 31 24 27l-5.5 4 1.5-7.5L15 19l6.5-2.5L24 10z" fill="url(#g2)"/><path d="M14 32l4-2M34 32l-4-2" stroke="url(#g2)" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <a href="synonyms.html" class="module-card" data-module="synonyms">
+                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4ec9b0"/><stop offset="100%" stop-color="#2da89a"/></linearGradient></defs><path d="M10 12h7M10 16h5M23 12h7M25 16h5" stroke="url(#g2)" stroke-width="2.2" stroke-linecap="round"/><path d="M14 22c2-3 4-4 6-4s4 1 6 4" stroke="url(#g2)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M14 22l-2 2M26 22l2 2" stroke="url(#g2)" stroke-width="2" stroke-linecap="round"/><circle cx="20" cy="28" r="2.5" fill="url(#g2)"/></svg></div>
                 <div class="card-body">
                     <h3>高频同义替换</h3>
                     <p>10组话题 · 雅思6.0→6.5提分</p>
                 </div>
-                <div class="card-arrow"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+                <div class="card-progress">
+                    <div class="card-bar"><div class="card-bar-fill mp-fill-syn" id="mpSynFill" style="width:0%"></div></div>
+                    <div class="card-meta"><span id="mpSynCount">0 / 80</span><span class="mp-goal-star" id="mpStar-synonyms" onclick="event.preventDefault();event.stopPropagation();setGoalModule('synonyms')" title="设为每日目标">☆</span></div>
+                    <div class="card-sub" id="mpSynSub"></div>
+                </div>
+                <div class="card-arrow"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
             </a>
 
-            <a href="errorbook.html" class="module-card">
-                <div class="icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff9a56"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><rect x="6" y="6" width="36" height="36" rx="8" fill="url(#g3)" opacity="0.2"/><path d="M24 9l3.2 7.8 8.3.7-6.3 5.5 1.9 8.1L24 35.8l-7.1 4.3 1.9-8.1-6.3-5.5 8.3-.7L24 9z" fill="url(#g3)"/><circle cx="24" cy="23" r="2.5" fill="#fff"/></svg></div>
+            <a href="errorbook.html" class="module-card" data-module="errorbook">
+                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff9a56"/><stop offset="100%" stop-color="#ff7a3d"/></linearGradient></defs><path d="M20 8l2.5 6 6.5.5-5 4.3 1.5 6.2L20 21.5 14.5 25l1.5-6.2-5-4.3 6.5-.5L20 8z" fill="url(#g3)" opacity="0.85"/><path d="M16 30l8 0M18 33l4 0" stroke="url(#g3)" stroke-width="2" stroke-linecap="round"/></svg></div>
                 <div class="card-body">
                     <h3>错词本</h3>
                     <p>自动收录错词 · 筛选复习 · 连续答对后移出</p>
                 </div>
-                <div class="card-arrow"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+                <div class="card-progress">
+                    <div class="card-bar"><div class="card-bar-fill mp-fill-err" id="mpErrFill" style="width:0%"></div></div>
+                    <div class="card-meta"><span id="mpErrCount">0 个错词</span><span class="mp-goal-star" id="mpStar-errorbook" onclick="event.preventDefault();event.stopPropagation();setGoalModule('errorbook')" title="设为每日目标">☆</span></div>
+                    <div class="card-sub" id="mpErrSub">答错自动收录 · 连续答对自动移出</div>
+                </div>
+                <div class="card-arrow"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
             </a>
 
-
+            <a href="spelling.html" class="module-card" data-module="spelling">
+                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff6b6b"/><stop offset="100%" stop-color="#ee4a4a"/></linearGradient></defs><path d="M28 6l4 4-16 16-6 2 2-6L28 6z" fill="url(#g4)" opacity="0.85"/><path d="M26 8l4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/><path d="M10 32l4-4M8 34l2-2" stroke="url(#g4)" stroke-width="2" stroke-linecap="round"/></svg></div>
+                <div class="card-body">
+                    <h3>拼写练习</h3>
+                    <p>导入词库 · 三种模式 · 沉浸拼写</p>
+                </div>
+                <div class="card-progress">
+                    <div class="card-bar"><div class="card-bar-fill" id="mpSpellFill" style="width:0%;background:linear-gradient(90deg,#ff6b6b,#ff9a56);"></div></div>
+                    <div class="card-meta"><span id="mpSpellCount">听音拼写</span></div>
+                    <div class="card-sub" id="mpSpellSub">听音拼写 · 正确率追踪</div>
+                </div>
+                <div class="card-arrow"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+            </a>
         </div>
 
         <!-- 学习仪表盘 -->
@@ -1539,75 +1608,8 @@
                     </div>
                 </div>
 
-                <!-- ========== 学习模块 ========== -->
-                <div style="margin-top:16px;">
-                    <div class="section-label">
-                        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M3 12h4l3-9 4 18 3-9h4" stroke="#8299ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                        <span>学习模块</span>
-                        <span class="section-hint">点击进入 · 点星标设为每日目标</span>
-                    </div>
-                    <div class="mp-grid">
-                        <!-- 艾宾浩斯 -->
-                        <div class="module-progress-item" data-module="ebbinghaus" onclick="location.href='ebbinghaus.html'" style="cursor:pointer;">
-                            <div class="mp-header">
-                                <span class="mp-icon">📘</span>
-                                <span class="mp-name">艾宾浩斯</span>
-                                <span class="mp-count" id="mpEbbCount">0 / 475</span>
-                                <span class="mp-goal-star" id="mpStar-ebbinghaus" onclick="event.stopPropagation();setGoalModule('ebbinghaus')" title="设为每日目标">☆</span>
-                            </div>
-                            <div class="mp-bar">
-                                <div class="mp-fill mp-fill-ebb" id="mpEbbFill" style="width:0%"></div>
-                            </div>
-                            <div class="mp-sub" id="mpEbbSub"></div>
-                        </div>
-                        <!-- 同义替换 -->
-                        <div class="module-progress-item" data-module="synonyms" onclick="location.href='synonyms.html'" style="cursor:pointer;">
-                            <div class="mp-header">
-                                <span class="mp-icon">🔄</span>
-                                <span class="mp-name">同义替换</span>
-                                <span class="mp-count" id="mpSynCount">0 / 80</span>
-                                <span class="mp-goal-star" id="mpStar-synonyms" onclick="event.stopPropagation();setGoalModule('synonyms')" title="设为每日目标">☆</span>
-                            </div>
-                            <div class="mp-bar">
-                                <div class="mp-fill mp-fill-syn" id="mpSynFill" style="width:0%"></div>
-                            </div>
-                            <div class="mp-sub" id="mpSynSub"></div>
-                        </div>
-                        <!-- 错词本 -->
-                        <div class="module-progress-item" data-module="errorbook" onclick="location.href='errorbook.html'" style="cursor:pointer;">
-                            <div class="mp-header">
-                                <span class="mp-icon">📝</span>
-                                <span class="mp-name">错词本</span>
-                                <span class="mp-count" id="mpErrCount">0 个错词</span>
-                                <span class="mp-goal-star" id="mpStar-errorbook" onclick="event.stopPropagation();setGoalModule('errorbook')" title="设为每日目标">☆</span>
-                            </div>
-                            <div class="mp-bar">
-                                <div class="mp-fill mp-fill-err" id="mpErrFill" style="width:0%"></div>
-                            </div>
-                            <div class="mp-sub" id="mpErrSub">答错自动收录 · 连续答对自动移出</div>
-                        </div>
-                        <!-- 拼写练习 -->
-                        <div class="module-progress-item" data-module="spelling" onclick="location.href='spelling.html'" style="cursor:pointer;">
-                            <div class="mp-header">
-                                <span class="mp-icon">✍️</span>
-                                <span class="mp-name">拼写练习</span>
-                                <span class="mp-count" id="mpSpellCount">听音拼写</span>
-                            </div>
-                            <div class="mp-bar">
-                                <div class="mp-fill" id="mpSpellFill" style="width:0%;background:linear-gradient(90deg,#ff6b6b,#ff9a56);"></div>
-                            </div>
-                            <div class="mp-sub" id="mpSpellSub">导入词库 · 三种模式 · 沉浸拼写</div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- ========== 每日目标 ========== -->
                 <div style="margin-top:16px;">
-                    <div class="section-label">
-                        <svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#8299ff" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="5" stroke="#8299ff" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="1.5" fill="#8299ff"/></svg>
-                        <span>每日目标</span>
-                        <span class="section-hint" id="goalModuleLabel">艾宾浩斯 · 每天 10 个</span>
-                    </div>
                     <div class="goal-compact">
                         <div class="goal-compact-ring">
                             <svg width="44" height="44" style="transform:rotate(-90deg);">
@@ -1633,11 +1635,6 @@
 
                 <!-- ========== 今日任务 ========== -->
                 <div style="margin-top:16px;">
-                    <div class="section-label">
-                        <svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#ff8a8a" stroke-width="2" fill="none"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#8299ff" stroke-width="2" fill="none"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#ffb74d" stroke-width="2" fill="none"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="#8899aa" stroke-width="2" fill="none"/></svg>
-                        <span>今日任务</span>
-                        <span class="section-hint">先做 🔴 重要且紧急 · 解锁小红花</span>
-                    </div>
                     <div class="quadrant-grid">
                         <div class="quadrant-cell q-IU" onclick="focusQuadrantInput('IU')">
                             <div class="q-label">🔴 重要且紧急</div>
@@ -1664,11 +1661,6 @@
 
                 <!-- ========== 奖励与创造 ========== -->
                 <div style="margin-top:16px;">
-                    <div class="section-label">
-                        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z" stroke="#ffb74d" stroke-width="2" stroke-linejoin="round" fill="none"/></svg>
-                        <span>奖励与创造</span>
-                        <span class="section-hint">完成任务赚花 · 兑换愿望</span>
-                    </div>
                     <!-- 小红花余额 + 许愿按钮 -->
                     <div class="reward-bar">
                         <div class="flower-group">
@@ -1753,11 +1745,6 @@
 
                 <!-- ========== 数据回顾 ========== -->
                 <div style="margin-top:16px;">
-                    <div class="section-label">
-                        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M3 3v18h18" stroke="#4ec9b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M7 14l3-4 3 2 4-6" stroke="#4ec9b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                        <span>数据回顾</span>
-                        <span class="section-hint">小红花趋势 · 打卡日历</span>
-                    </div>
                     <!-- 小红花折线图 -->
                     <div class="chart-container">
                         <canvas id="learningChart"></canvas>
@@ -2315,11 +2302,6 @@
         // 更新目标模块标签 + 星标高亮
         function updateGoalModuleDisplay() {
             const settings = getGoalSettings();
-            const config = MODULE_CONFIG[settings.module];
-            const label = document.getElementById('goalModuleLabel');
-            if (label && config) {
-                label.textContent = config.name + ' · 每天 ' + settings.daily + ' 个';
-            }
             // 更新星标
             ['ebbinghaus','synonyms','errorbook'].forEach(function(mod) {
                 var star = document.getElementById('mpStar-' + mod);
@@ -2332,7 +2314,7 @@
                     star.textContent = '☆';
                 }
                 // 高亮目标模块卡片
-                var card = star.closest('.module-progress-item');
+                var card = star.closest('.module-card');
                 if (card) card.classList.toggle('is-goal-module', mod === settings.module);
             });
         }
@@ -3248,7 +3230,7 @@
                 const spellPct = spellData.total > 0 ? Math.min(100, Math.round(spellData.correct / spellData.total * 100)) : 0;
                 document.getElementById('mpSpellFill').style.width = spellPct + '%';
                 document.getElementById('mpSpellSub').textContent =
-                    todaySpell.total > 0 ? '正确率 ' + (todaySpell.total > 0 ? Math.round(todaySpell.correct / todaySpell.total * 100) : 0) + '%' : '导入词库 · 三种模式 · 沉浸拼写';
+                    todaySpell.total > 0 ? '正确率 ' + (todaySpell.total > 0 ? Math.round(todaySpell.correct / todaySpell.total * 100) : 0) + '%' : '听音拼写 · 正确率追踪';
 
                 // 创造空间（快速入口方块 + 冰封逻辑）
                 const sFlowers = d.rewards?.sFlowers || 0;
