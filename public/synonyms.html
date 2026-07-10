@@ -827,20 +827,17 @@
         function getStorageData() {
             try {
                 let d = localStorage.getItem(STORAGE_KEY);
-                return d ? JSON.parse(d) : {
-                    ebbinghaus: {
-                        masterMap: {},
-                        stats: {totalError: 0, totalMaster: 0},
-                        errors: [],
-                        memory: {}
-                    },
-                    synonyms: {
-                        starred: {}
-                    },
-                    microbe: {
-                        starred: {}
-                    }
+                if (!d) return {
+                    ebbinghaus: { masterMap: {}, stats: {totalError: 0, totalMaster: 0}, errors: [], memory: {} },
+                    synonyms: { starred: {} },
+                    microbe: { starred: {} }
                 };
+                let parsed = JSON.parse(d);
+                // 确保必要字段存在
+                if (!parsed.synonyms) parsed.synonyms = { starred: {} };
+                if (!parsed.synonyms.starred) parsed.synonyms.starred = {};
+                if (!parsed.ebbinghaus) parsed.ebbinghaus = { masterMap: {}, stats: {totalError: 0, totalMaster: 0}, errors: [], memory: {} };
+                return parsed;
             } catch (error) {
                 console.error('Error getting storage data:', error);
                 return {
@@ -876,11 +873,14 @@
         
         function getStarredWords() {
             const data = getStorageData();
-            return data.synonyms.starred || {};
+            if (!data.synonyms) data.synonyms = {};
+            if (!data.synonyms.starred) data.synonyms.starred = {};
+            return data.synonyms.starred;
         }
 
         function saveStarredWords(starred) {
             const data = getStorageData();
+            if (!data.synonyms) data.synonyms = {};
             data.synonyms.starred = starred;
             return setStorageData(data);
         }
