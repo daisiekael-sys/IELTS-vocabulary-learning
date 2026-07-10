@@ -2022,8 +2022,8 @@
                         const keys = await caches.keys();
                         await Promise.all(keys.map(k => caches.delete(k)));
                     }
-                    // 强制重新加载（绕过缓存）
-                    window.location.reload();
+                    // 强制重新加载（绕过SW + 浏览器HTTP缓存）
+                    window.location.href = window.location.pathname + '?v=' + Date.now();
                 } catch (e) {
                     console.error('更新失败:', e);
                     alert('更新失败，请手动清除浏览器缓存后重新打开');
