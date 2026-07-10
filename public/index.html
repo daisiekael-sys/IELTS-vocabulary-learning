@@ -625,16 +625,81 @@
             border-radius: 12px;
             padding: 14px 16px;
         }
-        .module-progress-item {
+
+        /* 区块标题 */
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .section-label svg { opacity: 0.5; }
+        .section-label span {
+            color: #8a94a6;
+            font-size: 0.8rem;
+        }
+
+        /* 2x2 紧凑网格 */
+        .mp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .mp-grid .module-progress-item {
+            margin-bottom: 0;
             padding: 10px 12px;
             border-radius: 10px;
             background: rgba(26, 35, 69, 0.4);
-            margin-bottom: 8px;
             transition: background 0.2s;
+            position: relative;
+            overflow: hidden;
         }
-        .module-progress-item:last-child { margin-bottom: 0; }
-        .module-progress-item:hover {
+        .mp-grid .module-progress-item:hover {
             background: rgba(26, 35, 69, 0.7);
+        }
+        .mp-grid .mp-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .mp-grid .mp-icon { font-size: 0.95rem; }
+        .mp-grid .mp-name {
+            font-size: 0.78rem;
+            color: #c7d1ff;
+            font-weight: 500;
+        }
+        .mp-grid .mp-count {
+            margin-left: auto;
+            font-size: 0.7rem;
+            color: #8a94a6;
+            font-variant-numeric: tabular-nums;
+        }
+        .mp-grid .mp-bar {
+            height: 6px;
+            background: rgba(130, 150, 255, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .mp-grid .mp-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+        .mp-grid .mp-sub {
+            font-size: 0.62rem;
+            color: #5a6480;
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 奖励区 */
+        .reward-section {
+            background: rgba(18, 28, 58, 0.4);
+            border-radius: 12px;
+            padding: 14px 16px;
         }
 
         /* 快速入口方块 */
@@ -655,6 +720,8 @@
             cursor: pointer;
             transition: all 0.2s;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
         .quick-tile:hover {
             background: rgba(26, 35, 69, 0.7);
@@ -679,7 +746,7 @@
         /* 冰封覆盖层 */
         .ice-overlay {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 10px;
+            border-radius: 12px;
             z-index: 2;
             display: flex; align-items: center; justify-content: center;
             pointer-events: all;
@@ -692,7 +759,7 @@
         }
         .ice-texture {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 10px;
+            border-radius: 12px;
             background: linear-gradient(135deg,
                 rgba(150,200,255,0.15) 0%,
                 rgba(180,220,255,0.08) 30%,
@@ -767,7 +834,8 @@
         }
 
         /* 解锁后卡片发光 */
-        .module-progress-item.unlocked-glow {
+        .module-progress-item.unlocked-glow,
+        .quick-tile.unlocked-glow {
             animation: unlockGlow 1.5s ease;
         }
         @keyframes unlockGlow {
@@ -1452,17 +1520,138 @@
                                 <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="12" y="16.5" text-anchor="middle" fill="currentColor" font-size="13" font-weight="700" font-family="Arial">i</text></svg>
                             </button>
                         </div>
-                        <div class="btn-row">
-                            <button class="wish-btn" style="background:rgba(255,215,0,0.1);border-color:rgba(255,215,0,0.25);color:#ffd700;" onclick="location.href='dreamspace.html'">🏵️ 创造空间</button>
+                    </div>
+                </div>
+
+                <!-- 小红花规则卡片 -->
+                <div class="reward-info-card" id="rewardInfoCard">
+                    <div class="reward-info-header">
+                        <span>🏵️ 小红花规则</span>
+                        <button onclick="toggleRewardInfo()" style="background:none;border:none;color:#5a6480;cursor:pointer;font-size:1.1rem;">✕</button>
+                    </div>
+                    <div class="reward-info-body">
+                        <div class="reward-rule-item">
+                            <span class="reward-rule-icon s-flower-icon">🏵️</span>
+                            <div><b style="color:#ffd700;">S级小红花</b><br><span style="color:#5a6480;">完成全部 🔴重要且紧急 任务后获得</span></div>
+                        </div>
+                        <div class="reward-rule-item">
+                            <span class="reward-rule-icon">🌸</span>
+                            <div><b style="color:#ffb74d;">额外小红花</b><br><span style="color:#5a6480;">S级获得后，每完成1个其他任务 +1朵</span></div>
+                        </div>
+                        <div class="reward-rule-divider"></div>
+                        <div class="reward-rule-item">
+                            <span style="color:#ff6b6b;font-size:0.85rem;">⚠️</span>
+                            <div><span style="color:#8a94a6;">先做不重要的任务不会获得小红花。<br>只有拿到 🏵️S级 后，已完成的其他任务才会<span style="color:#ffb74d;">同时发放</span>小花。</span></div>
+                        </div>
+                        <div class="reward-rule-divider"></div>
+                        <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
+                            <b style="color:#8a94a6;">许愿兑换（普通小花 🌸）</b><br>
+                            🌈 出去玩 · 1朵/60min<br>
+                            💪 运动 · 1朵/30min<br>
+                            📖 翻词典 · 1朵/3词<br>
+                            😴 睡觉休息 · 1朵/60min
+                        </div>
+                        <div class="reward-rule-divider"></div>
+                        <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
+                            <b style="color:#ffd700;">S级专属（🏵️ 3朵 = 1个创造空间）</b><br>
+                            创造主题式/项目制空间，设定世界法则<br>
+                            <span style="color:#96c8ff;">❄️ 板块冻结中 · 集齐3🏵️后冰块融化解锁</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 四象限任务 -->
+                <!-- ========== 学习区 ========== -->
                 <div style="margin-top:16px;">
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                    <div class="section-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M3 12h4l3-9 4 18 3-9h4" stroke="#8299ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                        <span>学习模块</span>
+                    </div>
+                    <div class="mp-grid">
+                        <!-- 艾宾浩斯 -->
+                        <div class="module-progress-item" onclick="location.href='ebbinghaus.html'" style="cursor:pointer;">
+                            <div class="mp-header">
+                                <span class="mp-icon">📘</span>
+                                <span class="mp-name">艾宾浩斯</span>
+                                <span class="mp-count" id="mpEbbCount">0 / 475</span>
+                            </div>
+                            <div class="mp-bar">
+                                <div class="mp-fill mp-fill-ebb" id="mpEbbFill" style="width:0%"></div>
+                            </div>
+                            <div class="mp-sub" id="mpEbbSub"></div>
+                        </div>
+                        <!-- 同义替换 -->
+                        <div class="module-progress-item" onclick="location.href='synonyms.html'" style="cursor:pointer;">
+                            <div class="mp-header">
+                                <span class="mp-icon">🔄</span>
+                                <span class="mp-name">同义替换</span>
+                                <span class="mp-count" id="mpSynCount">0 / 80</span>
+                            </div>
+                            <div class="mp-bar">
+                                <div class="mp-fill mp-fill-syn" id="mpSynFill" style="width:0%"></div>
+                            </div>
+                            <div class="mp-sub" id="mpSynSub"></div>
+                        </div>
+                        <!-- 错词本 -->
+                        <div class="module-progress-item" onclick="location.href='errorbook.html'" style="cursor:pointer;">
+                            <div class="mp-header">
+                                <span class="mp-icon">📝</span>
+                                <span class="mp-name">错词本</span>
+                                <span class="mp-count" id="mpErrCount">0 个错词</span>
+                            </div>
+                            <div class="mp-bar">
+                                <div class="mp-fill mp-fill-err" id="mpErrFill" style="width:0%"></div>
+                            </div>
+                            <div class="mp-sub" id="mpErrSub">答错自动收录 · 连续答对自动移出</div>
+                        </div>
+                        <!-- 拼写练习 -->
+                        <div class="module-progress-item" onclick="location.href='spelling.html'" style="cursor:pointer;">
+                            <div class="mp-header">
+                                <span class="mp-icon">✍️</span>
+                                <span class="mp-name">拼写练习</span>
+                                <span class="mp-count" id="mpSpellCount">听音拼写</span>
+                            </div>
+                            <div class="mp-bar">
+                                <div class="mp-fill" id="mpSpellFill" style="width:0%;background:linear-gradient(90deg,#ff6b6b,#ff9a56);"></div>
+                            </div>
+                            <div class="mp-sub" id="mpSpellSub">导入词库 · 三种模式 · 沉浸拼写</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== 激励区 ========== -->
+                <div style="margin-top:16px;">
+                    <div class="section-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z" stroke="#ffb74d" stroke-width="2" stroke-linejoin="round" fill="none"/></svg>
+                        <span>奖励与创造</span>
+                    </div>
+                    <div class="quick-grid">
+                        <div class="quick-tile" id="dreamSpaceCard" onclick="openDreamSpaceOrWish()" style="position:relative;overflow:hidden;">
+                            <!-- 冰封覆盖层 -->
+                            <div class="ice-overlay" id="dreamIce">
+                                <div class="ice-texture"></div>
+                                <div class="ice-label">❄️ 集齐 3 🏵️ 解冻</div>
+                            </div>
+                            <!-- 融化动画层 -->
+                            <div class="melt-overlay" id="dreamMelt" style="display:none;">
+                                <div class="melt-water"></div>
+                            </div>
+                            <span class="quick-tile-icon">🏵️</span>
+                            <span class="quick-tile-name">创造空间</span>
+                            <span class="quick-tile-badge" id="qtDreamBadge">3🏵️=1空间</span>
+                        </div>
+                        <div class="quick-tile" onclick="location.href='plaza.html'">
+                            <span class="quick-tile-icon">🌐</span>
+                            <span class="quick-tile-name">项目广场</span>
+                            <span class="quick-tile-badge">开发中</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== 今日任务 ========== -->
+                <div style="margin-top:16px;">
+                    <div class="section-label">
                         <svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#ff8a8a" stroke-width="2" fill="none"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#8299ff" stroke-width="2" fill="none"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#ffb74d" stroke-width="2" fill="none"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="#8899aa" stroke-width="2" fill="none"/></svg>
-                        <span style="color:#8a94a6;font-size:0.8rem;">今日任务</span>
+                        <span>今日任务</span>
                     </div>
                     <div class="quadrant-grid">
                         <div class="quadrant-cell q-IU" onclick="focusQuadrantInput('IU')">
@@ -1488,102 +1677,32 @@
                     </div>
                 </div>
 
-                <!-- 三大板块进度 -->
-                <div class="module-progress-section" style="margin-top:16px;">
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-                        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M3 12h4l3-9 4 18 3-9h4" stroke="#8299ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                        <span style="color:#8a94a6;font-size:0.8rem;">板块进度</span>
-                    </div>
-
-                    <!-- 艾宾浩斯 -->
-                    <div class="module-progress-item" onclick="location.href='ebbinghaus.html'" style="cursor:pointer;">
-                        <div class="mp-header">
-                            <span class="mp-icon">📘</span>
-                            <span class="mp-name">艾宾浩斯</span>
-                            <span class="mp-count" id="mpEbbCount">0 / 475</span>
-                        </div>
-                        <div class="mp-bar">
-                            <div class="mp-fill mp-fill-ebb" id="mpEbbFill" style="width:0%"></div>
-                        </div>
-                        <div class="mp-sub" id="mpEbbSub"></div>
-                    </div>
-
-                    <!-- 同义替换 -->
-                    <div class="module-progress-item" onclick="location.href='synonyms.html'" style="cursor:pointer;">
-                        <div class="mp-header">
-                            <span class="mp-icon">🔄</span>
-                            <span class="mp-name">同义替换</span>
-                            <span class="mp-count" id="mpSynCount">0 / 80</span>
-                        </div>
-                        <div class="mp-bar">
-                            <div class="mp-fill mp-fill-syn" id="mpSynFill" style="width:0%"></div>
-                        </div>
-                        <div class="mp-sub" id="mpSynSub"></div>
-                    </div>
-
-                    <!-- 错词本 -->
-                    <div class="module-progress-item" onclick="location.href='errorbook.html'" style="cursor:pointer;">
-                        <div class="mp-header">
-                            <span class="mp-icon">📝</span>
-                            <span class="mp-name">错词本</span>
-                            <span class="mp-count" id="mpErrCount">0 个错词</span>
-                        </div>
-                        <div class="mp-bar">
-                            <div class="mp-fill mp-fill-err" id="mpErrFill" style="width:0%"></div>
-                        </div>
-                        <div class="mp-sub" id="mpErrSub">答错自动收录 · 连续答对自动移出</div>
-                    </div>
-
-                    <!-- 拼写练习 -->
-                    <div class="module-progress-item" onclick="location.href='spelling.html'" style="cursor:pointer;">
-                        <div class="mp-header">
-                            <span class="mp-icon">✍️</span>
-                            <span class="mp-name">拼写练习</span>
-                            <span class="mp-count" id="mpSpellCount">听音拼写</span>
-                        </div>
-                        <div class="mp-bar">
-                            <div class="mp-fill" id="mpSpellFill" style="width:0%;background:linear-gradient(90deg,#ff6b6b,#ff9a56);"></div>
-                        </div>
-                        <div class="mp-sub" id="mpSpellSub">导入词库 · 三种模式 · 沉浸拼写</div>
-                    </div>
-                </div>
-
-                <!-- 快速入口 -->
-                <div style="margin-top:12px;">
-                    <div class="quick-grid">
-                        <div class="quick-tile" onclick="location.href='dreamspace.html'">
-                            <span class="quick-tile-icon">🏵️</span>
-                            <span class="quick-tile-name">创造空间</span>
-                            <span class="quick-tile-badge" id="qtDreamBadge">3🏵️=1空间</span>
-                        </div>
-                        <div class="quick-tile" onclick="location.href='plaza.html'">
-                            <span class="quick-tile-icon">🌐</span>
-                            <span class="quick-tile-name">项目广场</span>
-                            <span class="quick-tile-badge">开发中</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 小红花折线图 -->
-                <div class="chart-container" style="margin-top:16px;">
-                    <canvas id="learningChart"></canvas>
-                </div>
-
-                <!-- 打卡日历（子折叠） -->
+                <!-- ========== 回顾区 ========== -->
                 <div style="margin-top:16px;">
-                    <div style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:8px 0;" onclick="toggleCalendar()">
-                        <svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#8299ff" stroke-width="2" fill="none"/><path d="M3 9h18M8 3v4M16 3v4" stroke="#8299ff" stroke-width="2" stroke-linecap="round"/></svg>
-                        <span style="color:#8a94a6;font-size:0.85rem;">打卡日历</span>
-                        <span id="calMonthLabel" style="margin-left:8px;color:#c7d1ff;font-size:0.85rem;">2026-07</span>
-                        <svg class="chevron" id="calChevron" width="14" height="14" viewBox="0 0 24 24" style="margin-left:auto;opacity:0.4;transition:transform 0.3s;"><path d="M6 9l6 6 6-6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <div class="section-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M3 3v18h18" stroke="#4ec9b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M7 14l3-4 3 2 4-6" stroke="#4ec9b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                        <span>数据回顾</span>
                     </div>
-                    <div id="calendarWrapper" style="display:none;padding-top:8px;">
-                        <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:8px;">
-                            <button class="calendar-nav" id="calPrev"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;"><path d="M15 6l-6 6 6 6" stroke="#c7d1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></button>
-                            <button class="calendar-nav" id="calNext"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;"><path d="M9 6l6 6-6 6" stroke="#c7d1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></button>
+                    <!-- 小红花折线图 -->
+                    <div class="chart-container">
+                        <canvas id="learningChart"></canvas>
+                    </div>
+                    <!-- 打卡日历（子折叠） -->
+                    <div style="margin-top:12px;">
+                        <div style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:8px 0;" onclick="toggleCalendar()">
+                            <svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#8299ff" stroke-width="2" fill="none"/><path d="M3 9h18M8 3v4M16 3v4" stroke="#8299ff" stroke-width="2" stroke-linecap="round"/></svg>
+                            <span style="color:#8a94a6;font-size:0.85rem;">打卡日历</span>
+                            <span id="calMonthLabel" style="margin-left:8px;color:#c7d1ff;font-size:0.85rem;">2026-07</span>
+                            <svg class="chevron" id="calChevron" width="14" height="14" viewBox="0 0 24 24" style="margin-left:auto;opacity:0.4;transition:transform 0.3s;"><path d="M6 9l6 6 6-6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                         </div>
-                        <div class="calendar-grid" id="calendarDayHeaders"></div>
-                        <div class="calendar-grid" id="calendarGrid" style="margin-top:4px;"></div>
+                        <div id="calendarWrapper" style="display:none;padding-top:8px;">
+                            <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:8px;">
+                                <button class="calendar-nav" id="calPrev"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;"><path d="M15 6l-6 6 6 6" stroke="#c7d1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></button>
+                                <button class="calendar-nav" id="calNext"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;"><path d="M9 6l6 6-6 6" stroke="#c7d1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></button>
+                            </div>
+                            <div class="calendar-grid" id="calendarDayHeaders"></div>
+                            <div class="calendar-grid" id="calendarGrid" style="margin-top:4px;"></div>
+                        </div>
                     </div>
                 </div>
             </div><!-- /dashboard-body -->
@@ -1636,29 +1755,6 @@
     </div>
 
     <!-- ====== 以下弹窗放在 body 层级，避免 backdrop-filter 影响 fixed 定位 ====== -->
-
-    <!-- 小红花规则抽屉 -->
-    <div class="reward-info-mask" id="rewardInfoMask" onclick="toggleRewardInfo()"></div>
-    <div class="reward-info-card" id="rewardInfoCard">
-        <div class="reward-info-header">
-            <span>🏵️ 小红花规则</span>
-            <button onclick="toggleRewardInfo()" style="background:none;border:none;color:#5a6480;cursor:pointer;font-size:1.1rem;">✕</button>
-        </div>
-        <div class="reward-info-body">
-            <div class="reward-rule-item">
-                <span class="reward-rule-icon s-flower-icon">🏵️</span>
-                <div><b style="color:#ffd700;">S级</b> <span style="color:#6a7a96;">完成全部🔴重要紧急 → 获得1朵，之后每1个任务=1朵🌸</span></div>
-            </div>
-            <div class="reward-rule-item">
-                <span class="reward-rule-icon">🌸</span>
-                <div><b style="color:#ffb74d;">基础</b> <span style="color:#6a7a96;">每完成2个其他任务=1朵🌸</span></div>
-            </div>
-            <div class="reward-rule-divider"></div>
-            <div style="color:#6a7a96;font-size:0.72rem;line-height:1.5;">
-                <b style="color:#8a94a6;">许愿兑换</b> 用🌸换想要做的事，如运动30min=1朵🌸
-            </div>
-        </div>
-    </div>
 
     <!-- 日历详情弹窗 -->
     <div class="day-detail-overlay" id="dayDetailOverlay" onclick="if(event.target===this)closeDayDetail()">
@@ -2288,9 +2384,7 @@
 
         function toggleRewardInfo() {
             const card = document.getElementById('rewardInfoCard');
-            const mask = document.getElementById('rewardInfoMask');
             card.classList.toggle('open');
-            mask.classList.toggle('open');
         }
 
         // ===== 许愿兑换（两步流程 + 愿望库 + 展示模式）=====
@@ -2353,6 +2447,21 @@
                     '</div>';
             });
 
+            // S级专属：创造空间
+            var sFlowers = RewardSystem.getSFlowers ? RewardSystem.getSFlowers() : 0;
+            html += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,215,0,0.15);">' +
+                '<div style="font-size:0.75rem;color:#ffd700;margin-bottom:8px;font-weight:600;">🏵️ S级专属兑换</div>' +
+                '<div class="wish-type-card" style="border-color:rgba(255,215,0,0.2);background:rgba(255,215,0,0.04);" onclick="selectWishType(\'dreamspace\')">' +
+                '<span class="wish-icon">🏵️</span>' +
+                '<div class="wish-info">' +
+                '<h4 style="color:#ffd700;">创造空间</h4>' +
+                '<p>3朵🏵️ = 1个 · 创造主题式或项目制空间</p>' +
+                '</div></div>' +
+                '<div class="wish-redeem-row" id="wishRedeem-dreamspace">' +
+                '<span style="color:#ffd700;font-size:0.8rem;">当前 🏵️ ' + sFlowers + ' 朵' + (sFlowers >= 3 ? ' ✅' : '（还需' + (3-sFlowers) + '朵）') + '</span>' +
+                '<button class="confirm-btn" style="background:linear-gradient(135deg,#ffd700,#ff9a56);" onclick="redeemDreamSpace()">解锁</button>' +
+                '</div></div>';
+
             container.innerHTML = html;
 
             // 绑定 input 事件 + 隐藏兑换行
@@ -2373,6 +2482,9 @@
                 var el = document.getElementById('wishRedeem-' + t);
                 if (el) el.classList.toggle('show', t === type);
             });
+            // S级专属行单独处理
+            var dsRow = document.getElementById('wishRedeem-dreamspace');
+            if (dsRow) dsRow.classList.toggle('show', type === 'dreamspace');
         }
 
         // 出发
@@ -2388,6 +2500,63 @@
                 var el = document.getElementById('wishRedeem-' + type);
                 if (el) el.classList.remove('show');
             }
+        }
+
+        // 创造空间S级兑换
+        function redeemDreamSpace() {
+            if (!window.RewardSystem) return;
+            var sFlowers = RewardSystem.getSFlowers ? RewardSystem.getSFlowers() : 0;
+            if (sFlowers < 3) {
+                alert('S级小红花不足，需要 3 🏵️，当前 ' + sFlowers + ' 🏵️');
+                return;
+            }
+            var name = prompt('给你的创造空间取个名字吧：');
+            if (!name || !name.trim()) {
+                alert('需要给空间命名才能解锁哦');
+                return;
+            }
+            // 扣除3个S级花朵 + 创建空间
+            try {
+                var d = JSON.parse(localStorage.getItem('ielts_learning_system'));
+                d.rewards.sFlowers -= 3;
+                if (!d.dreamSpaces) d.dreamSpaces = [];
+                d.dreamSpaces.push({
+                    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+                    name: name.trim(),
+                    type: 'theme',
+                    laws: '',
+                    creations: [],
+                    team: [],
+                    vision: '',
+                    createdAt: new Date().toISOString()
+                });
+                localStorage.setItem('ielts_learning_system', JSON.stringify(d));
+                if (typeof syncDataWithCloud === 'function') syncDataWithCloud();
+            } catch(e) { console.error(e); return; }
+
+            closeWishPanel();
+            playMeltAnimation();
+        }
+
+        // 冰块融化动画
+        function playMeltAnimation() {
+            var iceOverlay = document.getElementById('dreamIce');
+            var meltOverlay = document.getElementById('dreamMelt');
+            var card = document.getElementById('dreamSpaceCard');
+            if (!iceOverlay || !meltOverlay || !card) return;
+
+            if (window.SFX && SFX.play) SFX.play('complete');
+
+            meltOverlay.style.display = 'block';
+            iceOverlay.classList.add('unlocked');
+            card.classList.add('unlocked-glow');
+
+            setTimeout(function() {
+                meltOverlay.style.display = 'none';
+                card.classList.remove('unlocked-glow');
+                card.onclick = function() { location.href = 'dreamspace.html'; };
+                if (typeof updateModuleProgress === 'function') updateModuleProgress();
+            }, 2200);
         }
 
         // 渲染待登记区
@@ -2746,9 +2915,24 @@
             renderWishManageList();
         }
 
-        // 创造空间按钮：直接跳转dreamspace.html
+        // 创造空间按钮：已解锁则跳转，未解锁则打开兑换面板
         function openDreamSpaceOrWish() {
-            location.href = 'dreamspace.html';
+            try {
+                const d = JSON.parse(localStorage.getItem('ielts_learning_system') || '{}');
+                const dreamSpaces = d.dreamSpaces || [];
+                if (dreamSpaces.length > 0) {
+                    location.href = 'dreamspace.html';
+                } else {
+                    openWishPanel();
+                    setTimeout(function() {
+                        selectWishType('dreamspace');
+                        var dreamSection = document.getElementById('wishRedeem-dreamspace');
+                        if (dreamSection) dreamSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 150);
+                }
+            } catch(e) {
+                location.href = 'dreamspace.html';
+            }
         }
 
         // S级花朵余额刷新
@@ -2963,7 +3147,7 @@
                 document.getElementById('mpSpellSub').textContent =
                     todaySpell.total > 0 ? '正确率 ' + (todaySpell.total > 0 ? Math.round(todaySpell.correct / todaySpell.total * 100) : 0) + '%' : '导入词库 · 三种模式 · 沉浸拼写';
 
-                // 创造空间（快速入口方块）
+                // 创造空间（快速入口方块 + 冰封逻辑）
                 const sFlowers = d.rewards?.sFlowers || 0;
                 const dreamSpaces = d.dreamSpaces || [];
                 var qtBadge = document.getElementById('qtDreamBadge');
@@ -2971,6 +3155,34 @@
                     qtBadge.textContent = dreamSpaces.length > 0
                         ? dreamSpaces.length + '个空间 · 🏵️' + sFlowers
                         : '3🏵️=1空间 · ' + sFlowers + '朵';
+                }
+                // 冰封/解冻状态
+                var iceOverlay = document.getElementById('dreamIce');
+                var meltOverlay = document.getElementById('dreamMelt');
+                var dreamCard = document.getElementById('dreamSpaceCard');
+                if (iceOverlay && dreamCard) {
+                    if (dreamSpaces.length > 0) {
+                        iceOverlay.style.display = 'none';
+                        iceOverlay.classList.add('unlocked');
+                        dreamCard.onclick = function() { location.href = 'dreamspace.html'; };
+                        dreamCard.style.cursor = 'pointer';
+                    } else {
+                        iceOverlay.style.display = '';
+                        iceOverlay.classList.remove('unlocked');
+                        dreamCard.onclick = function() {
+                            if (sFlowers >= 3) {
+                                openWishPanel();
+                                setTimeout(function() {
+                                    selectWishType('dreamspace');
+                                    var ds = document.getElementById('wishRedeem-dreamspace');
+                                    if (ds) ds.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }, 150);
+                            } else {
+                                alert('❄️ 还需要 ' + (3 - sFlowers) + ' 朵 🏵️S级小红花 才能解冻创造空间');
+                            }
+                        };
+                        dreamCard.style.cursor = 'pointer';
+                    }
                 }
             } catch(e) {
                 console.error('[moduleProgress] error:', e);
