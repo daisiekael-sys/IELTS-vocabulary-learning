@@ -1844,23 +1844,18 @@
             async function forceUpdate() {
                 try {
                     if ('serviceWorker' in navigator) {
-                        const reg = await navigator.serviceWorker.getRegistration();
-                        if (reg) {
-                            // 注入新 SW 并跳过等待
-                            await reg.update();
-                            if (reg.waiting) {
-                                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-                            }
-                        }
-                        // 清除所有 SW 缓存
+                        // 直接注销所有 Service Worker
+                        const regs = await navigator.serviceWorker.getRegistrations();
+                        await Promise.all(regs.map(r => r.unregister()));
+                        // 清除所有缓存
                         const keys = await caches.keys();
                         await Promise.all(keys.map(k => caches.delete(k)));
                     }
-                    alert('更新完成，即将重新加载页面');
+                    // 强制重新加载（绕过缓存）
                     window.location.reload();
                 } catch (e) {
                     console.error('更新失败:', e);
-                    alert('更新失败，请手动关闭后重新打开');
+                    alert('更新失败，请手动清除浏览器缓存后重新打开');
                 }
             }
 
