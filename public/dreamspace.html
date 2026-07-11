@@ -573,6 +573,9 @@
         .timeline-text {
             font-size: 0.78rem; color: #c7d1ff; line-height: 1.5;
         }
+        .timeline-meta {
+            font-size: 0.62rem; color: #5a6480; margin-top: 2px;
+        }
         .timeline-input {
             width: 100%; background: rgba(130,150,255,0.05);
             border: 1px solid rgba(130,150,255,0.1); border-radius: 6px;
@@ -1117,7 +1120,7 @@
     <div class="modal" style="max-width:480px;max-height:85vh;overflow-y:auto;">
         <h4 style="display:flex;align-items:center;gap:6px;">🧩 团队地图</h4>
         <div style="font-size:0.72rem;color:#8a94a6;margin-bottom:10px;">
-            本空间所有创造物的碎片拼图总览。空心=未认领，实心=已认领，绿色=已完成。点击碎片查看工作时间线。
+            所有创造物的碎片总览。虚线=未认领，金色=我认领，绿色=已完成。右上角数字=工作留痕条数。点击碎片查看工作时间线。
         </div>
         <div id="puzzleMapGrid"></div>
         <div id="puzzleMapEmpty" style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:16px 0;">
@@ -1136,7 +1139,7 @@
         <div id="fragmentTimelineInfo" style="font-size:0.75rem;color:#8a94a6;margin-bottom:10px;padding:8px 10px;background:rgba(130,150,255,0.05);border-radius:8px;"></div>
         <div id="fragmentTimelineList"></div>
         <div id="fragmentTimelineEmpty" style="color:#3d4a6a;font-size:0.72rem;text-align:center;padding:12px 0;">
-            还没有工作记录。完成工作后可在此添加留痕，确保可追溯。
+            还没有工作记录。勾选任务或添加留痕，所有工作可追溯。
         </div>
         <input class="timeline-input" id="timelineInput" placeholder="记录完成的工作，回车提交留痕…" onkeydown="if(event.key==='Enter')addTimelineEntry()">
         <div class="modal-btns" style="margin-top:12px;">
@@ -1154,6 +1157,17 @@
     const STORAGE_KEY = 'ielts_learning_system';
     let currentSpaceId = null;
     let newSpaceType = 'theme';
+
+    // ===== 用户身份 =====
+    function getCurrentUser() {
+        if (window.auth && window.auth.currentUser) {
+            var user = window.auth.currentUser;
+            var email = user.email || '';
+            var name = email ? email.split('@')[0] : 'me';
+            return { uid: user.uid, name: name, email: email, loggedIn: true };
+        }
+        return { uid: 'me', name: '我', email: '', loggedIn: false };
+    }
 
     // ===== 数据 =====
     function loadData() {
@@ -1434,7 +1448,9 @@
         var spaces = loadData();
         var space = spaces.find(s => s.id === currentSpaceId);
         if (!space || !space.creations[cIdx] || !space.creations[cIdx].fragments) return;
-        space.creations[cIdx].fragments[fIdx].assignee = 'me';
+        var user = getCurrentUser();
+        space.creations[cIdx].fragments[fIdx].assignee = user.uid;
+        space.creations[cIdx].fragments[fIdx].assigneeName = user.name;
         space.creations[cIdx].fragments[fIdx].done = false;
         saveData(spaces);
         openSpaceDetail(currentSpaceId);
@@ -1505,7 +1521,18 @@
         if (!space || !space.creations[cIdx] || !space.creations[cIdx].fragments) return;
         var frag = space.creations[cIdx].fragments[fIdx];
         if (!frag.rounds || !frag.rounds[roundIdx]) return;
-        frag.rounds[roundIdx].tasks[taskIdx].done = !frag.rounds[roundIdx].tasks[taskIdx].done;
+        var task = frag.rounds[roundIdx].tasks[taskIdx];
+        task.done = !task.done;
+        var user = getCurrentUser();
+        if (task.done) {
+            task.completedAt = new Date().toISOString();
+            task.completedBy = user.name;
+            task.completedByUid = user.uid;
+        } else {
+            task.completedAt = null;
+            task.completedBy = null;
+            task.completedByUid = null;
+        }
 
         // Check if all tasks in this round are done → mark fragment done
         var allDone = frag.rounds[roundIdx].tasks.every(function(t) { return t.done; });
@@ -1816,7 +1843,7 @@
                 var f = c.fragments[j];
                 var state = 'unclaimed';
                 if (f.done) state = 'done';
-                else if (f.assignee === 'me') state = 'claimed-by-me';
+                else if (f.assignee === getCurrentUser().uid) state = 'claimed-by-me';
                 else if (f.assignee) state = 'claimed';
                 pieces.push({
                     cIdx: i, fIdx: j,
@@ -1824,6 +1851,7 @@
                     creationName: c.name,
                     state: state,
                     assignee: f.assignee,
+                    assigneeName: f.assigneeName || '',
                     timelineCount: (f.timeline || []).length
                 });
             }
@@ -1840,7 +1868,7 @@
             var assigneeLabel = '';
             if (p.state === 'done') assigneeLabel = '<span class="puzzle-piece-assignee done">✅ 已完成</span>';
             else if (p.state === 'claimed-by-me') assigneeLabel = '<span class="puzzle-piece-assignee mine">🙋 我认领</span>';
-            else if (p.state === 'claimed') assigneeLabel = '<span class="puzzle-piece-assignee">🔒 已认领</span>';
+            else if (p.state === 'claimed') assigneeLabel = '<span class="puzzle-piece-assignee">🔒 ' + esc(p.assigneeName || p.assignee) + '</span>';
             else assigneeLabel = '<span class="puzzle-piece-assignee">未认领</span>';
             var tlBadge = p.timelineCount > 0
                 ? '<span style="position:absolute;top:4px;right:6px;font-size:0.6rem;background:rgba(100,200,100,0.2);color:#4caf50;border-radius:8px;padding:1px 5px;">' + p.timelineCount + '条</span>'
@@ -1878,22 +1906,65 @@
         var infoEl = document.getElementById('fragmentTimelineInfo');
         document.getElementById('fragmentTimelineTitle').textContent = '🕐 ' + f.name;
         infoEl.innerHTML = '来自「' + esc(c.name) + '」' +
-            (f.done ? ' · <span style="color:#4caf50;">已完成</span>' : f.assignee === 'me' ? ' · <span style="color:#ffd700;">我认领</span>' : ' · 未认领');
+            (f.done ? ' · <span style="color:#4caf50;">已完成</span>' : f.assignee === getCurrentUser().uid ? ' · <span style="color:#ffd700;">我认领</span>' : (f.assignee ? ' · <span style="color:#8a94a6;">' + esc(f.assigneeName || f.assignee) + ' 认领</span>' : ' · 未认领'));
+
+        // Build unified timeline: merge manual entries + round task completions
+        var entries = [];
+
+        // Manual timeline entries
         var tl = f.timeline || [];
-        if (tl.length === 0) {
+        for (var i = 0; i < tl.length; i++) {
+            entries.push({
+                ts: tl[i].createdAt || '',
+                type: 'manual',
+                text: tl[i].text,
+                author: tl[i].author || '',
+                authorUid: tl[i].authorUid || ''
+            });
+        }
+
+        // Round task completions
+        if (f.rounds) {
+            for (var ri = 0; ri < f.rounds.length; ri++) {
+                var round = f.rounds[ri];
+                for (var ti = 0; ti < round.tasks.length; ti++) {
+                    var task = round.tasks[ti];
+                    if (task.done && task.completedAt) {
+                        entries.push({
+                            ts: task.completedAt,
+                            type: 'task',
+                            text: '完成「' + task.name + '」（第' + round.roundNum + '轮）',
+                            author: task.completedBy || '',
+                            authorUid: task.completedByUid || ''
+                        });
+                    }
+                }
+            }
+        }
+
+        // Sort by timestamp descending (most recent first)
+        entries.sort(function(a, b) {
+            if (!a.ts) return 1;
+            if (!b.ts) return -1;
+            return b.ts.localeCompare(a.ts);
+        });
+
+        if (entries.length === 0) {
             listEl.innerHTML = '';
             emptyEl.style.display = 'block';
             return;
         }
         emptyEl.style.display = 'none';
         var html = '';
-        for (var i = 0; i < tl.length; i++) {
-            var e = tl[i];
-            var dt = e.createdAt ? new Date(e.createdAt).toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+        for (var k = 0; k < entries.length; k++) {
+            var e = entries[k];
+            var dt = e.ts ? new Date(e.ts).toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+            var dotStyle = e.type === 'task' ? ' style="background:#4ec9b0;"' : '';
+            var prefix = e.type === 'task' ? '<span style="color:#4ec9b0;">✓</span> ' : '';
             html += '<div class="timeline-entry">' +
-                '<div class="timeline-dot"></div>' +
+                '<div class="timeline-dot"' + dotStyle + '></div>' +
                 '<div class="timeline-content">' +
-                '<div class="timeline-text">' + esc(e.text) + '</div>' +
+                '<div class="timeline-text">' + prefix + esc(e.text) + '</div>' +
                 '<div class="timeline-meta">' + dt + (e.author ? ' · ' + esc(e.author) : '') + '</div>' +
                 '</div></div>';
         }
@@ -1924,7 +1995,7 @@
         var f = c.fragments[currentFragmentRef.fIdx];
         if (!f) return;
         if (!f.timeline) f.timeline = [];
-        f.timeline.push({ text: text, createdAt: new Date().toISOString(), author: '我' });
+        f.timeline.push({ text: text, createdAt: new Date().toISOString(), author: getCurrentUser().name, authorUid: getCurrentUser().uid });
         saveData(spaces);
         input.value = '';
         renderFragmentTimeline();
@@ -2254,7 +2325,7 @@
         if (frags.length > 0) {
             const claimed = frags.filter(f => f.assignee);
             const done = frags.filter(f => f.done);
-            const claimedByMe = frags.filter(f => f.assignee === 'me');
+            const claimedByMe = frags.filter(f => f.assignee === getCurrentUser().uid);
             fragmentHtml = '<div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(130,153,255,0.1);">' +
                 '<div style="font-size:0.68rem;color:#8a94a6;margin-bottom:4px;">🧩 碎片拼图</div>' +
                 '<div class="fragment-summary">' +
@@ -2266,25 +2337,25 @@
                 var f = frags[fi];
                 var dotClass = 'fragment-dot';
                 if (f.done) dotClass += ' done';
-                else if (f.assignee === 'me') dotClass += ' claimed-by-me';
+                else if (f.assignee === getCurrentUser().uid) dotClass += ' claimed-by-me';
                 else if (f.assignee) dotClass += ' claimed';
 
                 var assigneeText = '';
                 if (f.done) assigneeText = '<span class="fragment-assignee">✓ 已完成</span>';
-                else if (f.assignee === 'me') assigneeText = '<span class="fragment-assignee me">我</span>';
-                else if (f.assignee) assigneeText = '<span class="fragment-assignee">' + esc(f.assignee) + '</span>';
+                else if (f.assignee === getCurrentUser().uid) assigneeText = '<span class="fragment-assignee me">我</span>';
+                else if (f.assignee) assigneeText = '<span class="fragment-assignee">' + esc(f.assigneeName || f.assignee) + '</span>';
                 else assigneeText = '<span class="fragment-assignee">未认领</span>';
 
                 var actions = '<div class="fragment-actions">';
                 if (!f.assignee) {
                     actions += '<button class="frag-btn claim" onclick="claimFragment(' + idx + ',' + fi + ')">认领</button>';
-                } else if (f.assignee === 'me' && !f.done) {
+                } else if (f.assignee === getCurrentUser().uid && !f.done) {
                     actions += '<button class="frag-btn done-btn" onclick="completeFragment(' + idx + ',' + fi + ')">完成</button>';
                     actions += '<button class="frag-btn release" onclick="releaseFragment(' + idx + ',' + fi + ')">释放</button>';
-                } else if (f.done && f.assignee === 'me') {
+                } else if (f.done && f.assignee === getCurrentUser().uid) {
                     actions += '<button class="frag-btn" onclick="uncompleteFragment(' + idx + ',' + fi + ')">撤销</button>';
                 }
-                if (f.assignee === 'me' && !f.done) {
+                if (f.assignee === getCurrentUser().uid && !f.done) {
                     actions += '<button class="frag-btn" style="font-size:0.6rem;padding:2px 6px;background:rgba(130,153,255,0.1);color:#8299ff;border-color:rgba(130,153,255,0.2);" onclick="publishTaskRound(' + idx + ',' + fi + ')">+ 发布任务</button>';
                 }
                 actions += '</div>';
@@ -2704,8 +2775,8 @@
                 var piece = svgPieceEmpty;
                 var title = frag.name + ' — 未认领';
                 if (frag.done) { piece = svgPieceDone; title = frag.name + ' — 已完成'; }
-                else if (frag.assignee === 'me') { piece = svgPiece; title = frag.name + ' — 我认领'; }
-                else if (frag.assignee) { piece = svgPiece; title = frag.name + ' — 已认领'; }
+                else if (frag.assignee === getCurrentUser().uid) { piece = svgPiece; title = frag.name + ' — 我认领'; }
+                else if (frag.assignee) { piece = svgPiece; title = frag.name + ' — ' + (frag.assigneeName || frag.assignee) + ' 认领'; }
 
                 html += '<span title="' + esc(title) + '" style="cursor:pointer;" onclick="openFragmentTimeline(' + gr.cIdx + ',' + fi + ')">' + piece + '</span>';
             }
@@ -2717,8 +2788,8 @@
                 var fr = gr.fragments[fj];
                 var status = '⬜ 未认领';
                 if (fr.done) status = '✅ 已完成';
-                else if (fr.assignee === 'me') status = '🔵 我认领';
-                else if (fr.assignee) status = '🔒 已认领';
+                else if (fr.assignee === getCurrentUser().uid) status = '🔵 我认领';
+                else if (fr.assignee) status = '🔒 ' + esc(fr.assigneeName || fr.assignee);
                 
                 // Liquid progress bar
                 var prog = getFragmentProgress(fr);

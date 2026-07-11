@@ -1514,30 +1514,29 @@
 
         /* ===== 团队协作看板 ===== */
         .collab-corner-btn {
-            position: fixed;
-            bottom: 72px; right: 20px;
-            width: 44px; height: 44px;
+            position: relative;
+            width: 36px; height: 36px;
             border-radius: 50%;
-            background: rgba(130,150,255,0.12);
-            border: 1px solid rgba(130,150,255,0.25);
-            backdrop-filter: blur(8px);
+            background: rgba(130,150,255,0.1);
+            border: 1px solid rgba(130,150,255,0.2);
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 9997;
+            cursor: pointer;
             transition: all 0.2s;
         }
         .collab-corner-btn:hover {
             background: rgba(130,150,255,0.2);
-            transform: scale(1.1);
+            border-color: rgba(130,150,255,0.4);
         }
         .collab-corner-badge {
-            position: absolute; top: -3px; right: -3px;
+            position: absolute; top: -4px; right: -4px;
             background: #ff6b6b; color: #fff;
-            font-size: 0.55rem; font-weight: 600;
-            min-width: 16px; height: 16px;
+            font-size: 0.5rem; font-weight: 600;
+            min-width: 15px; height: 15px;
             border-radius: 8px;
             display: none;
             align-items: center; justify-content: center;
-            padding: 0 4px;
+            padding: 0 3px;
+            border: 1.5px solid #0a1028;
         }
         .collab-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -1549,99 +1548,136 @@
         }
         .collab-overlay.active { display: flex; }
         .collab-panel {
-            background: #1a2345;
+            background:
+                repeating-linear-gradient(
+                    transparent,
+                    transparent 27px,
+                    rgba(130,150,255,0.06) 27px,
+                    rgba(130,150,255,0.06) 28px
+                ),
+                linear-gradient(180deg, #1e2a4f 0%, #1a2345 100%);
             border: 1px solid rgba(130,150,255,0.15);
-            border-radius: 16px;
-            padding: 24px;
-            width: 90%; max-width: 460px;
+            border-radius: 4px;
+            padding: 0 20px 20px 20px;
+            width: 92%; max-width: 440px;
             max-height: 85vh; overflow-y: auto;
             margin: auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .collab-panel::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-1deg);
+            width: 80px; height: 18px;
+            background: rgba(255,215,0,0.15);
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 1px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
         .collab-panel h4 {
-            color: #c7d1ff; font-size: 1rem; margin-bottom: 12px;
+            color: #c7d1ff; font-size: 1rem; margin-bottom: 10px;
             display: flex; align-items: center; gap: 6px;
+            padding-top: 20px;
         }
         .collab-input-row {
-            display: flex; gap: 6px; margin-bottom: 14px;
+            display: flex; gap: 6px; margin-bottom: 12px;
         }
         .collab-input {
-            flex: 1; padding: 8px 12px; border-radius: 10px;
-            background: rgba(130,150,255,0.06);
-            border: 1px solid rgba(130,150,255,0.12);
+            flex: 1; padding: 8px 12px; border-radius: 4px;
+            background: transparent;
+            border: none;
+            border-bottom: 1.5px dashed rgba(130,150,255,0.25);
             color: #c7d1ff; font-size: 0.85rem; outline: none;
+            font-family: "Microsoft YaHei", monospace;
         }
-        .collab-input:focus { border-color: rgba(130,150,255,0.35); }
+        .collab-input:focus {
+            border-bottom-color: rgba(130,150,255,0.5);
+        }
         .collab-input::placeholder { color: #3d4a6a; }
         .collab-task-item {
-            background: rgba(130,150,255,0.05);
-            border: 1px solid rgba(130,150,255,0.1);
-            border-radius: 8px;
-            padding: 10px 12px;
-            margin-bottom: 8px;
-            transition: border-color 0.2s;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 8px 0 8px 0;
+            margin-bottom: 0;
+            transition: all 0.15s;
+            border-bottom: 1px dashed rgba(130,150,255,0.08);
         }
-        .collab-task-item:hover { border-color: rgba(130,150,255,0.2); }
-        .collab-task-item.done { opacity: 0.5; }
+        .collab-task-item:hover {
+            background: rgba(130,150,255,0.03);
+        }
+        .collab-task-item:last-child { border-bottom: none; }
+        .collab-task-item.done { opacity: 0.45; }
         .collab-task-row {
             display: flex; align-items: flex-start; gap: 8px;
         }
         .collab-task-check {
-            width: 18px; height: 18px; border-radius: 4px;
+            width: 16px; height: 16px; border-radius: 2px;
             border: 1.5px solid #5a6480; flex-shrink: 0;
-            cursor: pointer; margin-top: 1px;
+            cursor: pointer; margin-top: 2px;
             display: flex; align-items: center; justify-content: center;
             transition: all 0.2s;
+            background: transparent;
         }
         .collab-task-check:hover { border-color: #4ec9b0; }
         .collab-task-check.checked {
             background: #4ec9b0; border-color: #4ec9b0;
+            border-radius: 2px;
         }
         .collab-task-check.checked::after {
-            content: '✓'; color: #fff; font-size: 0.7rem; font-weight: 700;
+            content: '✓'; color: #fff; font-size: 0.65rem; font-weight: 700;
         }
         .collab-task-text {
             flex: 1; font-size: 0.82rem; color: #c7d1ff; line-height: 1.5;
         }
         .collab-task-item.done .collab-task-text {
-            text-decoration: line-through; color: #5a6480;
+            text-decoration: line-through; text-decoration-color: #4ec9b0;
+            color: #5a6480;
         }
         .collab-task-meta {
-            font-size: 0.62rem; color: #3d4a6a; margin-top: 3px;
-            margin-left: 26px;
+            font-size: 0.6rem; color: #3d4a6a; margin-top: 2px;
+            margin-left: 24px;
         }
         .collab-task-sub {
-            margin-top: 6px; padding-left: 26px;
+            margin-top: 4px; padding-left: 24px;
         }
         .collab-sub-item {
             display: flex; align-items: flex-start; gap: 6px;
-            padding: 3px 0;
+            padding: 2px 0;
         }
         .collab-sub-check {
-            width: 14px; height: 14px; border-radius: 3px;
+            width: 13px; height: 13px; border-radius: 2px;
             border: 1.5px solid #3d4a6a; flex-shrink: 0;
-            cursor: pointer; margin-top: 1px;
+            cursor: pointer; margin-top: 2px;
             display: flex; align-items: center; justify-content: center;
             transition: all 0.2s;
         }
         .collab-sub-check.checked {
             background: #ffd700; border-color: #ffd700;
+            border-radius: 2px;
         }
         .collab-sub-check.checked::after {
-            content: '✓'; color: #1a2345; font-size: 0.55rem; font-weight: 700;
+            content: '✓'; color: #1a2345; font-size: 0.5rem; font-weight: 700;
         }
         .collab-sub-text {
             font-size: 0.72rem; color: #8a94a6; line-height: 1.4; flex: 1;
         }
         .collab-sub-item.done .collab-sub-text {
-            text-decoration: line-through; color: #3d4a6a;
+            text-decoration: line-through; text-decoration-color: #ffd700;
+            color: #3d4a6a;
         }
         .collab-sub-input {
-            width: 100%; background: rgba(130,150,255,0.05);
-            border: 1px solid rgba(130,150,255,0.1); border-radius: 6px;
-            padding: 5px 8px; color: #c7d1ff; font-size: 0.72rem;
+            width: 100%; background: transparent;
+            border: none; border-bottom: 1px dashed rgba(130,150,255,0.15);
+            border-radius: 0;
+            padding: 4px 0; color: #c7d1ff; font-size: 0.72rem;
             outline: none; margin-top: 4px;
+            font-family: "Microsoft YaHei", monospace;
         }
-        .collab-sub-input:focus { border-color: rgba(255,215,0,0.3); }
+        .collab-sub-input:focus { border-bottom-color: rgba(255,215,0,0.3); }
         .collab-sub-input::placeholder { color: #3d4a6a; }
         .collab-task-del {
             background: none; border: none; color: #3d4a6a;
@@ -1649,11 +1685,18 @@
             transition: color 0.2s;
         }
         .collab-task-del:hover { color: #ff6b6b; }
+        .sub-action-btn {
+            background: none; border: none; cursor: pointer;
+            font-size: 0.58rem; padding: 1px 4px;
+            opacity: 0.7; transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+        .sub-action-btn:hover { opacity: 1; }
         .collab-frag-summary {
             margin-top: 12px; padding: 10px 12px;
             background: rgba(130,150,255,0.04);
-            border: 1px solid rgba(130,150,255,0.08);
-            border-radius: 8px;
+            border: 1px dashed rgba(130,150,255,0.1);
+            border-radius: 4px;
             font-size: 0.72rem; color: #8a94a6; line-height: 1.6;
         }
         .collab-frag-summary b { color: #c7d1ff; }
@@ -1676,6 +1719,13 @@
         <div class="hero">
             <div class="user-auth">
                 <span id="userInfo"></span>
+                <div class="collab-corner-btn" onclick="openCollabBoard()" title="团队协作看板" style="display:inline-flex;">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                        <path d="M9 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-4M9 7V5a3 3 0 016 0v2M9 7h6" stroke="#8299ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <path d="M9 13l2 2 4-4" stroke="#4ec9b0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                    <span class="collab-corner-badge" id="collabBadge"></span>
+                </div>
                 <button id="loginBtn" onclick="window.location.href='login.html'"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" stroke="#8299ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>登录/注册</button>
                 <button id="logoutBtn" onclick="handleLogout()"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="#ff9a8b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>登出</button>
             </div>
@@ -3517,6 +3567,15 @@
         }
 
         // ===== 团队协作看板（首页平台级） =====
+        function getCurrentUser() {
+            if (window.auth && window.auth.currentUser) {
+                var user = window.auth.currentUser;
+                var email = user.email || '';
+                var name = email ? email.split('@')[0] : 'me';
+                return { uid: user.uid, name: name, email: email, loggedIn: true };
+            }
+            return { uid: 'me', name: '我', email: '', loggedIn: false };
+        }
         function getCollabBoard() {
             try {
                 var d = JSON.parse(localStorage.getItem('ielts_learning_system') || '{}');
@@ -3531,6 +3590,68 @@
                 localStorage.setItem('ielts_learning_system', JSON.stringify(d));
                 if (typeof syncDataWithCloud === 'function') syncDataWithCloud();
             } catch(e) { console.error('[collab] saveCollabBoard error:', e); }
+        }
+        // ===== Feedback & Optimization Score =====
+        function getFeedbacks() {
+            try {
+                var d = JSON.parse(localStorage.getItem('ielts_learning_system') || '{}');
+                return d.feedbacks || [];
+            } catch(e) { return []; }
+        }
+        function saveFeedbacks(items) {
+            try {
+                var d = JSON.parse(localStorage.getItem('ielts_learning_system') || '{}');
+                d.feedbacks = items;
+                d._lastModified = new Date().toISOString();
+                localStorage.setItem('ielts_learning_system', JSON.stringify(d));
+                if (typeof syncDataWithCloud === 'function') syncDataWithCloud();
+            } catch(e) { console.error('[feedback] save error:', e); }
+        }
+        // Calculate optimization score for a user
+        function getOptimizationScore(uid) {
+            var feedbacks = getFeedbacks();
+            var given = feedbacks.filter(function(f){ return f.fromUid === uid; });
+            var applied = given.filter(function(f){ return f.status === 'applied'; });
+            var accepted = given.filter(function(f){ return f.status === 'accepted' || f.status === 'applied'; });
+            var rejected = given.filter(function(f){ return f.status === 'rejected'; });
+            return {
+                uid: uid,
+                totalGiven: given.length,
+                accepted: accepted.length,
+                applied: applied.length,
+                rejected: rejected.length,
+                effectiveRate: given.length > 0 ? Math.round(applied.length / given.length * 100) : 0,
+                score: applied.length
+            };
+        }
+        // Record a feedback when a sub-task is created
+        function recordFeedback(subTask, parentTaskText) {
+            var feedbacks = getFeedbacks();
+            feedbacks.push({
+                id: subTask.id,
+                fromUid: subTask.createdBy,
+                fromName: subTask.createdByName,
+                targetTaskId: subTask.id,
+                text: subTask.text,
+                status: 'pending',
+                createdAt: subTask.createdAt,
+                resolvedAt: null,
+                resolvedBy: null
+            });
+            saveFeedbacks(feedbacks);
+        }
+        // Update feedback status when sub-task state changes
+        function updateFeedbackStatus(subTaskId, newStatus, resolvedByUid) {
+            var feedbacks = getFeedbacks();
+            for (var i = 0; i < feedbacks.length; i++) {
+                if (feedbacks[i].id === subTaskId) {
+                    feedbacks[i].status = newStatus;
+                    feedbacks[i].resolvedAt = new Date().toISOString();
+                    feedbacks[i].resolvedBy = resolvedByUid;
+                    break;
+                }
+            }
+            saveFeedbacks(feedbacks);
         }
         function updateCollabBadge() {
             var items = getCollabBoard();
@@ -3666,6 +3787,7 @@
                 return;
             }
             emptyEl.style.display = 'none';
+            var user = getCurrentUser ? getCurrentUser() : { uid: 'me', name: '我' };
             var html = '';
             for (var i = 0; i < items.length; i++) {
                 var t = items[i];
@@ -3677,20 +3799,70 @@
                 html += '<button class="collab-task-del" onclick="removeCollabTask(' + i + ')">✕</button>';
                 html += '</div>';
                 var meta = t.createdAt ? new Date(t.createdAt).toLocaleDateString('zh-CN', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-                if (meta) html += '<div class="collab-task-meta">' + meta + '</div>';
+                if (meta) html += '<div class="collab-task-meta">' + meta + (t.createdByName ? ' · ' + escHtml(t.createdByName) : '') + '</div>';
                 html += '<div class="collab-task-sub">';
                 if (t.children && t.children.length > 0) {
                     for (var j = 0; j < t.children.length; j++) {
                         var s = t.children[j];
-                        var sDone = s.done ? ' done' : '';
-                        html += '<div class="collab-sub-item' + sDone + '">';
-                        html += '<div class="collab-sub-check' + (s.done ? ' checked' : '') + '" onclick="toggleCollabSub(' + i + ',' + j + ')"></div>';
-                        html += '<div class="collab-sub-text">' + escHtml(s.text) + '</div>';
-                        html += '<button class="collab-task-del" style="font-size:0.6rem;" onclick="removeCollabSub(' + i + ',' + j + ')">✕</button>';
+                        // Skip withdrawn sub-tasks (they disappear)
+                        if (s.status === 'withdrawn') continue;
+                        var isDone = (s.status === 'done_by_owner' || s.status === 'done_by_other');
+                        var sDone = isDone ? ' done' : '';
+                        var isCreator = (s.createdBy === user.uid);
+                        var isOwner = (s.createdFor === user.uid);
+                        var statusLabel = '';
+                        var statusColor = '';
+                        if (s.status === 'pending_decision') { statusLabel = '待回应'; statusColor = '#ffd700'; }
+                        else if (s.status === 'owner_will_do') { statusLabel = '所有者认领'; statusColor = '#8299ff'; }
+                        else if (s.status === 'opened') { statusLabel = '已开放'; statusColor = '#4ec9b0'; }
+                        else if (s.status === 'done_by_owner') { statusLabel = '✓ 完成'; statusColor = '#4ec9b0'; }
+                        else if (s.status === 'done_by_other') { statusLabel = '✓ ' + (s.doneByName || '他人') + '完成'; statusColor = '#4ec9b0'; }
+                        else if (s.status === 'rejected') { statusLabel = '已拒绝'; statusColor = '#ff6b6b'; }
+
+                        html += '<div class="collab-sub-item' + sDone + '" style="border-left:2px solid ' + (isCreator ? 'rgba(130,150,255,0.25)' : 'rgba(255,215,0,0.2)') + ';padding-left:6px;">';
+                        // Checkbox — only clickable when owner_will_do (by owner) or opened (by anyone except creator)
+                        var canCheck = false;
+                        if (s.status === 'owner_will_do' && isOwner) canCheck = true;
+                        if (s.status === 'opened' && !isCreator) canCheck = true;
+                        if (isDone) {
+                            html += '<div class="collab-sub-check checked" style="background:' + statusColor + ';border-color:' + statusColor + ';"></div>';
+                        } else if (canCheck) {
+                            html += '<div class="collab-sub-check" onclick="toggleCollabSub(' + i + ',' + j + ')" style="cursor:pointer;"></div>';
+                        } else {
+                            html += '<div class="collab-sub-check" style="opacity:0.3;cursor:not-allowed;"></div>';
+                        }
+                        html += '<div class="collab-sub-text">' + escHtml(s.text);
+                        if (statusLabel) html += ' <span style="font-size:0.55rem;color:' + statusColor + ';margin-left:4px;">' + statusLabel + '</span>';
+                        html += '</div>';
+                        // Actions for pending_decision: owner can choose
+                        if (s.status === 'pending_decision' && isOwner) {
+                            html += '<button class="sub-action-btn" onclick="respondToSubTask(' + i + ',' + j + ',\'self\')" title="我自己做" style="color:#8299ff;">自做</button>';
+                            html += '<button class="sub-action-btn" onclick="respondToSubTask(' + i + ',' + j + ',\'open\')" title="开放给他人" style="color:#4ec9b0;">开放</button>';
+                            html += '<button class="sub-action-btn" onclick="respondToSubTask(' + i + ',' + j + ',\'reject\')" title="拒绝" style="color:#ff6b6b;">拒</button>';
+                        }
+                        // Creator can withdraw if not done
+                        if (isCreator && !isDone && s.status !== 'rejected') {
+                            html += '<button class="sub-action-btn" onclick="withdrawSubTask(' + i + ',' + j + ')" title="撤回" style="color:#5a6480;">撤回</button>';
+                        }
                         html += '</div>';
                     }
                 }
-                html += '<input class="collab-sub-input" placeholder="添加批注/反馈，回车提交…" onkeydown="if(event.key===\'Enter\')addCollabSub(' + i + ', this)">';
+                // Input for adding sub-task — blocked if user has a pending one
+                var hasPending = false;
+                if (t.children) {
+                    for (var p = 0; p < t.children.length; p++) {
+                        if (t.children[p].createdBy === user.uid &&
+                            (t.children[p].status === 'pending_decision' || t.children[p].status === 'created')) {
+                            hasPending = true;
+                            break;
+                        }
+                    }
+                }
+                if (hasPending) {
+                    html += '<div style="font-size:0.6rem;color:#3d4a6a;font-style:italic;padding:4px 0;">等待回应中，暂不能添加新的子任务</div>';
+                } else {
+                    html += '<input class="collab-sub-input" placeholder="添加反馈/子任务，回车提交…" onkeydown="if(event.key===\'Enter\')addCollabSub(' + i + ', this)">';
+                }
                 html += '</div>';
                 html += '</div>';
             }
@@ -3701,12 +3873,15 @@
             var input = document.getElementById('collabInput');
             var text = input.value.trim();
             if (!text) return;
+            var user = getCurrentUser ? getCurrentUser() : { uid: 'me', name: '我' };
             var items = getCollabBoard();
             items.unshift({
                 id: 'cb_' + Date.now(),
                 text: text,
                 done: false,
                 createdAt: new Date().toISOString(),
+                createdBy: user.uid,
+                createdByName: user.name,
                 children: []
             });
             saveCollabBoard(items);
@@ -3737,15 +3912,102 @@
             var items = getCollabBoard();
             if (!items[idx]) return;
             if (!items[idx].children) items[idx].children = [];
-            items[idx].children.push({ text: text, done: false });
+            var user = getCurrentUser ? getCurrentUser() : { uid: 'me', name: '我' };
+            // Check 0-feedback rule: if this user already has a pending sub-task, block
+            for (var k = 0; k < items[idx].children.length; k++) {
+                var existing = items[idx].children[k];
+                if (existing.createdBy === user.uid &&
+                    (existing.status === 'created' || existing.status === 'pending_decision')) {
+                    // Can't write a second sub-task before owner responds
+                    return;
+                }
+            }
+            var subTask = {
+                id: 'st_' + Date.now(),
+                text: text,
+                status: 'created',
+                createdBy: user.uid,
+                createdByName: user.name,
+                createdFor: items[idx].createdBy || 'me',
+                createdForName: items[idx].createdByName || '我',
+                createdAt: new Date().toISOString(),
+                doneBy: null,
+                doneByName: null,
+                doneAt: null,
+                openedAt: null,
+                withdrawnAt: null,
+                rejectedAt: null
+            };
+            items[idx].children.push(subTask);
+            // Auto-transition to pending_decision (owner needs to decide)
+            subTask.status = 'pending_decision';
             saveCollabBoard(items);
+            // Record feedback for optimization score tracking
+            recordFeedback(subTask, items[idx].text);
             renderCollabList();
         }
         function toggleCollabSub(idx, subIdx) {
             var items = getCollabBoard();
             if (!items[idx] || !items[idx].children || !items[idx].children[subIdx]) return;
-            items[idx].children[subIdx].done = !items[idx].children[subIdx].done;
+            var sub = items[idx].children[subIdx];
+            var user = getCurrentUser ? getCurrentUser() : { uid: 'me', name: '我' };
+            // Creator cannot complete their own sub-task (anti抢工)
+            if (sub.createdBy === user.uid) return;
+            // Can only complete if status is 'owner_will_do' (by owner) or 'opened' (by anyone)
+            if (sub.status === 'owner_will_do' || sub.status === 'opened') {
+                if (sub.status === 'owner_will_do') {
+                    sub.status = 'done_by_owner';
+                } else {
+                    sub.status = 'done_by_other';
+                }
+                sub.doneBy = user.uid;
+                sub.doneByName = user.name;
+                sub.doneAt = new Date().toISOString();
+                saveCollabBoard(items);
+                // Mark feedback as applied (sub-task was accepted and led to completion)
+                updateFeedbackStatus(sub.id, 'applied', sub.createdFor);
+                renderCollabList();
+                if (window.SFX) SFX.correct();
+            }
+        }
+        // Owner responds to a pending sub-task: do it themselves, open to others, or reject
+        function respondToSubTask(idx, subIdx, action) {
+            var items = getCollabBoard();
+            if (!items[idx] || !items[idx].children || !items[idx].children[subIdx]) return;
+            var sub = items[idx].children[subIdx];
+            if (sub.status !== 'pending_decision' && sub.status !== 'created') return;
+            var user = getCurrentUser ? getCurrentUser() : { uid: 'me', name: '我' };
+            var now = new Date().toISOString();
+            if (action === 'self') {
+                sub.status = 'owner_will_do';
+                updateFeedbackStatus(sub.id, 'accepted', user.uid);
+            } else if (action === 'open') {
+                sub.status = 'opened';
+                sub.openedAt = now;
+                updateFeedbackStatus(sub.id, 'accepted', user.uid);
+            } else if (action === 'reject') {
+                sub.status = 'rejected';
+                sub.rejectedAt = now;
+                updateFeedbackStatus(sub.id, 'rejected', user.uid);
+            }
             saveCollabBoard(items);
+            renderCollabList();
+        }
+        // Creator withdraws their sub-task (理解偏差)
+        function withdrawSubTask(idx, subIdx) {
+            var items = getCollabBoard();
+            if (!items[idx] || !items[idx].children || !items[idx].children[subIdx]) return;
+            var sub = items[idx].children[subIdx];
+            var user = getCurrentUser ? getCurrentUser() : { uid: 'me', name: '我' };
+            // Only creator can withdraw
+            if (sub.createdBy !== user.uid) return;
+            // Can only withdraw if not yet done
+            if (sub.status === 'done_by_owner' || sub.status === 'done_by_other') return;
+            sub.status = 'withdrawn';
+            sub.withdrawnAt = new Date().toISOString();
+            saveCollabBoard(items);
+            // Update feedback status to withdrawn (not counted)
+            updateFeedbackStatus(sub.id, 'withdrawn', user.uid);
             renderCollabList();
         }
         function removeCollabSub(idx, subIdx) {
@@ -3781,43 +4043,33 @@
         });
     </script>
 
-    <!-- 团队协作看板 — 通知角 -->
-    <div class="collab-corner-btn" onclick="openCollabBoard()" title="团队协作看板">
-        <svg width="20" height="20" viewBox="0 0 24 24">
-            <path d="M9 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-4M9 7V5a3 3 0 016 0v2M9 7h6" stroke="#8299ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <path d="M9 13l2 2 4-4" stroke="#4ec9b0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
-        <span class="collab-corner-badge" id="collabBadge"></span>
-    </div>
-
     <!-- 团队协作看板弹窗 -->
     <div class="collab-overlay" id="collabOverlay">
         <div class="collab-panel">
             <h4>
                 <svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-4M9 7V5a3 3 0 016 0v2M9 7h6" stroke="#8299ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                 团队协作看板
-                <span style="font-size:0.6rem;background:rgba(130,150,255,0.12);color:#8299ff;padding:1px 6px;border-radius:4px;border:1px solid rgba(130,150,255,0.2);margin-left:4px;">本地 MVP</span>
             </h4>
-            <div style="font-size:0.7rem;color:#5a6480;margin-bottom:12px;padding:8px 10px;background:rgba(130,150,255,0.04);border-radius:8px;line-height:1.6;">
-                写下任务，回车添加为小方格。完成任务点勾划掉。他人对任务有异议可添加子级反馈。
+            <div style="font-size:0.68rem;color:#3d4a6a;margin-bottom:10px;line-height:1.6;font-style:italic;">
+                写下任务，回车添加。完成点勾划掉。他人有异议可添加子级反馈。
             </div>
             <div class="collab-input-row">
                 <input class="collab-input" id="collabInput" placeholder="写下任务/汇报，回车添加…" onkeydown="if(event.key==='Enter')addCollabTask()">
-                <button class="add-btn" onclick="addCollabTask()" style="padding:8px 14px;border-radius:10px;background:rgba(130,150,255,0.12);border:1px solid rgba(130,150,255,0.2);color:#c7d1ff;font-size:0.8rem;cursor:pointer;white-space:nowrap;">添加</button>
+                <button onclick="addCollabTask()" style="padding:6px 14px;border-radius:2px;background:transparent;border:1px solid rgba(130,150,255,0.2);color:#8299ff;font-size:0.78rem;cursor:pointer;white-space:nowrap;transition:all .2s;" onmouseover="this.style.borderColor='rgba(130,150,255,0.4)';this.style.color='#c7d1ff'" onmouseout="this.style.borderColor='rgba(130,150,255,0.2)';this.style.color='#8299ff'">+</button>
             </div>
             <div id="collabList"></div>
-            <div id="collabEmpty" style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:16px 0;">
+            <div id="collabEmpty" style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:16px 0;font-style:italic;">
                 还没有任务。写下第一个任务吧。
             </div>
-            <div id="collabFragSection" style="display:none;margin-top:16px;border-top:1px solid rgba(130,150,255,0.08);padding-top:14px;">
+            <div id="collabFragSection" style="display:none;margin-top:12px;border-top:1px dashed rgba(130,150,255,0.1);padding-top:12px;">
                 <div style="font-size:0.78rem;color:#8299ff;margin-bottom:8px;display:flex;align-items:center;gap:4px;">
                     <svg width="14" height="14" viewBox="0 0 24 24"><path d="M9 3h6v3.5a1.5 1.5 0 003 0V3h3v6h-3.5a1.5 1.5 0 000 3H21v6h-6v-3.5a1.5 1.5 0 00-3 0V18H6v-6h3.5a1.5 1.5 0 000-3H6V3h9z" fill="none" stroke="#8299ff" stroke-width="1.5" stroke-linejoin="round"/></svg>
                     碎片分工概览
                 </div>
                 <div id="collabFragList"></div>
             </div>
-            <div style="margin-top:16px;display:flex;justify-content:flex-end;">
-                <button class="add-btn" onclick="closeCollabBoard()" style="padding:8px 20px;border-radius:10px;background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.15);color:#8a94a6;font-size:0.85rem;cursor:pointer;">完成</button>
+            <div style="margin-top:14px;display:flex;justify-content:flex-end;">
+                <button onclick="closeCollabBoard()" style="padding:6px 18px;border-radius:2px;background:transparent;border:1px solid rgba(130,150,255,0.15);color:#8a94a6;font-size:0.8rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(130,150,255,0.3)';this.style.color='#c7d1ff'" onmouseout="this.style.borderColor='rgba(130,150,255,0.15)';this.style.color='#8a94a6'">完成</button>
             </div>
         </div>
     </div>
