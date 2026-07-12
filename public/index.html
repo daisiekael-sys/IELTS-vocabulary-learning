@@ -40,6 +40,7 @@
     <script src="task-manager.js?v=2"></script>
     <script src="reward-system.js?v=2"></script>
     <script src="sfx.js?v=1"></script>
+    <script src="sidebar.js?v=1"></script>
     <style>
         * {
             margin: 0;
@@ -2006,9 +2007,125 @@
         .collab-frag-dot.claimed { background: #ffd700; border-color: #ffd700; }
         .collab-frag-name { color: #c7d1ff; flex: 1; }
         .collab-frag-pct { color: #5a6480; font-size: 0.62rem; }
+
+        /* === 侧边栏导航 === */
+        .sidebar-overlay {
+            position: fixed; inset: 0;
+            background: rgba(5,7,20,0.5);
+            backdrop-filter: blur(3px);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 9998;
+        }
+        .sidebar-overlay.show { opacity: 1; pointer-events: auto; }
+        .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: 260px;
+            background: rgba(10,16,40,0.97);
+            backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(130,150,255,0.1);
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            z-index: 9999;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(130,150,255,0.08);
+            flex-shrink: 0;
+        }
+        .sidebar-title { font-size: 0.85rem; color: #ffd700; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .sidebar-close {
+            background: rgba(130,150,255,0.08); border: 1px solid rgba(130,150,255,0.12);
+            border-radius: 6px; padding: 4px 8px; cursor: pointer;
+            color: #8a94a6; font-size: 0.7rem; transition: all 0.2s;
+        }
+        .sidebar-close:hover { color: #c7d1ff; background: rgba(130,150,255,0.15); }
+        .sidebar-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 0; }
+        .tree-node { user-select: none; }
+        .tree-row {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 12px; cursor: pointer;
+            transition: background 0.15s; min-height: 32px;
+        }
+        .tree-row:hover { background: rgba(130,150,255,0.06); }
+        .tree-row.active { background: rgba(255,215,0,0.06); box-shadow: inset 2px 0 0 #ffd700; }
+        .tree-chevron {
+            flex-shrink: 0; width: 14px; height: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: #5a6480; transition: transform 0.2s;
+        }
+        .tree-chevron.open { transform: rotate(90deg); }
+        .tree-chevron.hidden { visibility: hidden; }
+        .tree-icon { flex-shrink: 0; font-size: 0.85rem; width: 18px; text-align: center; }
+        .tree-label {
+            flex: 1; font-size: 0.78rem; color: #c7d1ff;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .tree-row.active .tree-label { color: #ffd700; }
+        .tree-pin {
+            flex-shrink: 0; width: 14px; height: 14px;
+            opacity: 0; transition: opacity 0.2s;
+            cursor: pointer; color: #5a6480;
+        }
+        .tree-row:hover .tree-pin { opacity: 0.5; }
+        .tree-pin.pinned { opacity: 1; color: #ffd700; }
+        .tree-pin:hover { opacity: 1 !important; }
+        .tree-children {
+            display: none; padding-left: 14px;
+            border-left: 1px dashed rgba(130,150,255,0.08);
+            margin-left: 18px;
+        }
+        .tree-children.open { display: block; }
+        .tree-empty { padding: 20px 16px; text-align: center; color: #3d4a6a; font-size: 0.72rem; }
+        .hamburger-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px;
+            background: rgba(130,150,255,0.08);
+            border: 1px solid rgba(130,150,255,0.12);
+            border-radius: 8px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .hamburger-btn:hover { background: rgba(130,150,255,0.15); }
+        .hamburger-btn svg { color: #8a94a6; }
+        .hamburger-btn:hover svg { color: #c7d1ff; }
+        .page-pin-btn {
+            position: fixed; top: 60px; right: 16px;
+            width: 32px; height: 32px;
+            display: none; align-items: center; justify-content: center;
+            background: rgba(10,16,40,0.8); backdrop-filter: blur(8px);
+            border: 1px solid rgba(130,150,255,0.12);
+            border-radius: 8px; cursor: pointer;
+            z-index: 90; transition: all 0.2s; color: #5a6480;
+        }
+        .page-pin-btn:hover { color: #c7d1ff; border-color: rgba(130,150,255,0.2); }
+        .page-pin-btn.pinned { color: #ffd700; border-color: rgba(255,215,0,0.2); background: rgba(255,215,0,0.06); }
     </style>
 </head>
 <body>
+    <!-- 侧边栏遮罩 -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+    <!-- 侧边栏 -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">🧭 导航</span>
+            <button class="sidebar-close" onclick="toggleSidebar(false)">✕</button>
+        </div>
+        <div class="sidebar-body" id="sidebarBody"></div>
+    </div>
+    <!-- 页面 pin 按钮 -->
+    <div class="page-pin-btn" id="pagePinBtn" onclick="toggleCurrentPagePin()" title="固定到侧边栏" style="display:flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M9 4h6l-1 7 3 3v2h-4v4l-1 1-1-1v-4H7v-2l3-3-1-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    </div>
+    <!-- 汉堡按钮 -->
+    <div style="position:fixed;top:20px;left:20px;z-index:90;">
+        <button class="hamburger-btn" onclick="toggleSidebar()" title="导航列表">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+    </div>
     <div class="container">
         <div class="nav-right">
             <!-- 通知/信息图标 -->
@@ -4775,6 +4892,12 @@
             updateModuleProgress();
             updateCollabBadge();
             renderCollabSummary();
+
+            // 侧边栏
+            if (typeof renderSidebar === 'function') {
+                renderSidebar();
+                updatePagePinBtn();
+            }
 
             // 每日结算
             if (window.RewardSystem && window.TaskManager) {
