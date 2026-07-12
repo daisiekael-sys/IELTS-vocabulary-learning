@@ -80,6 +80,7 @@
         .hero {
             text-align: center;
             margin-bottom: 40px;
+            position: relative;
         }
 
         .hero h1 {
@@ -143,8 +144,8 @@
         }
 
         .module-card .card-body {
-            flex: 0 0 auto;
-            min-width: 0;
+            flex: 1 1 auto;
+            min-width: 120px;
         }
 
         .module-card h3 {
@@ -164,8 +165,8 @@
         }
 
         .module-card .card-progress {
-            flex: 1;
-            min-width: 0;
+            flex: 0 0 180px;
+            min-width: 180px;
             margin-left: 8px;
         }
         .module-card .card-bar {
@@ -183,10 +184,8 @@
         .module-card .card-meta {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-        }
-        .module-card .card-meta span:first-child {
+            justify-content: flex-start;
+            gap: 8px;
             font-size: 0.7rem;
             color: #8a94a6;
             font-variant-numeric: tabular-nums;
@@ -199,11 +198,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .module-card.is-goal-module {
-            border-color: rgba(255,215,0,0.25);
-            background: rgba(255,215,0,0.03);
-        }
-
         .module-card .card-arrow {
             flex-shrink: 0;
             opacity: 0.3;
@@ -211,14 +205,34 @@
         }
         .module-card:hover .card-arrow { opacity: 0.8; }
 
+        @media (max-width: 900px) {
+            .module-card .card-body { flex: 1 1 auto; min-width: 100px; }
+        }
         @media (max-width: 640px) {
             .module-grid { gap: 10px; margin-top: 16px; }
-            .module-card { padding: 10px 12px; gap: 10px; }
+            .module-card {
+                padding: 10px 12px;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
             .module-card .icon { width: 32px; height: 32px; }
             .module-card .icon svg { width: 32px; height: 32px; }
+            .module-card .card-body { flex: 1 1 auto; min-width: 100px; }
             .module-card h3 { font-size: 0.9rem; }
             .module-card p { font-size: 0.7rem; }
-            .module-card .card-progress { display: none; }
+            .module-card .card-progress {
+                display: flex;
+                flex: 1 1 100%;
+                margin-left: 42px;
+                margin-top: 4px;
+                order: 3;
+            }
+            .module-card .card-arrow { order: 2; margin-left: auto; }
+        }
+        @media (max-width: 480px) {
+            .module-card .card-progress {
+                flex: 1 1 100%;
+            }
         }
         .btn-start {
             margin-top: 18px;
@@ -246,48 +260,7 @@
             }
         }
 
-        .special-section {
-            margin-top: 16px;
-            background: rgba(26, 35, 69, 0.5);
-            border: 1px solid rgba(130, 150, 255, 0.15);
-            border-radius: 14px;
-            overflow: hidden;
-        }
-
-        .special-section h3 {
-            color: #c7d1ff;
-            font-size: 1rem;
-            padding: 16px 20px;
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: background 0.2s;
-        }
-        .special-section h3:hover { background: rgba(130, 150, 255, 0.06); }
-        .special-section h3 .chevron {
-            margin-left: auto;
-            transition: transform 0.3s;
-            opacity: 0.4;
-        }
-        .special-section h3.open .chevron { transform: rotate(180deg); }
-
-        .special-section .btn-group {
-            display: none;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            padding: 0 20px 20px;
-        }
-        .special-section .btn-group.open { display: flex; }
-
-        /* 设置面板 */
-        .settings-body {
-            display: none;
-            padding: 0 20px 20px;
-        }
-        .settings-body.open { display: block; }
+        /* 设置面板 — 被 avatar-dropdown 复用 */
         .settings-row {
             display: flex;
             align-items: center;
@@ -337,118 +310,222 @@
             background: #4ec9b0;
         }
 
-        .special-section button {
-            padding: 10px 20px;
-            background: linear-gradient(90deg, #8899ff, #6677cc);
-            color: #ffffff;
-            border: none;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(136, 153, 255, 0.3);
-        }
-
-        .special-section button:hover {
-            background: linear-gradient(90deg, #7788ee, #5566bb);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(119, 136, 238, 0.4);
-        }
-
-        @media (max-width: 640px) {
-            .special-section {
-                margin: 20px 0;
-                padding: 20px 12px;
-                border-radius: 12px;
-            }
-
-            .special-section h3 {
-                font-size: 1rem;
-                margin-bottom: 16px;
-            }
-
-            .special-section .btn-group {
-                gap: 10px;
-            }
-
-            .special-section button {
-                padding: 10px 16px;
-                font-size: 12px;
-                border-radius: 20px;
-            }
-        }
-
-        .user-auth {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        /* === 右上角导航栏 === */
+        .nav-right {
+            position: static;
             display: flex;
             align-items: center;
-            gap: 15px;
-        }
-
-        @media (max-width: 640px) {
-            .user-auth {
-                position: static;
-                justify-content: center;
-                margin-bottom: 16px;
-                gap: 10px;
-            }
-
-            #userInfo {
-                font-size: 12px;
-            }
-
-            #loginBtn, #logoutBtn {
-                padding: 8px 14px;
-                font-size: 12px;
-            }
-        }
-
-        #userInfo {
-            display: none;
-            color: #c7d1ff;
-            font-size: 14px;
-            font-weight: 500;
-            align-items: center;
+            justify-content: flex-end;
             gap: 10px;
+            margin-bottom: 10px;
+        }
+        .nav-btn-wrap {
+            position: relative;
+        }
+        .nav-icon-btn {
+            position: relative;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: rgba(130,150,255,0.08);
+            border: 1px solid rgba(130,150,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-icon-btn:hover {
+            background: rgba(130,150,255,0.18);
+            border-color: rgba(130,150,255,0.3);
+        }
+        .nav-badge {
+            position: absolute; top: -2px; right: -2px;
+            background: #ff6b6b; color: #fff;
+            font-size: 0.5rem; font-weight: 600;
+            min-width: 15px; height: 15px;
+            border-radius: 8px;
+            display: none;
+            align-items: center; justify-content: center;
+            padding: 0 3px;
+            border: 1.5px solid #0a1028;
+        }
+        .nav-avatar-wrap {
+            position: relative;
+            cursor: pointer;
+        }
+        .nav-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6a85ff, #4a6cff);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #fff; font-size: 14px;
+            border: 2px solid rgba(130,150,255,0.3);
+            transition: all 0.2s;
+        }
+        .nav-avatar-wrap:hover .nav-avatar {
+            border-color: rgba(130,150,255,0.6);
+            box-shadow: 0 0 0 3px rgba(130,150,255,0.12);
+        }
+        .nav-avatar-placeholder {
+            background: rgba(130,150,255,0.1);
+            color: #8a94a6;
+            border-color: rgba(130,150,255,0.2);
+        }
+        .nav-avatar-guest .nav-avatar {
+            background: rgba(130,150,255,0.08);
+        }
+        .nav-username {
+            font-size: 0.58rem;
+            color: #8a94a6;
+            text-align: center;
+            margin-top: 2px;
+            max-width: 48px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        #userInfo .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(90deg, #6a85ff, #4a6cff);
+        /* === 头像下拉菜单 === */
+        .avatar-dropdown {
+            display: none;
+            position: absolute;
+            top: 48px; right: 0;
+            width: 280px;
+            background: linear-gradient(160deg, rgba(22,32,65,0.99), rgba(16,24,52,0.99));
+            border: 1px solid rgba(130,150,255,0.2);
+            border-radius: 14px;
+            box-shadow: 0 12px 50px rgba(0,0,0,0.5);
+            z-index: 200;
+            overflow: hidden;
+        }
+        .avatar-dropdown.show { display: block; }
+        .avatar-dropdown-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px;
+        }
+        .dd-username { color: #e6edf7; font-size: 0.9rem; font-weight: 600; }
+        .dd-email { color: #5a6480; font-size: 0.7rem; margin-top: 2px; }
+        .avatar-dropdown-divider {
+            height: 1px;
+            background: rgba(130,150,255,0.1);
+            margin: 0;
+        }
+        .dd-section-label {
+            padding: 10px 16px 4px;
+            color: #8a94a6;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .dd-settings { padding: 0 16px; }
+        .dd-settings .settings-row { padding: 8px 0; }
+        .dd-btn-group {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            margin-top: 8px;
+        }
+        .dd-logout-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: white;
-            font-size: 14px;
-        }
-
-        #loginBtn, #logoutBtn {
-            padding: 10px 20px;
-            background: linear-gradient(90deg, #6a85ff, #4a6cff);
-            color: #ffffff;
-            border: none;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
+            width: 100%;
+            padding: 10px;
+            margin: 12px 16px 16px;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            border-radius: 10px;
+            color: #ff7272;
+            font-size: 0.82rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(106, 133, 255, 0.3);
+            transition: all 0.2s;
         }
-
-        #loginBtn:hover, #logoutBtn:hover {
-            background: linear-gradient(90deg, #5a75ff, #3a5cff);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(90, 117, 255, 0.4);
+        .dd-logout-btn:hover {
+            background: rgba(255, 107, 107, 0.18);
+            border-color: rgba(255, 107, 107, 0.35);
         }
+        .dd-btn-group button {
+            background: rgba(26,35,69,0.6);
+            border: 1px solid rgba(130,150,255,0.15);
+            border-radius: 8px;
+            color: #c7d1ff;
+            padding: 6px 10px;
+            font-size: 0.72rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center;
+        }
+        .dd-btn-group button:hover {
+            background: rgba(130,150,255,0.12);
+            border-color: rgba(130,150,255,0.3);
+        }
+        .dd-logout-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: #ff9a8b;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .dd-logout-btn:hover { background: rgba(255,107,107,0.08); }
 
-        #logoutBtn {
+        /* === 通知面板 === */
+        .notify-panel {
             display: none;
+            position: absolute;
+            top: 48px; right: 0;
+            width: 300px;
+            background: linear-gradient(160deg, rgba(22,32,65,0.99), rgba(16,24,52,0.99));
+            border: 1px solid rgba(130,150,255,0.2);
+            border-radius: 14px;
+            box-shadow: 0 12px 50px rgba(0,0,0,0.5);
+            z-index: 200;
+            overflow: hidden;
+        }
+        .notify-panel.show { display: block; }
+        .notify-panel-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(130,150,255,0.1);
+        }
+        .notify-close {
+            background: none; border: none; color: #8a94a6;
+            font-size: 1rem; cursor: pointer; padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .notify-close:hover { background: rgba(130,150,255,0.1); }
+        .notify-panel-body { padding: 8px; }
+        .notify-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .notify-item:hover { background: rgba(130,150,255,0.06); }
+        .notify-item-icon { font-size: 1.2rem; flex-shrink: 0; }
+        .notify-item-content { flex: 1; min-width: 0; }
+        .notify-item-title { color: #c7d1ff; font-size: 0.82rem; font-weight: 500; }
+        .notify-item-desc { color: #5a6480; font-size: 0.68rem; margin-top: 2px; }
+        .notify-item-badge {
+            background: #ff6b6b; color: #fff;
+            font-size: 0.55rem; font-weight: 600;
+            min-width: 15px; height: 15px;
+            border-radius: 8px;
+            display: none;
+            align-items: center; justify-content: center;
+            padding: 0 3px;
+        }
+
+        @media (max-width: 640px) {
+            .nav-right {
+                gap: 8px;
+            }
+            .avatar-dropdown, .notify-panel {
+                width: calc(100vw - 40px);
+                max-width: 320px;
+                right: 0;
+            }
         }
 
         .footer {
@@ -687,21 +764,6 @@
             font-weight: 400;
         }
 
-        /* 模块星标（设为目标） */
-        .mp-goal-star {
-            cursor: pointer;
-            font-size: 0.85rem;
-            color: rgba(130,150,255,0.25);
-            transition: all 0.2s;
-            margin-left: 4px;
-            user-select: none;
-        }
-        .mp-goal-star:hover { color: rgba(255,215,0,0.6); }
-        .mp-goal-star.active {
-            color: #ffd700;
-            text-shadow: 0 0 6px rgba(255,215,0,0.4);
-        }
-
         /* 紧凑目标条 */
         .goal-compact {
             display: flex;
@@ -750,10 +812,10 @@
             gap: 4px;
             flex-shrink: 0;
         }
-        /* 目标模块高亮 */
-        .mp-grid .module-progress-item.is-goal-module {
-            border: 1px solid rgba(255,215,0,0.25);
-            background: rgba(255,215,0,0.04);
+        .mp-sub {
+            font-size: 0.68rem;
+            color: #5a6480;
+            margin-top: 4px;
         }
 
         /* 2x2 紧凑网格 */
@@ -1039,15 +1101,29 @@
             aspect-ratio: 1;
             border-radius: 6px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-size: 0.75rem;
             color: #5a6480;
             background: rgba(26, 35, 69, 0.4);
             position: relative;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            padding: 2px;
+            overflow: hidden;
         }
-        .calendar-cell.has-data {
-            color: #e6edf7;
+        .calendar-cell:hover {
+            background: rgba(130, 150, 255, 0.12);
+            transform: scale(1.05);
+        }
+        .calendar-cell.has-flowers {
+            background: rgba(26, 35, 69, 0.6);
+            border: 1px solid rgba(130, 150, 255, 0.2);
+        }
+        .calendar-cell.has-sflower {
+            border-color: rgba(255, 215, 0, 0.35);
+            background: rgba(40, 36, 20, 0.5);
         }
         .calendar-cell .day-num {
             position: absolute;
@@ -1056,7 +1132,38 @@
             font-size: 0.65rem;
             opacity: 0.5;
         }
-        /* 热力等级 */
+        .calendar-cell .flower-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            line-height: 1.1;
+        }
+        .calendar-cell .flower-line {
+            display: flex;
+            align-items: center;
+            gap: 1px;
+            font-size: 0.7rem;
+        }
+        .calendar-cell .flower-line .f-icon-sm {
+            font-size: 0.85rem;
+        }
+        .calendar-cell .flower-line .f-count-s {
+            color: #ffd700;
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+        .calendar-cell .flower-line .f-count-n {
+            color: #ffb0c8;
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+        .calendar-cell .task-hint {
+            font-size: 0.55rem;
+            color: #5a6480;
+            margin-top: 1px;
+        }
+        /* 热力等级（保留兼容但不再使用） */
         .heat-0 { background: rgba(26, 35, 69, 0.4); }
         .heat-1 { background: rgba(130, 150, 255, 0.25); }
         .heat-2 { background: rgba(130, 150, 255, 0.45); }
@@ -1067,6 +1174,8 @@
             .stat-card { min-width: 90px; padding: 12px 8px; }
             .stat-card-value { font-size: 1.4rem; }
             .calendar-cell { font-size: 0.65rem; }
+            .quadrant-grid { grid-template-columns: 1fr; }
+            .viz-tab { padding: 8px 10px; font-size: 0.72rem; }
         }
 
         /* === 目标设定区（顶部优先可见） === */
@@ -1197,6 +1306,112 @@
         .q-add-input:focus { outline: none; border-bottom-color: rgba(130, 150, 255, 0.7); }
         .q-add-input::placeholder { color: rgba(130, 150, 255, 0.3); }
 
+        /* === 四象限笔记本风格 === */
+        .quadrant-notebook {
+            background: linear-gradient(135deg, rgba(40,52,90,0.5), rgba(30,40,72,0.5));
+            border: 1px solid rgba(130, 150, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+        }
+        .quadrant-notebook::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, rgba(255,107,107,0.4), rgba(130,150,255,0.4), rgba(255,183,77,0.4), rgba(100,120,140,0.3));
+            border-radius: 12px 0 0 12px;
+        }
+        .quadrant-notebook .quadrant-grid {
+            margin-top: 0;
+        }
+        .quadrant-notebook .quadrant-cell {
+            border-radius: 8px;
+            padding: 10px 12px;
+            min-height: 70px;
+        }
+
+        /* === 分区域折叠 === */
+        .section-fold {
+            margin-top: 16px;
+        }
+        .section-fold-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+            user-select: none;
+            border-radius: 10px;
+            transition: background 0.2s;
+        }
+        .section-fold-header:hover { background: rgba(130, 150, 255, 0.06); }
+        .section-fold-header .chevron {
+            margin-left: auto;
+            opacity: 0.4;
+            transition: transform 0.3s;
+        }
+        .section-fold-header.open .chevron { transform: rotate(180deg); }
+        .section-fold-header .section-title {
+            color: #8a94a6;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .section-fold-body {
+            display: none;
+            padding: 0 4px;
+        }
+        .section-fold-body.open { display: block; }
+
+        /* === 数据可视化横条（图表+日历切换） === */
+        .viz-bar {
+            display: flex;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(130, 150, 255, 0.15);
+            margin-top: 12px;
+        }
+        .viz-tab {
+            flex: 1;
+            padding: 10px 16px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.78rem;
+            color: #5a6480;
+            background: rgba(18, 28, 58, 0.4);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border-right: 1px solid rgba(130, 150, 255, 0.1);
+        }
+        .viz-tab:last-child { border-right: none; }
+        .viz-tab:hover { color: #8a94a6; background: rgba(26, 35, 69, 0.6); }
+        .viz-tab.active {
+            color: #c7d1ff;
+            background: rgba(26, 35, 69, 0.6);
+        }
+        .viz-tab.active.chart-tab { color: #4ec9b0; border-bottom: 2px solid rgba(78,201,176,0.5); }
+        .viz-tab.active.cal-tab { color: #8299ff; border-bottom: 2px solid rgba(130,150,255,0.5); }
+        .viz-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+            border: 1px solid rgba(130, 150, 255, 0.15);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+        }
+        .viz-content.open {
+            max-height: 500px;
+        }
+        .viz-panel {
+            display: none;
+            padding: 12px;
+        }
+        .viz-panel.active { display: block; }
+
         /* === 日历详情弹窗 === */
         .day-detail-overlay {
             display: none;
@@ -1206,27 +1421,37 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(4px);
         }
         .day-detail-overlay.show { display: flex; }
         .day-detail-panel {
-            background: rgba(18, 28, 58, 0.97);
+            background: linear-gradient(160deg, rgba(22,32,65,0.98), rgba(16,24,52,0.98));
             border: 1px solid rgba(130, 150, 255, 0.25);
             border-radius: 16px;
-            padding: 24px;
-            max-width: 480px;
+            padding: 0;
+            max-width: 500px;
             width: 90%;
             max-height: 85vh;
             overflow-y: auto;
             margin: auto;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 12px 50px rgba(0,0,0,0.6);
         }
-        .day-detail-panel h3 {
-            color: #c7d1ff;
-            font-size: 1rem;
-            margin-bottom: 12px;
+        .day-detail-panel .dd-header {
             display: flex;
             align-items: center;
             gap: 8px;
+            padding: 18px 20px 12px;
+            border-bottom: 1px solid rgba(130,150,255,0.12);
+        }
+        .day-detail-panel .dd-header .dd-date {
+            color: #c7d1ff;
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+        .day-detail-panel .dd-header .dd-sub {
+            font-size: 0.75rem;
+            color: #8a94a6;
+            font-weight: 400;
         }
         .day-detail-panel .close-btn {
             margin-left: auto;
@@ -1235,44 +1460,151 @@
             color: #8a94a6;
             font-size: 1.2rem;
             cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
         }
-        .detail-task-list { margin-bottom: 16px; }
-        .detail-task-item {
+        .day-detail-panel .close-btn:hover { background: rgba(130,150,255,0.1); }
+        .dd-body { padding: 16px 20px 20px; }
+
+        /* === 花朵分区卡片 === */
+        .flower-section {
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(130,150,255,0.15);
+            position: relative;
+        }
+        .flower-section.s-flower {
+            background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(255,180,40,0.03));
+            border-color: rgba(255,215,0,0.2);
+        }
+        .flower-section.n-flower {
+            background: linear-gradient(135deg, rgba(255,176,200,0.06), rgba(255,143,171,0.03));
+            border-color: rgba(255,176,200,0.18);
+        }
+        .flower-section.no-flower {
+            background: rgba(26,35,69,0.4);
+        }
+        .flower-section-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .flower-section-header .fs-icon { font-size: 1.1rem; }
+        .flower-section-header .fs-count {
+            font-size: 0.75rem;
+            color: #8a94a6;
+            font-weight: 400;
+        }
+        .flower-section-header .fs-label-s { color: #ffd700; }
+        .flower-section-header .fs-label-n { color: #ffb0c8; }
+        .flower-section-header .fs-label-none { color: #5a6480; }
+
+        /* === 任务项 === */
+        .dd-task-list { display: flex; flex-direction: column; gap: 4px; }
+        .dd-task-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 0;
-            font-size: 0.85rem;
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 0.82rem;
             color: #c7d1ff;
+            transition: background 0.15s;
         }
-        .detail-task-item.done { opacity: 0.5; }
-        .detail-task-item.done span { text-decoration: line-through; }
-        .detail-task-item .q-tag {
-            font-size: 0.65rem;
+        .dd-task-item:hover { background: rgba(130,150,255,0.06); }
+        .dd-task-item input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: #4ec9b0;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .dd-task-item input[type="checkbox"]:disabled {
+            accent-color: #4ec9b0;
+            opacity: 1;
+        }
+        .dd-task-item.done .task-text { color: #c7d1ff; }
+        .dd-task-item .q-tag {
+            font-size: 0.62rem;
             padding: 1px 6px;
             border-radius: 4px;
             font-weight: 500;
+            flex-shrink: 0;
         }
         .q-tag-IU { background: rgba(255,107,107,0.2); color: #ff8a8a; }
         .q-tag-IN { background: rgba(130,150,255,0.2); color: #8299ff; }
         .q-tag-NU { background: rgba(255,183,77,0.2); color: #ffb74d; }
         .q-tag-NN { background: rgba(100,120,140,0.2); color: #8899aa; }
-        .day-meta {
-            display: flex;
-            gap: 12px;
-            margin-top: 12px;
-            flex-wrap: wrap;
+        .dd-empty-hint {
+            color: #5a6480;
+            font-size: 0.78rem;
+            padding: 4px 0;
         }
-        .day-meta label { color: #8a94a6; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; }
-        .day-meta select, .day-meta textarea {
-            background: rgba(26,35,69,0.6);
-            border: 1px solid rgba(130,150,255,0.25);
+
+        /* === 总结与心情区 === */
+        .dd-summary-section {
+            margin-top: 4px;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(26,35,69,0.5);
+            border: 1px solid rgba(130,150,255,0.12);
+        }
+        .dd-summary-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .dd-summary-header .dd-summary-label {
+            color: #8a94a6;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .dd-mood-picker {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .dd-mood-btn {
+            background: none;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 3px 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: all 0.15s;
+            line-height: 1;
+        }
+        .dd-mood-btn:hover { opacity: 0.7; transform: scale(1.15); }
+        .dd-mood-btn.active {
+            opacity: 1;
+            border-color: rgba(130,150,255,0.4);
+            background: rgba(130,150,255,0.1);
+        }
+        .dd-summary-textarea {
+            width: 100%;
+            min-height: 56px;
+            background: rgba(18,28,58,0.6);
+            border: 1px solid rgba(130,150,255,0.2);
             border-radius: 8px;
             color: #e6edf7;
-            padding: 4px 8px;
-            font-size: 0.8rem;
+            padding: 8px 10px;
+            font-size: 0.82rem;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
         }
-        .day-meta textarea { width: 100%; min-height: 50px; margin-top: 6px; resize: vertical; }
+        .dd-summary-textarea:focus {
+            outline: none;
+            border-color: rgba(130,150,255,0.4);
+        }
+        .dd-summary-textarea::placeholder { color: #3d4868; }
 
         /* === 奖励展示区 === */
         .reward-bar {
@@ -1491,53 +1823,15 @@
             cursor: pointer;
         }
 
-        /* 日历任务勾选 */
-        .calendar-cell .task-dots {
-            display: flex;
-            gap: 2px;
-            justify-content: center;
-            margin-top: 1px;
+        /* 日历花朵点击区域 */
+        .calendar-cell .flower-line {
+            cursor: pointer;
         }
-        .calendar-cell .task-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            border: 1px solid rgba(130,150,255,0.4);
-        }
-        .calendar-cell .task-dot.done {
-            background: #4ec9b0;
-            border-color: #4ec9b0;
-        }
-        .calendar-cell .task-dot.pending {
-            border-style: dashed;
+        .calendar-cell .flower-line:hover .f-icon-sm {
+            filter: brightness(1.3);
         }
 
         /* ===== 团队协作看板 ===== */
-        .collab-corner-btn {
-            position: relative;
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            background: rgba(130,150,255,0.1);
-            border: 1px solid rgba(130,150,255,0.2);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .collab-corner-btn:hover {
-            background: rgba(130,150,255,0.2);
-            border-color: rgba(130,150,255,0.4);
-        }
-        .collab-corner-badge {
-            position: absolute; top: -4px; right: -4px;
-            background: #ff6b6b; color: #fff;
-            font-size: 0.5rem; font-weight: 600;
-            min-width: 15px; height: 15px;
-            border-radius: 8px;
-            display: none;
-            align-items: center; justify-content: center;
-            padding: 0 3px;
-            border: 1.5px solid #0a1028;
-        }
         .collab-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(5,7,20,0.8);
@@ -1716,68 +2010,147 @@
 </head>
 <body>
     <div class="container">
-        <div class="hero">
-            <div class="user-auth">
-                <span id="userInfo"></span>
-                <div class="collab-corner-btn" onclick="openCollabBoard()" title="团队协作看板" style="display:inline-flex;">
-                    <svg width="18" height="18" viewBox="0 0 24 24">
-                        <path d="M9 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-4M9 7V5a3 3 0 016 0v2M9 7h6" stroke="#8299ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        <path d="M9 13l2 2 4-4" stroke="#4ec9b0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                    </svg>
-                    <span class="collab-corner-badge" id="collabBadge"></span>
+        <div class="nav-right">
+            <!-- 通知/信息图标 -->
+            <div class="nav-btn-wrap">
+                <div class="nav-icon-btn" id="navNotifyBtn" onclick="toggleNotifyPanel(event)" title="通知与协作">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0" stroke="#c7d1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <span class="nav-badge" id="navNotifyBadge"></span>
                 </div>
-                <button id="loginBtn" onclick="window.location.href='login.html'"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" stroke="#8299ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>登录/注册</button>
-                <button id="logoutBtn" onclick="handleLogout()"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="#ff9a8b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>登出</button>
+                <!-- 通知面板 -->
+                <div class="notify-panel" id="notifyPanel">
+                    <div class="notify-panel-header">
+                        <span style="font-weight:600;color:#c7d1ff;font-size:0.9rem;">通知</span>
+                        <button class="notify-close" onclick="closeNotifyPanel()">✕</button>
+                    </div>
+                    <div class="notify-panel-body" id="notifyPanelBody">
+                        <!-- 团队协作看板入口 -->
+                        <div class="notify-item notify-collab" onclick="openCollabBoard()">
+                            <div class="notify-item-icon">🤝</div>
+                            <div class="notify-item-content">
+                                <div class="notify-item-title">团队协作看板</div>
+                                <div class="notify-item-desc" id="notifyCollabDesc">查看分工与反馈</div>
+                            </div>
+                            <span class="notify-item-badge" id="notifyCollabBadge"></span>
+                        </div>
+                        <!-- 系统更新 -->
+                        <div class="notify-item">
+                            <div class="notify-item-icon">🔄</div>
+                            <div class="notify-item-content">
+                                <div class="notify-item-title">系统更新</div>
+                                <div class="notify-item-desc">当前版本 v24</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- 头像 -->
+            <div class="nav-btn-wrap">
+                <div class="nav-avatar-wrap" id="navAvatarWrap" style="display:none;" onclick="toggleAvatarMenu(event)">
+                    <div class="nav-avatar" id="navAvatar">D</div>
+                    <div class="nav-username" id="navUsername">用户</div>
+                </div>
+
+                <!-- 未登录头像 -->
+                <div class="nav-avatar-wrap nav-avatar-guest" id="navAvatarGuest" onclick="window.location.href='login.html'">
+                    <div class="nav-avatar nav-avatar-placeholder">
+                        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="12" cy="7" r="4" stroke="#8a94a6" stroke-width="2" fill="none"/></svg>
+                    </div>
+                </div>
+
+                <!-- 头像下拉菜单 -->
+                <div class="avatar-dropdown" id="avatarDropdown">
+                    <div class="avatar-dropdown-header">
+                        <div class="nav-avatar" style="width:40px;height:40px;font-size:16px;" id="ddAvatar">D</div>
+                        <div>
+                            <div class="dd-username" id="ddUsername">用户</div>
+                            <div class="dd-email" id="ddEmail"></div>
+                        </div>
+                    </div>
+                    <div class="avatar-dropdown-divider"></div>
+                    <div class="dd-section-label">设置</div>
+                    <div class="dd-settings" id="ddSettings">
+                        <!-- 音效控制 -->
+                        <div class="settings-row">
+                            <div class="settings-label">
+                                <span style="font-size:1rem;margin-right:6px;">🔊</span>
+                                <div><div style="color:#c7d1ff;font-size:0.82rem;">音效</div><div style="color:#5a6480;font-size:0.68rem;">答题反馈与结算音效</div></div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="sfxToggle" onchange="toggleSFX(this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <!-- 数据管理 -->
+                        <div style="border-top:1px solid rgba(130,150,255,0.12);margin:10px 0;padding-top:10px;">
+                            <div style="color:#8a94a6;font-size:0.72rem;margin-bottom:8px;">数据管理</div>
+                            <div class="dd-btn-group">
+                                <button onclick="exportData()"><svg width="13" height="13" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:3px;"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 17v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="#7c9fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>导出</button>
+                                <button onclick="importData()"><svg width="13" height="13" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:3px;"><path d="M12 21V9m0 0l-4 4m4-4l4 4M5 7V5a2 2 0 012-2h10a2 2 0 012 2v2" stroke="#4ec9b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>导入</button>
+                                <button onclick="clearData()"><svg width="13" height="13" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:3px;"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-9 0v12a2 2 0 002 2h6a2 2 0 002-2V7" stroke="#ff7272" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>清除</button>
+                                <button onclick="openBackups()"><svg width="13" height="13" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:3px;"><ellipse cx="12" cy="6" rx="8" ry="3" stroke="#c9a0ff" stroke-width="2" fill="none"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6" stroke="#c9a0ff" stroke-width="2" fill="none"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" stroke="#c9a0ff" stroke-width="2" fill="none"/></svg>恢复</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="avatar-dropdown-divider"></div>
+                    <button class="dd-logout-btn" onclick="handleLogout()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:6px;"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="#ff9a8b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>登出
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero">
             <h1>雅思词汇学习中心</h1>
             <h2>选择适合你的词汇学习模式</h2>
         </div>
 
         <div class="module-grid">
             <a href="ebbinghaus.html" class="module-card" data-module="ebbinghaus">
-                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8299ff"/><stop offset="100%" stop-color="#5b6eff"/></linearGradient></defs><path d="M8 10c0-1.1.9-2 2-2h7c1.1 0 2 .9 2 2v20c0-1.1-.9-2-2-2h-7c-1.1 0-2-.9-2-2V10z" fill="url(#g1)"/><path d="M32 10c0-1.1-.9-2-2-2h-7c-1.1 0-2 .9-2 2v20c0-1.1.9-2 2-2h7c1.1 0 2-.9 2-2V10z" fill="url(#g1)" opacity="0.65"/><path d="M14 14h4M14 18h4M22 14h4M22 18h4" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/></svg></div>
+                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8299ff"/><stop offset="100%" stop-color="#5b6eff"/></linearGradient></defs><path d="M10 9c0-1.1.9-2 2-2h7c1.1 0 2 .9 2 2v22c0-1.1-.9-2-2-2h-7c-1.1 0-2-.9-2-2V9z" fill="url(#g1)"/><path d="M30 9c0-1.1-.9-2-2-2h-7c-1.1 0-2 .9-2 2v22c0-1.1.9-2 2-2h7c1.1 0 2-.9 2-2V9z" fill="url(#g1)" opacity="0.5"/><path d="M13 13h5M13 17h5M13 21h3M24 13h5M24 17h5M24 21h3" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity="0.6"/></svg></div>
                 <div class="card-body">
                     <h3>艾宾浩斯宇宙版</h3>
                     <p>遗忘曲线智能记忆 · 雅思5.5→7.0核心词</p>
                 </div>
                 <div class="card-progress">
                     <div class="card-bar"><div class="card-bar-fill mp-fill-ebb" id="mpEbbFill" style="width:0%"></div></div>
-                    <div class="card-meta"><span id="mpEbbCount">0 / 475</span><span class="mp-goal-star" id="mpStar-ebbinghaus" onclick="event.preventDefault();event.stopPropagation();setGoalModule('ebbinghaus')" title="设为每日目标">☆</span></div>
+                    <div class="card-meta"><span id="mpEbbCount">0 / 475</span></div>
                     <div class="card-sub" id="mpEbbSub"></div>
                 </div>
                 <div class="card-arrow"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
             </a>
 
             <a href="synonyms.html" class="module-card" data-module="synonyms">
-                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4ec9b0"/><stop offset="100%" stop-color="#2da89a"/></linearGradient></defs><path d="M10 12h7M10 16h5M23 12h7M25 16h5" stroke="url(#g2)" stroke-width="2.2" stroke-linecap="round"/><path d="M14 22c2-3 4-4 6-4s4 1 6 4" stroke="url(#g2)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M14 22l-2 2M26 22l2 2" stroke="url(#g2)" stroke-width="2" stroke-linecap="round"/><circle cx="20" cy="28" r="2.5" fill="url(#g2)"/></svg></div>
+                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4ec9b0"/><stop offset="100%" stop-color="#2da89a"/></linearGradient></defs><path d="M10 8c0-1.1.9-2 2-2h9c1.1 0 2 .9 2 2v24c0-1.1-.9-2-2-2h-9c-1.1 0-2-.9-2-2V8z" fill="url(#g2)" opacity="0.25"/><path d="M20 8c0-1.1.9-2 2-2h9c1.1 0 2 .9 2 2v20c0 1.1-.9 2-2 2h-9c-1.1 0-2-.9-2-2V8z" fill="url(#g2)"/><path d="M24 14h5M24 18h5" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/><path d="M13 16l-3 3 3 3M10 19h7" stroke="url(#g2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M27 24l3-3-3-3M30 21h-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.7"/></svg></div>
                 <div class="card-body">
                     <h3>高频同义替换</h3>
                     <p>10组话题 · 雅思6.0→6.5提分</p>
                 </div>
                 <div class="card-progress">
                     <div class="card-bar"><div class="card-bar-fill mp-fill-syn" id="mpSynFill" style="width:0%"></div></div>
-                    <div class="card-meta"><span id="mpSynCount">0 / 80</span><span class="mp-goal-star" id="mpStar-synonyms" onclick="event.preventDefault();event.stopPropagation();setGoalModule('synonyms')" title="设为每日目标">☆</span></div>
+                    <div class="card-meta"><span id="mpSynCount">0 / 80</span></div>
                     <div class="card-sub" id="mpSynSub"></div>
                 </div>
                 <div class="card-arrow"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
             </a>
 
             <a href="errorbook.html" class="module-card" data-module="errorbook">
-                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff9a56"/><stop offset="100%" stop-color="#ff7a3d"/></linearGradient></defs><path d="M20 8l2.5 6 6.5.5-5 4.3 1.5 6.2L20 21.5 14.5 25l1.5-6.2-5-4.3 6.5-.5L20 8z" fill="url(#g3)" opacity="0.85"/><path d="M16 30l8 0M18 33l4 0" stroke="url(#g3)" stroke-width="2" stroke-linecap="round"/></svg></div>
+                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff9a56"/><stop offset="100%" stop-color="#ff7a3d"/></linearGradient></defs><path d="M20 7l2.8 6.7 7.2.6-5.5 4.7 1.7 7L20 22.3 13.8 26l1.7-7L10 14.3l7.2-.6L20 7z" fill="url(#g3)" opacity="0.9"/><path d="M14 30.5h12" stroke="url(#g3)" stroke-width="2.2" stroke-linecap="round"/><path d="M16.5 34h7" stroke="url(#g3)" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/></svg></div>
                 <div class="card-body">
                     <h3>错词本</h3>
                     <p>自动收录错词 · 筛选复习 · 连续答对后移出</p>
                 </div>
                 <div class="card-progress">
                     <div class="card-bar"><div class="card-bar-fill mp-fill-err" id="mpErrFill" style="width:0%"></div></div>
-                    <div class="card-meta"><span id="mpErrCount">0 个错词</span><span class="mp-goal-star" id="mpStar-errorbook" onclick="event.preventDefault();event.stopPropagation();setGoalModule('errorbook')" title="设为每日目标">☆</span></div>
+                    <div class="card-meta"><span id="mpErrCount">0 个错词</span></div>
                     <div class="card-sub" id="mpErrSub">答错自动收录 · 连续答对自动移出</div>
                 </div>
                 <div class="card-arrow"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
             </a>
 
             <a href="spelling.html" class="module-card" data-module="spelling">
-                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff6b6b"/><stop offset="100%" stop-color="#ee4a4a"/></linearGradient></defs><path d="M28 6l4 4-16 16-6 2 2-6L28 6z" fill="url(#g4)" opacity="0.85"/><path d="M26 8l4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/><path d="M10 32l4-4M8 34l2-2" stroke="url(#g4)" stroke-width="2" stroke-linecap="round"/></svg></div>
+                <div class="icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff6b6b"/><stop offset="100%" stop-color="#ee4a4a"/></linearGradient></defs><path d="M29 7l4 4-17 17-5 2 2-5L29 7z" fill="url(#g4)" opacity="0.9"/><path d="M27 9l4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/><rect x="9" y="30" width="14" height="2.5" rx="1" fill="url(#g4)" opacity="0.5"/></svg></div>
                 <div class="card-body">
                     <h3>拼写练习</h3>
                     <p>导入词库 · 三种模式 · 沉浸拼写</p>
@@ -1841,101 +2214,118 @@
                     </div>
                 </div>
 
-                <!-- ========== 今日任务 ========== -->
-                <div style="margin-top:16px;">
-                    <div class="quadrant-grid">
-                        <div class="quadrant-cell q-IU" onclick="focusQuadrantInput('IU')">
-                            <div class="q-label">🔴 重要且紧急</div>
-                            <div class="q-tasks" id="qTasks-IU"></div>
-                            <input class="q-add-input" id="qInput-IU" placeholder="输入任务后回车…" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')addTaskFromInput('IU')">
-                        </div>
-                        <div class="quadrant-cell q-IN" onclick="focusQuadrantInput('IN')">
-                            <div class="q-label">🔵 重要不紧急</div>
-                            <div class="q-tasks" id="qTasks-IN"></div>
-                            <input class="q-add-input" id="qInput-IN" placeholder="输入任务后回车…" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')addTaskFromInput('IN')">
-                        </div>
-                        <div class="quadrant-cell q-NU" onclick="focusQuadrantInput('NU')">
-                            <div class="q-label">🟡 不重要但紧急</div>
-                            <div class="q-tasks" id="qTasks-NU"></div>
-                            <input class="q-add-input" id="qInput-NU" placeholder="输入任务后回车…" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')addTaskFromInput('NU')">
-                        </div>
-                        <div class="quadrant-cell q-NN" onclick="focusQuadrantInput('NN')">
-                            <div class="q-label">⚪ 不重要不紧急</div>
-                            <div class="q-tasks" id="qTasks-NN"></div>
-                            <input class="q-add-input" id="qInput-NN" placeholder="输入任务后回车…" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')addTaskFromInput('NN')">
+                <!-- ========== 四象限笔记本（独立折叠） ========== -->
+                <div class="section-fold">
+                    <div class="section-fold-header open" onclick="toggleFold(this)">
+                        <span class="section-title">📓 今日任务 · 四象限</span>
+                        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    </div>
+                    <div class="section-fold-body open" id="quadrantFoldBody">
+                        <div class="quadrant-notebook" style="margin-top:8px;">
+                            <div class="quadrant-grid">
+                                <div class="quadrant-cell q-IU" onclick="focusQuadrantInput('IU')">
+                                    <div class="q-label">🔴 重要且紧急</div>
+                                    <div class="q-tasks" id="qTasks-IU"></div>
+                                    <input class="q-add-input" id="qInput-IU" placeholder="输入任务后回车…" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')addTaskFromInput('IU')">
+                                </div>
+                                <div class="quadrant-cell q-IN" onclick="focusQuadrantInput('IN')">
+                                    <div class="q-label">🔵 重要不紧急</div>
+                                    <div class="q-tasks" id="qTasks-IN"></div>
+                                    <input class="q-add-input" id="qInput-IN" placeholder="输入任务后回车…" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')addTaskFromInput('IN')">
+                                </div>
+                                <div class="quadrant-cell q-NU" onclick="focusQuadrantInput('NU')">
+                                    <div class="q-label">🟡 不重要但紧急</div>
+                                    <div class="q-tasks" id="qTasks-NU"></div>
+                                    <input class="q-add-input" id="qInput-NU" placeholder="输入任务后回车…" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')addTaskFromInput('NU')">
+                                </div>
+                                <div class="quadrant-cell q-NN" onclick="focusQuadrantInput('NN')">
+                                    <div class="q-label">⚪ 不重要不紧急</div>
+                                    <div class="q-tasks" id="qTasks-NN"></div>
+                                    <input class="q-add-input" id="qInput-NN" placeholder="输入任务后回车…" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')addTaskFromInput('NN')">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ========== 奖励与创造 ========== -->
+                <!-- ========== 奖励兑换（独立折叠） ========== -->
+                <div class="section-fold">
+                    <div class="section-fold-header open" onclick="toggleFold(this)">
+                        <span class="section-title">🎁 奖励与兑换</span>
+                        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    </div>
+                    <div class="section-fold-body open" id="rewardFoldBody">
+                        <div style="margin-top:8px;">
+                            <!-- 小红花余额 + 许愿按钮 -->
+                            <div class="reward-bar">
+                                <div class="flower-group">
+                                    <div class="flower-item" id="flowerSItem">
+                                        <span class="f-icon gold" id="flowerS">🏵️</span>
+                                        <span class="f-num gold" id="flowerSCount">0</span>
+                                    </div>
+                                    <div class="flower-item">
+                                        <span class="f-icon">🌸</span>
+                                        <span class="f-num pink" id="flowerCount">0</span>
+                                    </div>
+                                    <span id="aplusBadges"></span>
+                                </div>
+                                <div class="btn-area">
+                                    <div class="btn-row">
+                                        <button class="wish-btn" onclick="openWishPanel()">🎁 许愿兑换</button>
+                                        <button class="info-circle-btn" id="rewardInfoBtn" onclick="toggleRewardInfo()" title="小红花规则">
+                                            <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="12" y="16.5" text-anchor="middle" fill="currentColor" font-size="13" font-weight="700" font-family="Arial">i</text></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 小红花规则卡片 -->
+                            <div class="reward-info-card" id="rewardInfoCard">
+                                <div class="reward-info-header">
+                                    <span>🏵️ 小红花规则</span>
+                                    <button onclick="toggleRewardInfo()" style="background:none;border:none;color:#5a6480;cursor:pointer;font-size:1.1rem;">✕</button>
+                                </div>
+                                <div class="reward-info-body">
+                                    <div class="reward-rule-item">
+                                        <span class="reward-rule-icon s-flower-icon">🏵️</span>
+                                        <div><b style="color:#ffd700;">S级小红花</b><br><span style="color:#5a6480;">完成全部 🔴重要且紧急 任务后获得</span></div>
+                                    </div>
+                                    <div class="reward-rule-item">
+                                        <span class="reward-rule-icon">🌸</span>
+                                        <div><b style="color:#ffb74d;">额外小红花</b><br><span style="color:#5a6480;">S级获得后，每完成1个其他任务 +1朵</span></div>
+                                    </div>
+                                    <div class="reward-rule-divider"></div>
+                                    <div class="reward-rule-item">
+                                        <span style="color:#ff6b6b;font-size:0.85rem;">⚠️</span>
+                                        <div><span style="color:#8a94a6;">先做不重要的任务不会获得小红花。<br>只有拿到 🏵️S级 后，已完成的其他任务才会<span style="color:#ffb74d;">同时发放</span>小花。</span></div>
+                                    </div>
+                                    <div class="reward-rule-divider"></div>
+                                    <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
+                                        <b style="color:#8a94a6;">许愿兑换（普通小花 🌸）</b><br>
+                                        🌈 出去玩 · 1朵/60min<br>
+                                        💪 运动 · 1朵/30min<br>
+                                        📖 翻词典 · 1朵/3词<br>
+                                        😴 睡觉休息 · 1朵/60min
+                                    </div>
+                                    <div class="reward-rule-divider"></div>
+                                    <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
+                                        <b style="color:#ffd700;">S级专属（🏵️ 3朵 = 1个创造空间）</b><br>
+                                        创造主题式/项目制空间，设定世界法则<br>
+                                        <span style="color:#96c8ff;">❄️ 板块冻结中 · 集齐3🏵️后冰块融化解锁</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== 创造空间 + 项目广场（不折叠，独立区域） ========== -->
                 <div style="margin-top:16px;">
-                    <!-- 小红花余额 + 许愿按钮 -->
-                    <div class="reward-bar">
-                        <div class="flower-group">
-                            <div class="flower-item" id="flowerSItem">
-                                <span class="f-icon gold" id="flowerS">🏵️</span>
-                                <span class="f-num gold" id="flowerSCount">0</span>
-                            </div>
-                            <div class="flower-item">
-                                <span class="f-icon">🌸</span>
-                                <span class="f-num pink" id="flowerCount">0</span>
-                            </div>
-                            <span id="aplusBadges"></span>
-                        </div>
-                        <div class="btn-area">
-                            <div class="btn-row">
-                                <button class="wish-btn" onclick="openWishPanel()">🎁 许愿兑换</button>
-                                <button class="info-circle-btn" id="rewardInfoBtn" onclick="toggleRewardInfo()" title="小红花规则">
-                                    <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="12" y="16.5" text-anchor="middle" fill="currentColor" font-size="13" font-weight="700" font-family="Arial">i</text></svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 小红花规则卡片 -->
-                    <div class="reward-info-card" id="rewardInfoCard">
-                        <div class="reward-info-header">
-                            <span>🏵️ 小红花规则</span>
-                            <button onclick="toggleRewardInfo()" style="background:none;border:none;color:#5a6480;cursor:pointer;font-size:1.1rem;">✕</button>
-                        </div>
-                        <div class="reward-info-body">
-                            <div class="reward-rule-item">
-                                <span class="reward-rule-icon s-flower-icon">🏵️</span>
-                                <div><b style="color:#ffd700;">S级小红花</b><br><span style="color:#5a6480;">完成全部 🔴重要且紧急 任务后获得</span></div>
-                            </div>
-                            <div class="reward-rule-item">
-                                <span class="reward-rule-icon">🌸</span>
-                                <div><b style="color:#ffb74d;">额外小红花</b><br><span style="color:#5a6480;">S级获得后，每完成1个其他任务 +1朵</span></div>
-                            </div>
-                            <div class="reward-rule-divider"></div>
-                            <div class="reward-rule-item">
-                                <span style="color:#ff6b6b;font-size:0.85rem;">⚠️</span>
-                                <div><span style="color:#8a94a6;">先做不重要的任务不会获得小红花。<br>只有拿到 🏵️S级 后，已完成的其他任务才会<span style="color:#ffb74d;">同时发放</span>小花。</span></div>
-                            </div>
-                            <div class="reward-rule-divider"></div>
-                            <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
-                                <b style="color:#8a94a6;">许愿兑换（普通小花 🌸）</b><br>
-                                🌈 出去玩 · 1朵/60min<br>
-                                💪 运动 · 1朵/30min<br>
-                                📖 翻词典 · 1朵/3词<br>
-                                😴 睡觉休息 · 1朵/60min
-                            </div>
-                            <div class="reward-rule-divider"></div>
-                            <div style="color:#5a6480;font-size:0.7rem;line-height:1.6;">
-                                <b style="color:#ffd700;">S级专属（🏵️ 3朵 = 1个创造空间）</b><br>
-                                创造主题式/项目制空间，设定世界法则<br>
-                                <span style="color:#96c8ff;">❄️ 板块冻结中 · 集齐3🏵️后冰块融化解锁</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 创造空间 + 项目广场 -->
-                    <div class="quick-grid" style="margin-top:8px;">
+                    <div class="quick-grid">
                         <div class="quick-tile" id="dreamSpaceCard" onclick="openDreamSpaceOrWish()" style="position:relative;overflow:hidden;">
-                            <!-- 冰封覆盖层 -->
                             <div class="ice-overlay" id="dreamIce">
                                 <div class="ice-texture"></div>
                                 <div class="ice-label">❄️ 集齐 3 🏵️ 解冻</div>
                             </div>
-                            <!-- 融化动画层 -->
                             <div class="melt-overlay" id="dreamMelt" style="display:none;">
                                 <div class="melt-water"></div>
                             </div>
@@ -1951,23 +2341,26 @@
                     </div>
                 </div>
 
-                <!-- ========== 数据回顾 ========== -->
+                <!-- ========== 数据可视化横条（图表+日历切换） ========== -->
                 <div style="margin-top:16px;">
-                    <!-- 小红花折线图 -->
-                    <div class="chart-container">
-                        <canvas id="learningChart"></canvas>
-                    </div>
-                    <!-- 打卡日历（子折叠） -->
-                    <div style="margin-top:12px;">
-                        <div style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:8px 0;" onclick="toggleCalendar()">
-                            <svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#8299ff" stroke-width="2" fill="none"/><path d="M3 9h18M8 3v4M16 3v4" stroke="#8299ff" stroke-width="2" stroke-linecap="round"/></svg>
-                            <span style="color:#8a94a6;font-size:0.85rem;">打卡日历</span>
-                            <span id="calMonthLabel" style="margin-left:8px;color:#c7d1ff;font-size:0.85rem;">2026-07</span>
-                            <svg class="chevron" id="calChevron" width="14" height="14" viewBox="0 0 24 24" style="margin-left:auto;opacity:0.4;transition:transform 0.3s;"><path d="M6 9l6 6 6-6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <div class="viz-bar" id="vizBar">
+                        <div class="viz-tab chart-tab" id="vizTabChart" onclick="toggleViz('chart')">
+                            📊 任务曲线
                         </div>
-                        <div id="calendarWrapper" style="display:none;padding-top:8px;">
+                        <div class="viz-tab cal-tab" id="vizTabCal" onclick="toggleViz('cal')">
+                            📅 打卡日历
+                        </div>
+                    </div>
+                    <div class="viz-content" id="vizContent">
+                        <div class="viz-panel" id="vizPanelChart">
+                            <div class="chart-container">
+                                <canvas id="learningChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="viz-panel" id="vizPanelCal">
                             <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:8px;">
                                 <button class="calendar-nav" id="calPrev"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;"><path d="M15 6l-6 6 6 6" stroke="#c7d1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></button>
+                                <span id="calMonthLabel" style="color:#c7d1ff;font-size:0.85rem;">2026-07</span>
                                 <button class="calendar-nav" id="calNext"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;"><path d="M9 6l6 6-6 6" stroke="#c7d1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></button>
                             </div>
                             <div class="calendar-grid" id="calendarDayHeaders"></div>
@@ -1982,37 +2375,6 @@
                 </div>
             </div><!-- /dashboard-body -->
         </div>
-
-        <div class="special-section">
-            <h3 id="settingsToggle" onclick="toggleSettings()">
-                <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="#8299ff" stroke-width="2" fill="none"/><path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.08 7.08l4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.08-7.08l4.24-4.24" stroke="#8299ff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
-                设置
-                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" style="margin-left:auto;"><path d="M6 9l6 6 6-6" stroke="#8a94a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-            </h3>
-            <div class="settings-body" id="settingsBody">
-                <!-- 音效控制 -->
-                <div class="settings-row">
-                    <div class="settings-label">
-                        <span style="font-size:1rem;margin-right:6px;">🔊</span>
-                        <div><div style="color:#c7d1ff;font-size:0.85rem;">音效</div><div style="color:#5a6480;font-size:0.7rem;">答题反馈与结算音效</div></div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="sfxToggle" onchange="toggleSFX(this.checked)">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <!-- 数据管理 -->
-                <div style="border-top:1px solid rgba(130,150,255,0.12);margin:12px 0;padding-top:12px;">
-                    <div style="color:#8a94a6;font-size:0.75rem;margin-bottom:8px;">数据管理</div>
-                    <div class="btn-group">
-                        <button onclick="exportData()"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 17v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="#7c9fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>导出</button>
-                        <button onclick="importData()"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path d="M12 21V9m0 0l-4 4m4-4l4 4M5 7V5a2 2 0 012-2h10a2 2 0 012 2v2" stroke="#4ec9b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>导入</button>
-                        <button onclick="clearData()"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-9 0v12a2 2 0 002 2h6a2 2 0 002-2V7" stroke="#ff7272" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>清除</button>
-                        <button onclick="openBackups()"><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><ellipse cx="12" cy="6" rx="8" ry="3" stroke="#c9a0ff" stroke-width="2" fill="none"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6" stroke="#c9a0ff" stroke-width="2" fill="none"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" stroke="#c9a0ff" stroke-width="2" fill="none"/></svg>恢复</button>
-                    </div>
-                </div>
-            </div>
-         </div>
 
         <div class="footer">
              © 2026 雅思词汇学习中心 | 架构设计：艾宾浩斯宇宙版
@@ -2034,27 +2396,13 @@
     <!-- 日历详情弹窗 -->
     <div class="day-detail-overlay" id="dayDetailOverlay" onclick="if(event.target===this)closeDayDetail()">
         <div class="day-detail-panel">
-            <h3>
-                <svg width="16" height="16" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#8299ff" stroke-width="2" fill="none"/><path d="M3 9h18M8 3v4M16 3v4" stroke="#8299ff" stroke-width="2" stroke-linecap="round"/></svg>
-                <span id="dayDetailTitle">2026-07-08</span>
+            <div class="dd-header">
+                <span class="dd-date" id="dayDetailTitle">2026-07-08</span>
+                <span class="dd-sub" id="dayDetailSub"></span>
                 <button class="close-btn" onclick="closeDayDetail()">✕</button>
-            </h3>
-            <div class="detail-task-list" id="dayDetailTasks"></div>
-            <div class="day-meta">
-                <label>心情
-                    <select id="dayMood" onchange="saveDayMeta()">
-                        <option value="">--</option>
-                        <option value="😊">😊 开心</option>
-                        <option value="😌">😌 平静</option>
-                        <option value="😤">😤 加油</option>
-                        <option value="😢">😢 低落</option>
-                        <option value="🤯">🤯 爆炸</option>
-                    </select>
-                </label>
             </div>
-            <div class="day-meta" style="flex-direction:column;">
-                <label>今日总结（选填）</label>
-                <textarea id="daySummary" placeholder="写点什么…" onblur="saveDayMeta()"></textarea>
+            <div class="dd-body" id="dayDetailBody">
+                <!-- 动态渲染 -->
             </div>
         </div>
     </div>
@@ -2083,8 +2431,21 @@
                 </div>
                 <div id="wishManageList" style="max-height:200px;overflow-y:auto;"></div>
                 <div id="hiddenDefaultsRow" style="margin-top:4px;"></div>
-                <div id="randomRefreshRow" style="display:none;text-align:center;margin-top:6px;">
-                    <button onclick="refreshRandomAndRender()" style="background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.2);color:#8299ff;border-radius:6px;padding:4px 12px;font-size:0.7rem;cursor:pointer;">🔄 换一批</button>
+                <div id="selectedDisplayRow" style="display:none;text-align:center;margin-top:6px;">
+                    <button id="showMoreWishesBtn" onclick="showMoreWishes()" style="background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.2);color:#8299ff;border-radius:6px;padding:4px 12px;font-size:0.7rem;cursor:pointer;">显示更多 ▼</button>
+                </div>
+                <div id="randomRefreshRow" style="display:none;margin-top:6px;">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                        <span style="font-size:0.7rem;color:#8a94a6;">随机摇</span>
+                        <select id="randomPickCountSel" onchange="changeRandomPickCount(this.value)" style="background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.2);border-radius:4px;padding:2px 6px;color:#c7d1ff;font-size:0.7rem;">
+                            <option value="1">1 个</option>
+                            <option value="2">2 个</option>
+                            <option value="3" selected>3 个</option>
+                            <option value="4">4 个</option>
+                            <option value="5">5 个</option>
+                        </select>
+                        <button onclick="refreshRandomAndRender()" style="background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.2);color:#8299ff;border-radius:6px;padding:4px 12px;font-size:0.7rem;cursor:pointer;">🔄 换一批</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2154,7 +2515,7 @@
                 try {
                     const data = localStorage.getItem('ielts_learning_system');
                     if (!data) {
-                        alert('暂无学习数据可导出');
+                        customAlert('暂无学习数据可导出');
                         return;
                     }
                     
@@ -2167,10 +2528,10 @@
                     a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
-                    alert('数据导出成功！');
+                    customAlert('数据导出成功！', '导出');
                 } catch (error) {
                     console.error('Error exporting data:', error);
-                    alert('数据导出失败，请重试');
+                    customAlert('数据导出失败，请重试');
                 }
             }
 
@@ -2187,10 +2548,10 @@
                         try {
                             const data = e.target.result;
                             localStorage.setItem('ielts_learning_system', data);
-                            alert('数据导入成功！请刷新页面以应用更改');
+                            customAlert('数据导入成功！请刷新页面以应用更改', '导入');
                         } catch (error) {
                             console.error('Error importing data:', error);
-                            alert('数据导入失败，请检查文件格式');
+                            customAlert('数据导入失败，请检查文件格式');
                         }
                     };
                     reader.readAsText(file);
@@ -2199,16 +2560,16 @@
             }
 
             function clearData() {
-                if (confirm('确定要清除所有学习数据吗？删除前会自动生成一个备份，可随时在「恢复备份」中还原。')) {
+                customConfirm('确定要清除所有学习数据吗？<br>删除前会自动生成一个备份，可随时在「恢复备份」中还原。', '清除数据', function() {
                     try {
                         if (window.BackupManager) BackupManager.createBackup('清空前自动备份');
                         localStorage.removeItem('ielts_learning_system');
-                        alert('数据已清除！如需找回，可在「恢复备份」中还原。');
+                        customAlert('数据已清除！如需找回，可在「恢复备份」中还原。');
                     } catch (error) {
                         console.error('Error clearing data:', error);
-                        alert('数据清除失败，请重试');
+                        customAlert('数据清除失败，请重试');
                     }
-                }
+                });
             }
 
             // ---------- 检查更新 ----------
@@ -2226,7 +2587,7 @@
                     window.location.href = window.location.pathname + '?v=' + Date.now();
                 } catch (e) {
                     console.error('更新失败:', e);
-                    alert('更新失败，请手动清除浏览器缓存后重新打开');
+                    customAlert('更新失败，请手动清除浏览器缓存后重新打开');
                 }
             }
 
@@ -2273,33 +2634,37 @@
                 if (!window.BackupManager) return;
                 BackupManager.createBackup('手动备份');
                 renderBackups();
-                alert('已创建备份 ✓');
+                customAlert('已创建备份 ✓', '备份');
             }
 
             function restoreBackupById(id) {
-                if (!confirm('恢复到该备份会覆盖当前学习数据，确定吗？')) return;
-                if (BackupManager.restoreBackup(id)) {
-                    alert('已恢复！请刷新页面查看。');
-                    closeBackups();
-                } else {
-                    alert('恢复失败，备份不存在');
-                }
+                customConfirm('恢复到该备份会覆盖当前学习数据，确定吗？', '恢复备份', function() {
+                    if (BackupManager.restoreBackup(id)) {
+                        customAlert('已恢复！请刷新页面查看。');
+                        closeBackups();
+                        location.reload();
+                    } else {
+                        customAlert('恢复失败，备份不存在');
+                    }
+                });
             }
 
             function deleteBackupById(id) {
-                if (!confirm('确定删除该备份？')) return;
-                BackupManager.deleteBackup(id);
-                renderBackups();
+                customConfirm('确定删除该备份？', '删除备份', function() {
+                    BackupManager.deleteBackup(id);
+                    renderBackups();
+                });
             }
 
             // 处理登出
             async function handleLogout() {
                 try {
+                    document.getElementById('avatarDropdown').classList.remove('show');
                     await logoutUser();
-                    alert('登出成功！');
+                    customAlert('登出成功！');
                 } catch (error) {
                     console.error('Logout error:', error);
-                    alert('登出失败，请重试');
+                    customAlert('登出失败，请重试');
                 }
             }
 
@@ -2332,17 +2697,17 @@
                             const email = user.email || '';
                             const username = generateUsername(email);
                             const initial = username.charAt(0).toUpperCase();
-                            document.getElementById('userInfo').innerHTML = `
-                                <div class="avatar">${initial}</div>
-                                <span>欢迎，${username}</span>
-                            `;
-                            document.getElementById('userInfo').style.display = 'flex';
-                            document.getElementById('loginBtn').style.display = 'none';
-                            document.getElementById('logoutBtn').style.display = 'block';
+                            // 头像
+                            document.getElementById('navAvatar').textContent = initial;
+                            document.getElementById('navUsername').textContent = username;
+                            document.getElementById('ddAvatar').textContent = initial;
+                            document.getElementById('ddUsername').textContent = username;
+                            document.getElementById('ddEmail').textContent = email;
+                            document.getElementById('navAvatarWrap').style.display = 'flex';
+                            document.getElementById('navAvatarGuest').style.display = 'none';
                         } else {
-                            document.getElementById('userInfo').style.display = 'none';
-                            document.getElementById('loginBtn').style.display = 'block';
-                            document.getElementById('logoutBtn').style.display = 'none';
+                            document.getElementById('navAvatarWrap').style.display = 'none';
+                            document.getElementById('navAvatarGuest').style.display = 'flex';
                         }
                     });
                 } catch(e) {
@@ -2426,24 +2791,51 @@
             body.classList.toggle('open');
             toggle.classList.toggle('open');
         }
-        function toggleCalendar() {
-            const wrapper = document.getElementById('calendarWrapper');
-            const chevron = document.getElementById('calChevron');
-            const isHidden = wrapper.style.display === 'none';
-            wrapper.style.display = isHidden ? 'block' : 'none';
-            chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-        }
-        function toggleSettings() {
-            const toggle = document.getElementById('settingsToggle');
-            const body = document.getElementById('settingsBody');
-            toggle.classList.toggle('open');
-            body.classList.toggle('open');
-            // 同步当前开关状态
-            if (body.classList.contains('open')) {
-                document.getElementById('sfxToggle').checked = window.SFX ? SFX.enabled : false;
+        // ===== 分区域折叠 =====
+        function toggleFold(headerEl) {
+            const body = headerEl.nextElementSibling;
+            const isOpen = headerEl.classList.contains('open');
+            if (isOpen) {
+                headerEl.classList.remove('open');
+                body.classList.remove('open');
+            } else {
+                headerEl.classList.add('open');
+                body.classList.add('open');
             }
         }
 
+        // ===== 横条抽屉：图表/日历切换 =====
+        let vizState = null; // null=closed, 'chart', 'cal'
+        function toggleViz(tab) {
+            const content = document.getElementById('vizContent');
+            const panelChart = document.getElementById('vizPanelChart');
+            const panelCal = document.getElementById('vizPanelCal');
+            const tabChart = document.getElementById('vizTabChart');
+            const tabCal = document.getElementById('vizTabCal');
+
+            if (vizState === tab) {
+                // 点当前已激活的 tab → 收起
+                content.classList.remove('open');
+                tabChart.classList.remove('active');
+                tabCal.classList.remove('active');
+                vizState = null;
+            } else {
+                // 展开并切换
+                content.classList.add('open');
+                if (tab === 'chart') {
+                    panelChart.classList.add('active');
+                    panelCal.classList.remove('active');
+                    tabChart.classList.add('active');
+                    tabCal.classList.remove('active');
+                } else {
+                    panelChart.classList.remove('active');
+                    panelCal.classList.add('active');
+                    tabChart.classList.remove('active');
+                    tabCal.classList.add('active');
+                }
+                vizState = tab;
+            }
+        }
         function toggleSFX(on) {
             if (window.SFX) {
                 SFX.enabled = on;
@@ -2451,7 +2843,40 @@
             }
         }
 
-        // ===== 目标设定（增强版） =====
+        // ===== 头像下拉菜单 & 通知面板交互 =====
+        function toggleAvatarMenu(event) {
+            event.stopPropagation();
+            const dd = document.getElementById('avatarDropdown');
+            const np = document.getElementById('notifyPanel');
+            np.classList.remove('show');
+            dd.classList.toggle('show');
+            // 同步音效开关
+            const sfx = document.getElementById('sfxToggle');
+            if (sfx) sfx.checked = window.SFX ? SFX.enabled : false;
+        }
+        function toggleNotifyPanel(event) {
+            event.stopPropagation();
+            const np = document.getElementById('notifyPanel');
+            const dd = document.getElementById('avatarDropdown');
+            dd.classList.remove('show');
+            np.classList.toggle('show');
+        }
+        function closeNotifyPanel() {
+            document.getElementById('notifyPanel').classList.remove('show');
+        }
+        // 点击外部关闭所有面板
+        document.addEventListener('click', function(e) {
+            const dd = document.getElementById('avatarDropdown');
+            const np = document.getElementById('notifyPanel');
+            if (dd && !e.target.closest('#navAvatarWrap') && !e.target.closest('#avatarDropdown')) {
+                dd.classList.remove('show');
+            }
+            if (np && !e.target.closest('#navNotifyBtn') && !e.target.closest('#notifyPanel')) {
+                np.classList.remove('show');
+            }
+        });
+
+        // ===== 目标设定（简化版：仅保留每日目标数量） =====
         const GOAL_SETTINGS_KEY = 'ielts_goal_settings_v2';
 
         // 各板块总量和单元
@@ -2501,35 +2926,14 @@
             updateGoalModuleDisplay();
         }
 
-        // 点星标设为目标模块
+        // 点星标设为目标模块（已废弃，保留兼容）
         function setGoalModule(mod) {
-            const settings = getGoalSettings();
-            settings.module = mod;
-            settings.unit = 'all';
-            localStorage.setItem(GOAL_SETTINGS_KEY, JSON.stringify(settings));
-            updateGoalRing();
-            updateGoalModuleDisplay();
-            if (window.SFX && SFX.play) SFX.play('click');
+            // 星标功能已移除
         }
 
-        // 更新目标模块标签 + 星标高亮
+        // 更新目标模块标签 + 星标高亮（已废弃）
         function updateGoalModuleDisplay() {
-            const settings = getGoalSettings();
-            // 更新星标
-            ['ebbinghaus','synonyms','errorbook'].forEach(function(mod) {
-                var star = document.getElementById('mpStar-' + mod);
-                if (!star) return;
-                if (mod === settings.module) {
-                    star.classList.add('active');
-                    star.textContent = '★';
-                } else {
-                    star.classList.remove('active');
-                    star.textContent = '☆';
-                }
-                // 高亮目标模块卡片
-                var card = star.closest('.module-card');
-                if (card) card.classList.toggle('is-goal-module', mod === settings.module);
-            });
+            // 星标功能已移除，所有模块平等展示
         }
 
         function onGoalModuleChange() {
@@ -2790,7 +3194,7 @@
             var unitsEl = document.getElementById('wishUnits-' + type);
             var units = unitsEl ? parseFloat(unitsEl.value) || 0 : 0;
             var result = RewardSystem.depart(type, units);
-            alert(result.message);
+            customAlert(result.message);
             if (result.success) {
                 updateRewardBar();
                 document.getElementById('wishFlowerBalance').textContent = RewardSystem.getFlowers() || 0;
@@ -2805,35 +3209,162 @@
             if (!window.RewardSystem) return;
             var sFlowers = RewardSystem.getSFlowers ? RewardSystem.getSFlowers() : 0;
             if (sFlowers < 3) {
-                alert('S级小红花不足，需要 3 🏵️，当前 ' + sFlowers + ' 🏵️');
+                customAlert('S级小红花不足，需要 3 🏵️，当前 ' + sFlowers + ' 🏵️', '创造空间');
                 return;
             }
-            var name = prompt('给你的创造空间取个名字吧：');
-            if (!name || !name.trim()) {
-                alert('需要给空间命名才能解锁哦');
+            openDreamSpaceUnlockCard();
+        }
+
+        // ===== 创造空间解锁卡片（自定义，替代 prompt）=====
+        function openDreamSpaceUnlockCard() {
+            // 如果已存在则移除
+            var existing = document.getElementById('dsUnlockOverlay');
+            if (existing) existing.remove();
+
+            // 恢复草稿
+            var draft = null;
+            try { draft = JSON.parse(localStorage.getItem('dreamspace_create_draft') || 'null'); } catch(e) {}
+
+            var overlay = document.createElement('div');
+            overlay.id = 'dsUnlockOverlay';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s;';
+            overlay.innerHTML =
+                '<div id="dsUnlockCard" style="background:linear-gradient(135deg,rgba(26,35,69,0.98),rgba(20,28,55,0.98));border:1px solid rgba(255,215,0,0.25);border-radius:16px;padding:28px 32px;max-width:420px;width:90%;box-shadow:0 12px 48px rgba(0,0,0,0.5);transform:scale(0.9) translateY(10px);transition:transform .25s;">' +
+                '<div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">' +
+                '<span style="font-size:1.4rem;">✦</span>' +
+                '<span style="font-size:1rem;color:#ffd700;font-weight:600;">创造新空间</span>' +
+                '<span style="font-size:0.7rem;color:#5a6480;margin-left:auto;">消耗 3 🏵️</span>' +
+                '</div>' +
+                '<div style="margin-bottom:16px;">' +
+                '<label style="display:block;font-size:0.75rem;color:#8a94a6;margin-bottom:6px;">空间名称</label>' +
+                '<input id="dsName" type="text" placeholder="给你的世界起个名字" maxlength="30" style="width:100%;box-sizing:border-box;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.2);border-radius:8px;padding:8px 12px;color:#c7d1ff;font-size:0.85rem;outline:none;transition:border-color .2s;" onfocus="this.style.borderColor=\'rgba(255,215,0,0.4)\'" onblur="this.style.borderColor=\'rgba(130,150,255,0.2)\'">' +
+                '</div>' +
+                '<div style="margin-bottom:16px;">' +
+                '<label style="display:block;font-size:0.75rem;color:#8a94a6;margin-bottom:6px;">空间类型</label>' +
+                '<div style="display:flex;gap:8px;">' +
+                '<div id="dsTypeTheme" onclick="dsSelectType(\'theme\')" style="flex:1;text-align:center;padding:8px;border-radius:8px;cursor:pointer;font-size:0.78rem;transition:all .2s;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:#ffd700;">🌌 主题式</div>' +
+                '<div id="dsTypeProject" onclick="dsSelectType(\'project\')" style="flex:1;text-align:center;padding:8px;border-radius:8px;cursor:pointer;font-size:0.78rem;transition:all .2s;background:rgba(130,150,255,0.04);border:1px solid rgba(130,150,255,0.12);color:#5a6480;">⚙️ 项目制</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="margin-bottom:20px;">' +
+                '<label style="display:block;font-size:0.75rem;color:#8a94a6;margin-bottom:6px;">世界法则（每行一条，选填）</label>' +
+                '<textarea id="dsLaws" placeholder="这个世界的基本规则是什么？&#10;例：这里的时间流速是外界的3倍" style="width:100%;box-sizing:border-box;min-height:70px;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.2);border-radius:8px;padding:8px 12px;color:#c7d1ff;font-size:0.82rem;outline:none;resize:vertical;transition:border-color .2s;" onfocus="this.style.borderColor=\'rgba(255,215,0,0.4)\'" onblur="this.style.borderColor=\'rgba(130,150,255,0.2)\'"></textarea>' +
+                '</div>' +
+                '<div style="margin-bottom:20px;">' +
+                '<label style="display:block;font-size:0.75rem;color:#8a94a6;margin-bottom:6px;">蓝图（选填）</label>' +
+                '<textarea id="dsBlueprint" placeholder="大致描述一下这里是一个什么样的世界" style="width:100%;box-sizing:border-box;min-height:60px;background:rgba(26,35,69,0.6);border:1px solid rgba(130,150,255,0.2);border-radius:8px;padding:8px 12px;color:#c7d1ff;font-size:0.82rem;outline:none;resize:vertical;transition:border-color .2s;" onfocus="this.style.borderColor=\'rgba(255,215,0,0.4)\'" onblur="this.style.borderColor=\'rgba(130,150,255,0.2)\'"></textarea>' +
+                '</div>' +
+                '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+                '<button onclick="dsCancelUnlock()" style="padding:8px 20px;border-radius:8px;background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.15);color:#5a6480;font-size:0.8rem;cursor:pointer;transition:all .2s;">取消（退还）</button>' +
+                '<button onclick="dsConfirmUnlock()" style="padding:8px 24px;border-radius:8px;background:linear-gradient(135deg,#ffd700,#ff9a56);border:none;color:#1a2345;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all .2s;">创造 ✦</button>' +
+                '</div>' +
+                '</div>';
+            document.body.appendChild(overlay);
+            requestAnimationFrame(function() {
+                overlay.style.opacity = '1';
+                document.getElementById('dsUnlockCard').style.transform = 'scale(1) translateY(0)';
+            });
+
+            // 恢复草稿内容
+            var dsName = document.getElementById('dsName');
+            var dsLaws = document.getElementById('dsLaws');
+            var dsBlueprint = document.getElementById('dsBlueprint');
+            if (draft) {
+                dsName.value = draft.name || '';
+                dsLaws.value = draft.laws || '';
+                if (dsBlueprint) dsBlueprint.value = draft.blueprint || '';
+                if (draft.type === 'project') dsSelectType('project');
+            }
+
+            // 自动保存草稿
+            dsName.oninput = dsSaveDraft;
+            dsLaws.oninput = dsSaveDraft;
+            if (dsBlueprint) dsBlueprint.oninput = dsSaveDraft;
+            dsName.focus();
+        }
+
+        var dsNewType = 'theme';
+        function dsSelectType(type) {
+            dsNewType = type;
+            var themeEl = document.getElementById('dsTypeTheme');
+            var projEl = document.getElementById('dsTypeProject');
+            if (type === 'theme') {
+                themeEl.style.cssText = 'flex:1;text-align:center;padding:8px;border-radius:8px;cursor:pointer;font-size:0.78rem;transition:all .2s;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:#ffd700;';
+                projEl.style.cssText = 'flex:1;text-align:center;padding:8px;border-radius:8px;cursor:pointer;font-size:0.78rem;transition:all .2s;background:rgba(130,150,255,0.04);border:1px solid rgba(130,150,255,0.12);color:#5a6480;';
+            } else {
+                projEl.style.cssText = 'flex:1;text-align:center;padding:8px;border-radius:8px;cursor:pointer;font-size:0.78rem;transition:all .2s;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:#ffd700;';
+                themeEl.style.cssText = 'flex:1;text-align:center;padding:8px;border-radius:8px;cursor:pointer;font-size:0.78rem;transition:all .2s;background:rgba(130,150,255,0.04);border:1px solid rgba(130,150,255,0.12);color:#5a6480;';
+            }
+            dsSaveDraft();
+        }
+
+        function dsSaveDraft() {
+            var nameEl = document.getElementById('dsName');
+            var lawsEl = document.getElementById('dsLaws');
+            var bpEl = document.getElementById('dsBlueprint');
+            if (!nameEl || !lawsEl) return;
+            var d = { name: nameEl.value, laws: lawsEl.value, type: dsNewType, blueprint: bpEl ? bpEl.value : '' };
+            localStorage.setItem('dreamspace_create_draft', JSON.stringify(d));
+        }
+
+        function dsCancelUnlock() {
+            var overlay = document.getElementById('dsUnlockOverlay');
+            if (!overlay) return;
+            overlay.style.opacity = '0';
+            setTimeout(function() { overlay.remove(); }, 250);
+            // 退还花朵
+            try {
+                var d = JSON.parse(localStorage.getItem('ielts_learning_system'));
+                if (!d.rewards) d.rewards = {};
+                d.rewards.sFlowers = (d.rewards.sFlowers || 0) + 3;
+                localStorage.setItem('ielts_learning_system', JSON.stringify(d));
+                if (typeof syncDataWithCloud === 'function') syncDataWithCloud();
+            } catch(e) {}
+            // 清除草稿
+            localStorage.removeItem('dreamspace_create_draft');
+        }
+
+        function dsConfirmUnlock() {
+            var name = document.getElementById('dsName').value.trim();
+            if (!name) {
+                customAlert('给空间起个名字吧', '创造空间');
                 return;
             }
-            // 扣除3个S级花朵 + 创建空间
+            var lawsText = document.getElementById('dsLaws').value.trim();
+            var laws = lawsText ? lawsText.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l; }) : [];
+            var blueprintEl = document.getElementById('dsBlueprint');
+            var blueprint = blueprintEl ? blueprintEl.value.trim() : '';
+
+            // 创建空间数据
+            var spaceId = 'ds_' + Date.now();
             try {
                 var d = JSON.parse(localStorage.getItem('ielts_learning_system'));
                 d.rewards.sFlowers -= 3;
                 if (!d.dreamSpaces) d.dreamSpaces = [];
-                d.dreamSpaces.push({
-                    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-                    name: name.trim(),
-                    type: 'theme',
-                    laws: '',
+                d.dreamSpaces.unshift({
+                    id: spaceId,
+                    name: name,
+                    type: dsNewType,
+                    laws: laws,
+                    blueprint: blueprint,
                     creations: [],
                     team: [],
-                    vision: '',
                     createdAt: new Date().toISOString()
                 });
                 localStorage.setItem('ielts_learning_system', JSON.stringify(d));
                 if (typeof syncDataWithCloud === 'function') syncDataWithCloud();
             } catch(e) { console.error(e); return; }
 
+            // 清除草稿
+            localStorage.removeItem('dreamspace_create_draft');
+
+            // 关闭许愿面板和解锁卡片
             closeWishPanel();
-            playMeltAnimation();
+            var overlay = document.getElementById('dsUnlockOverlay');
+            if (overlay) overlay.remove();
+
+            // 直接跳转到创造空间，自动打开该空间
+            location.href = 'dreamspace.html?space=' + spaceId;
         }
 
         // 冰块融化动画
@@ -2968,7 +3499,7 @@
             var actual = parseFloat(document.getElementById('registerActual').value) || 0;
             var reflection = document.getElementById('registerReflection').value.trim();
             var result = RewardSystem.register(currentRegisterId, actual, reflection);
-            alert(result.message);
+            customAlert(result.message);
             if (result.success) {
                 updateRewardBar();
                 closeRegister();
@@ -2979,15 +3510,16 @@
 
         function cancelRegisterWish() {
             if (!currentRegisterId) return;
-            if (!confirm('取消并退还预扣的花朵？')) return;
-            var result = RewardSystem.cancelPending(currentRegisterId);
-            alert(result.message);
-            if (result.success) {
-                updateRewardBar();
-                closeRegister();
-                document.getElementById('wishFlowerBalance').textContent = RewardSystem.getFlowers() || 0;
-                renderPendingSection();
-            }
+            customConfirm('取消并退还预扣的花朵？', '取消许愿', function() {
+                var result = RewardSystem.cancelPending(currentRegisterId);
+                customAlert(result.message);
+                if (result.success) {
+                    updateRewardBar();
+                    closeRegister();
+                    document.getElementById('wishFlowerBalance').textContent = RewardSystem.getFlowers() || 0;
+                    renderPendingSection();
+                }
+            });
         }
 
         // 动态计算兑换花费预览（出发前）
@@ -3040,6 +3572,7 @@
             var selBtn = document.getElementById('modeSelectedBtn');
             var rndBtn = document.getElementById('modeRandomBtn');
             var refreshRow = document.getElementById('randomRefreshRow');
+            var selectedRow = document.getElementById('selectedDisplayRow');
 
             if (isRandom) {
                 selBtn.style.background = 'rgba(130,150,255,0.08)';
@@ -3049,6 +3582,10 @@
                 rndBtn.style.borderColor = 'rgba(255,183,77,0.35)';
                 rndBtn.style.color = '#ffb74d';
                 if (refreshRow) refreshRow.style.display = 'block';
+                if (selectedRow) selectedRow.style.display = 'none';
+                // 同步随机数量选择器
+                var sel = document.getElementById('randomPickCountSel');
+                if (sel) sel.value = config.randomPickCount || 3;
             } else {
                 selBtn.style.background = 'rgba(255,183,77,0.15)';
                 selBtn.style.borderColor = 'rgba(255,183,77,0.35)';
@@ -3057,12 +3594,54 @@
                 rndBtn.style.borderColor = 'rgba(130,150,255,0.15)';
                 rndBtn.style.color = '#5a6480';
                 if (refreshRow) refreshRow.style.display = 'none';
+                // 检查是否有更多可显示的愿望
+                var allKeys = Object.keys(RewardSystem.getWishTypes());
+                var visibleKeys = RewardSystem.getDisplayWishKeys();
+                if (selectedRow) {
+                    selectedRow.style.display = (visibleKeys.length < allKeys.length) ? 'block' : 'none';
+                    var btn = document.getElementById('showMoreWishesBtn');
+                    if (btn) {
+                        var cfg = RewardSystem.getWishConfig();
+                        var dc = cfg.displayCount || 3;
+                        if (dc >= 5) {
+                            btn.textContent = '最多显示 5 个';
+                            btn.disabled = true;
+                            btn.style.opacity = '0.4';
+                            btn.style.cursor = 'not-allowed';
+                        } else {
+                            btn.textContent = '显示更多 ▼ (' + dc + '/' + Math.min(5, allKeys.length) + ')';
+                            btn.disabled = false;
+                            btn.style.opacity = '1';
+                            btn.style.cursor = 'pointer';
+                        }
+                    }
+                }
             }
         }
 
         function refreshRandomAndRender() {
             if (!window.RewardSystem) return;
             RewardSystem.refreshRandomWishes();
+            renderWishTypeCards();
+        }
+
+        function showMoreWishes() {
+            if (!window.RewardSystem) return;
+            var config = RewardSystem.getWishConfig();
+            var dc = config.displayCount || 3;
+            var allKeys = Object.keys(RewardSystem.getWishTypes());
+            var maxDisplay = Math.min(5, allKeys.length);
+            if (dc >= maxDisplay) return;
+            RewardSystem.setDisplayCount(dc + 1);
+            renderWishTypeCards();
+            updateModeButtons();
+        }
+
+        function changeRandomPickCount(val) {
+            if (!window.RewardSystem) return;
+            var n = parseInt(val);
+            if (!n || n < 1 || n > 5) return;
+            RewardSystem.setRandomPickCount(n);
             renderWishTypeCards();
         }
 
@@ -3180,7 +3759,7 @@
             var cost = parseInt(document.getElementById('customWishCost').value) || 1;
             var desc = document.getElementById('customWishDesc').value.trim();
 
-            if (!name) { alert('请输入愿望名称'); return; }
+            if (!name) { customAlert('请输入愿望名称'); return; }
             if (cost < 1) cost = 1;
 
             // 生成唯一 key
@@ -3243,51 +3822,153 @@
         }
 
         // ===== 日历详情 =====
-        function openDayDetail(dateKey) {
+        const MOODS = ['😊','😌','😤','😢','🤯'];
+        let ddFlowerFilter = null; // null=全部, 's'=只看S级, 'n'=只看普通
+
+        function _getDayFlowerInfo(dateKey) {
+            const rewardData = (window.RewardSystem && RewardSystem.getData) ? RewardSystem.getData() : null;
+            const rewardHistory = (rewardData && rewardData.history) ? rewardData.history : [];
+            const dayReward = rewardHistory.find(h => h.date === dateKey);
+            return {
+                sCount: dayReward ? (dayReward.sFlower || 0) : 0,
+                nCount: dayReward ? (dayReward.count || 0) : 0,
+                reason: dayReward ? (dayReward.reason || '') : ''
+            };
+        }
+
+        function _isToday(dateKey) {
+            const now = new Date();
+            const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+            return dateKey === today;
+        }
+
+        function _renderTaskItem(item, dateKey) {
+            const isToday = _isToday(dateKey);
+            return '<div class="dd-task-item' + (item.done ? ' done' : '') + '">' +
+                '<input type="checkbox" ' + (item.done ? 'checked' : '') +
+                (isToday ? ' onchange="toggleDayDetailTask(\'' + item.id + '\',\'' + dateKey + '\')"' : ' disabled') + '>' +
+                '<span class="q-tag q-tag-' + item.quadrant + '">' + item.quadrant + '</span>' +
+                '<span class="task-text">' + item.text + '</span>' +
+                '</div>';
+        }
+
+        function _renderFlowerSection(icon, labelClass, label, count, quadrantLabel, items, dateKey, hasFlower) {
+            const sectionClass = icon === '🏵️' ? 's-flower' : 'n-flower';
+            let html = '<div class="flower-section ' + sectionClass + '">';
+            html += '<div class="flower-section-header">' +
+                '<span class="fs-icon">' + icon + '</span>' +
+                '<span class="' + labelClass + '">' + label + '</span>';
+            if (hasFlower) {
+                html += '<span class="fs-count">×' + count + '</span>';
+            }
+            html += '<span class="fs-count" style="margin-left:auto;">' + quadrantLabel + '</span>';
+            html += '</div>';
+
+            if (items.length === 0) {
+                html += '<div class="dd-empty-hint">无记录</div>';
+            } else {
+                html += '<div class="dd-task-list">';
+                items.forEach(item => { html += _renderTaskItem(item, dateKey); });
+                html += '</div>';
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function _renderSummarySection(mood, summary) {
+            let html = '<div class="dd-summary-section">';
+            html += '<div class="dd-summary-header">';
+            html += '<span class="dd-summary-label">总结</span>';
+            html += '<div class="dd-mood-picker">';
+            MOODS.forEach(m => {
+                html += '<button class="dd-mood-btn' + (mood === m ? ' active' : '') + '" onclick="setDayMood(\'' + m + '\')" title="' + m + '">' + m + '</button>';
+            });
+            html += '</div>';
+            html += '</div>';
+            html += '<textarea class="dd-summary-textarea" id="daySummary" placeholder="写点什么…（没有总结也没关系，选个心情就好）" onblur="saveDayMeta()">' + (summary || '') + '</textarea>';
+            html += '</div>';
+            return html;
+        }
+
+        function _renderDayDetail(dateKey, filter) {
             currentDayDetail = dateKey;
             const dayData = TaskManager.getDay(dateKey);
-            document.getElementById('dayDetailTitle').textContent = dateKey;
+            const flowerInfo = _getDayFlowerInfo(dateKey);
+            const allItems = TaskManager.getSortedItems(dateKey);
 
-            // 渲染任务列表
-            const tasksEl = document.getElementById('dayDetailTasks');
-            const sorted = TaskManager.getSortedItems(dateKey);
-            if (sorted.length === 0) {
-                tasksEl.innerHTML = '<div style="color:#5a6480;font-size:0.8rem;padding:8px 0;">这天没有任务记录</div>';
-            } else {
-                tasksEl.innerHTML = sorted.map(item =>
-                    '<div class="detail-task-item' + (item.done ? ' done' : '') + '">' +
-                    '<input type="checkbox" ' + (item.done ? 'checked' : '') + ' onchange="toggleDayDetailTask(\'' + item.id + '\',\'' + dateKey + '\')">' +
-                    '<span class="q-tag q-tag-' + item.quadrant + '">' + item.quadrant + '</span>' +
-                    '<span>' + item.text + '</span>' +
-                    '</div>'
-                ).join('');
+            // 标题
+            document.getElementById('dayDetailTitle').textContent = dateKey;
+            let subText = '';
+            if (flowerInfo.sCount > 0) subText += '🏵️×' + flowerInfo.sCount + ' ';
+            if (flowerInfo.nCount > 0) subText += '🌸×' + flowerInfo.nCount;
+            if (!subText && allItems.length === 0) subText = '无记录';
+            else if (!subText) subText = '暂未获得花朵';
+            document.getElementById('dayDetailSub').textContent = subText;
+
+            // 分区
+            const iuItems = allItems.filter(i => i.quadrant === 'IU');
+            const otherItems = allItems.filter(i => i.quadrant !== 'IU');
+
+            let html = '';
+
+            if (!filter || filter === 's') {
+                html += _renderFlowerSection('🏵️', 'fs-label-s', 'S级小红花',
+                    flowerInfo.sCount, '🔴 重要且紧急', iuItems, dateKey, flowerInfo.sCount > 0);
+            }
+            if (!filter || filter === 'n') {
+                html += _renderFlowerSection('🌸', 'fs-label-n', '普通小花',
+                    flowerInfo.nCount, '🔵🟡⚪ 其他象限', otherItems, dateKey, flowerInfo.nCount > 0);
             }
 
-            // 心情和总结
-            document.getElementById('dayMood').value = dayData.mood || '';
-            document.getElementById('daySummary').value = dayData.summary || '';
+            // 总结与心情（仅在全部视图时显示）
+            if (!filter) {
+                html += _renderSummarySection(dayData.mood, dayData.summary);
+            }
 
+            document.getElementById('dayDetailBody').innerHTML = html;
             document.getElementById('dayDetailOverlay').classList.add('show');
+        }
+
+        function openDayDetail(dateKey) {
+            ddFlowerFilter = null;
+            _renderDayDetail(dateKey, null);
         }
 
         function closeDayDetail() {
             document.getElementById('dayDetailOverlay').classList.remove('show');
             currentDayDetail = null;
+            ddFlowerFilter = null;
+        }
+
+        // ===== 花朵详情弹窗（点击日历花朵） =====
+        function openFlowerDetail(dateKey, flowerType) {
+            ddFlowerFilter = flowerType; // 's' or 'n'
+            _renderDayDetail(dateKey, flowerType);
         }
 
         function toggleDayDetailTask(taskId, dateKey) {
             TaskManager.toggleTask(taskId, dateKey);
-            openDayDetail(dateKey); // 重新渲染
+            _renderDayDetail(dateKey, ddFlowerFilter); // 重新渲染
             renderQuadrantTasks();
             renderCalendar();
             updateRewardBar();
         }
 
+        function setDayMood(mood) {
+            if (!currentDayDetail) return;
+            const dayData = TaskManager.getDay(currentDayDetail);
+            // 如果再次点击同一个心情，取消选择
+            const newMood = (dayData.mood === mood) ? '' : mood;
+            TaskManager.updateDayMeta(currentDayDetail, newMood, dayData.summary);
+            _renderDayDetail(currentDayDetail, ddFlowerFilter);
+        }
+
         function saveDayMeta() {
             if (!currentDayDetail) return;
-            const mood = document.getElementById('dayMood').value;
-            const summary = document.getElementById('daySummary').value;
-            TaskManager.updateDayMeta(currentDayDetail, mood, summary);
+            const dayData = TaskManager.getDay(currentDayDetail);
+            const summaryEl = document.getElementById('daySummary');
+            const summary = summaryEl ? summaryEl.value : '';
+            TaskManager.updateDayMeta(currentDayDetail, dayData.mood, summary);
         }
 
         // ===== 仪表盘初始化 =====
@@ -3476,7 +4157,7 @@
                                     if (ds) ds.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                 }, 150);
                             } else {
-                                alert('❄️ 还需要 ' + (3 - sFlowers) + ' 朵 🏵️S级小红花 才能解冻创造空间');
+                                customAlert('❄️ 还需要 ' + (3 - sFlowers) + ' 朵 🏵️S级小红花 才能解冻创造空间', '创造空间');
                             }
                         };
                         dreamCard.style.cursor = 'pointer';
@@ -3515,12 +4196,18 @@
                 grid.appendChild(empty);
             }
 
+            // 获取奖励历史（按日期索引）
+            const rewardData = (window.RewardSystem && RewardSystem.getData) ? RewardSystem.getData() : null;
+            const rewardHistory = (rewardData && rewardData.history) ? rewardData.history : [];
+
             // 日期格
-            const log = (window.StudyLog && StudyLog.getLog) ? StudyLog.getLog() : {};
             for (let day = 1; day <= daysInMonth; day++) {
                 const key = calYear + '-' + String(calMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
-                const dayData = log[key];
-                const val = dayData ? (dayData.ebbinghaus?.learned || 0) + (dayData.synonyms?.learned || 0) : 0;
+
+                // 查找当天的花朵记录
+                const dayReward = rewardHistory.find(h => h.date === key);
+                const sCount = dayReward ? (dayReward.sFlower || 0) : 0;
+                const nCount = dayReward ? (dayReward.count || 0) : 0;
 
                 // 任务数据
                 const taskDay = (window.TaskManager) ? TaskManager.getDay(key) : null;
@@ -3528,31 +4215,42 @@
                 const taskDone = taskItems.filter(i => i.done).length;
                 const taskTotal = taskItems.length;
 
-                let heatClass = 'heat-0';
-                if (val >= 30) heatClass = 'heat-4';
-                else if (val >= 20) heatClass = 'heat-3';
-                else if (val >= 10) heatClass = 'heat-2';
-                else if (val >= 1) heatClass = 'heat-1';
+                const hasFlowers = (sCount > 0 || nCount > 0);
 
                 const cell = document.createElement('div');
-                cell.className = 'calendar-cell ' + heatClass + (val > 0 ? ' has-data' : '');
-                cell.title = key + (val > 0 ? ' · 学习 ' + val + ' 个' : ' · 未学习');
-                cell.onclick = () => openDayDetail(key);
-
-                let taskDots = '';
-                if (taskTotal > 0) {
-                    taskDots = '<div class="task-dots">';
-                    const maxDots = Math.min(taskTotal, 5);
-                    for (let i = 0; i < maxDots; i++) {
-                        taskDots += '<div class="task-dot ' + (i < taskDone ? 'done' : 'pending') + '"></div>';
-                    }
-                    if (taskTotal > 5) taskDots += '<span style="font-size:0.5rem;color:#5a6480;">+' + (taskTotal - 5) + '</span>';
-                    taskDots += '</div>';
+                cell.className = 'calendar-cell';
+                if (hasFlowers) {
+                    cell.classList.add('has-flowers');
+                    if (sCount > 0) cell.classList.add('has-sflower');
                 }
 
-                cell.innerHTML = '<span class="day-num">' + day + '</span>' +
-                    (val > 0 ? '<span style="font-size:0.65rem;">' + val + '</span>' : '') +
-                    taskDots;
+                // 构建花朵展示
+                let flowerHtml = '';
+                if (hasFlowers) {
+                    flowerHtml = '<div class="flower-display">';
+                    if (sCount > 0) {
+                        flowerHtml += '<div class="flower-line">' +
+                            '<span class="f-icon-sm">🏵️</span>' +
+                            '<span class="f-count-s">×' + sCount + '</span>' +
+                            '</div>';
+                    }
+                    if (nCount > 0) {
+                        flowerHtml += '<div class="flower-line">' +
+                            '<span class="f-icon-sm">🌸</span>' +
+                            '<span class="f-count-n">×' + nCount + '</span>' +
+                            '</div>';
+                    }
+                    flowerHtml += '</div>';
+                } else if (taskTotal > 0) {
+                    // 有任务但还没拿到花
+                    flowerHtml = '<div class="task-hint">' + taskDone + '/' + taskTotal + ' 任务</div>';
+                }
+
+                cell.innerHTML = '<span class="day-num">' + day + '</span>' + flowerHtml;
+
+                // 点击格子打开日详情
+                cell.onclick = () => openDayDetail(key);
+
                 grid.appendChild(cell);
             }
         }
@@ -3562,7 +4260,6 @@
             const settings = getGoalSettings();
             const input = document.getElementById('dailyGoalInput');
             if (input) input.value = settings.daily;
-            updateGoalModuleDisplay();
             updateGoalRing();
         }
 
@@ -3575,6 +4272,43 @@
                 return { uid: user.uid, name: name, email: email, loggedIn: true };
             }
             return { uid: 'me', name: '我', email: '', loggedIn: false };
+        }
+
+        // ===== 自定义弹窗（替代 alert/confirm）=====
+        function customAlert(msg, title) {
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;';
+            overlay.innerHTML = '<div style="background:rgba(26,35,69,0.95);border:1px solid rgba(130,150,255,0.25);border-radius:14px;padding:24px 28px;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:scale(0.92);transition:transform .2s;">' +
+                (title ? '<div style="font-size:0.9rem;color:#c7d1ff;font-weight:600;margin-bottom:10px;">' + title + '</div>' : '') +
+                '<div style="font-size:0.82rem;color:#8a94a6;line-height:1.6;margin-bottom:18px;">' + msg + '</div>' +
+                '<button style="padding:6px 24px;border-radius:8px;background:rgba(130,150,255,0.15);border:1px solid rgba(130,150,255,0.3);color:#c7d1ff;font-size:0.8rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.background=\'rgba(130,150,255,0.25)\'" onmouseout="this.style.background=\'rgba(130,150,255,0.15)\'">好的</button>' +
+                '</div>';
+            document.body.appendChild(overlay);
+            requestAnimationFrame(function() { overlay.style.opacity = '1'; overlay.querySelector('div').style.transform = 'scale(1)'; });
+            var btn = overlay.querySelector('button');
+            btn.onclick = function() {
+                overlay.style.opacity = '0';
+                setTimeout(function() { overlay.remove(); }, 200);
+            };
+            btn.focus();
+        }
+
+        function customConfirm(msg, title, onConfirm, onCancel) {
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;';
+            overlay.innerHTML = '<div style="background:rgba(26,35,69,0.95);border:1px solid rgba(130,150,255,0.25);border-radius:14px;padding:24px 28px;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:scale(0.92);transition:transform .2s;">' +
+                (title ? '<div style="font-size:0.9rem;color:#c7d1ff;font-weight:600;margin-bottom:10px;">' + title + '</div>' : '') +
+                '<div style="font-size:0.82rem;color:#8a94a6;line-height:1.6;margin-bottom:18px;">' + msg + '</div>' +
+                '<div style="display:flex;gap:10px;justify-content:center;">' +
+                '<button id="ccCancel" style="padding:6px 18px;border-radius:8px;background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.15);color:#5a6480;font-size:0.8rem;cursor:pointer;transition:all .2s;">取消</button>' +
+                '<button id="ccOk" style="padding:6px 18px;border-radius:8px;background:rgba(130,150,255,0.15);border:1px solid rgba(130,150,255,0.3);color:#c7d1ff;font-size:0.8rem;cursor:pointer;transition:all .2s;">确认</button>' +
+                '</div></div>';
+            document.body.appendChild(overlay);
+            requestAnimationFrame(function() { overlay.style.opacity = '1'; overlay.querySelector('div').style.transform = 'scale(1)'; });
+            function close() { overlay.style.opacity = '0'; setTimeout(function() { overlay.remove(); }, 200); }
+            overlay.querySelector('#ccCancel').onclick = function() { close(); if (onCancel) onCancel(); };
+            overlay.querySelector('#ccOk').onclick = function() { close(); if (onConfirm) onConfirm(); };
+            overlay.querySelector('#ccOk').focus();
         }
         function getCollabBoard() {
             try {
@@ -3658,7 +4392,8 @@
             var undone = items.filter(function(t){ return !t.done; }).length;
             var badge = document.getElementById('collabBadge');
             if (!badge) return;
-            if (undone > 0) {
+            // Only show badge when there are actual undone tasks (placeholder mode has no badge)
+            if (undone > 0 && items.length > 0) {
                 badge.textContent = undone > 9 ? '9+' : undone;
                 badge.style.display = 'flex';
             } else {
@@ -3670,13 +4405,19 @@
             if (!el) return;
             var items = getCollabBoard();
             var total = items.length;
+            // If there are no collab tasks yet, show placeholder
+            if (total === 0) {
+                el.innerHTML = '<div style="padding:10px 14px;background:rgba(130,150,255,0.04);border:1px dashed rgba(130,150,255,0.1);border-radius:10px;cursor:pointer;" onclick="openCollabBoard()">' +
+                    '<div style="display:flex;align-items:center;gap:8px;">' +
+                    '<svg width="16" height="16" viewBox="0 0 24 24"><path d="M9 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-4M9 7V5a3 3 0 016 0v2M9 7h6" stroke="#8299ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>' +
+                    '<span style="color:#8299ff;font-size:0.85rem;">团队协作看板</span>' +
+                    '<span style="margin-left:auto;color:#5a6480;font-size:0.6rem;">占位 · 点击了解</span>' +
+                    '</div></div>';
+                return;
+            }
             var done = items.filter(function(t){ return t.done; }).length;
             var undone = total - done;
             var fragCount = getCollabFragCount();
-            if (total === 0 && fragCount === 0) {
-                el.innerHTML = '';
-                return;
-            }
             var html = '<div style="padding:10px 14px;background:rgba(130,150,255,0.04);border:1px solid rgba(130,150,255,0.08);border-radius:10px;cursor:pointer;" onclick="openCollabBoard()">' +
                 '<div style="display:flex;align-items:center;gap:8px;">' +
                 '<svg width="16" height="16" viewBox="0 0 24 24"><path d="M9 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-4M9 7V5a3 3 0 016 0v2M9 7h6" stroke="#8299ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>' +
@@ -3769,8 +4510,7 @@
             }
         }
         function openCollabBoard() {
-            renderCollabList();
-            renderCollabFragSection();
+            document.getElementById('notifyPanel').classList.remove('show');
             document.getElementById('collabOverlay').classList.add('active');
         }
         function closeCollabBoard() {
@@ -4050,26 +4790,29 @@
                 <svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-4M9 7V5a3 3 0 016 0v2M9 7h6" stroke="#8299ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                 团队协作看板
             </h4>
-            <div style="font-size:0.68rem;color:#3d4a6a;margin-bottom:10px;line-height:1.6;font-style:italic;">
-                写下任务，回车添加。完成点勾划掉。他人有异议可添加子级反馈。
-            </div>
-            <div class="collab-input-row">
-                <input class="collab-input" id="collabInput" placeholder="写下任务/汇报，回车添加…" onkeydown="if(event.key==='Enter')addCollabTask()">
-                <button onclick="addCollabTask()" style="padding:6px 14px;border-radius:2px;background:transparent;border:1px solid rgba(130,150,255,0.2);color:#8299ff;font-size:0.78rem;cursor:pointer;white-space:nowrap;transition:all .2s;" onmouseover="this.style.borderColor='rgba(130,150,255,0.4)';this.style.color='#c7d1ff'" onmouseout="this.style.borderColor='rgba(130,150,255,0.2)';this.style.color='#8299ff'">+</button>
-            </div>
-            <div id="collabList"></div>
-            <div id="collabEmpty" style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:16px 0;font-style:italic;">
-                还没有任务。写下第一个任务吧。
-            </div>
-            <div id="collabFragSection" style="display:none;margin-top:12px;border-top:1px dashed rgba(130,150,255,0.1);padding-top:12px;">
-                <div style="font-size:0.78rem;color:#8299ff;margin-bottom:8px;display:flex;align-items:center;gap:4px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24"><path d="M9 3h6v3.5a1.5 1.5 0 003 0V3h3v6h-3.5a1.5 1.5 0 000 3H21v6h-6v-3.5a1.5 1.5 0 00-3 0V18H6v-6h3.5a1.5 1.5 0 000-3H6V3h9z" fill="none" stroke="#8299ff" stroke-width="1.5" stroke-linejoin="round"/></svg>
-                    碎片分工概览
+            <div style="padding:16px 4px;">
+                <div style="font-size:0.82rem;color:#8299ff;line-height:1.8;margin-bottom:14px;">
+                    <b style="color:#c7d1ff;">团队协作看板是什么？</b><br>
+                    这是团队协作的入口。当你和其他伙伴一起做事时，这里会变成你们的协作中心——领取分工、互相反馈、记录工作留痕。
                 </div>
-                <div id="collabFragList"></div>
+                <div style="font-size:0.75rem;color:#8a94a6;line-height:1.8;margin-bottom:14px;">
+                    <b style="color:#c7d1ff;">有了团队之后可以做什么：</b><br>
+                    <span style="color:#4ec9b0;">·</span> 碎片分工概览——进来先看到全局，谁领了什么、完成到哪<br>
+                    <span style="color:#4ec9b0;">·</span> 领取分工——分工可以有具体任务，也可以先领取再细化<br>
+                    <span style="color:#4ec9b0;">·</span> 对别人的任务有想法？添加子级反馈，等对方回应<br>
+                    <span style="color:#4ec9b0;">·</span> 谁完成就计入谁的工作量<br>
+                    <span style="color:#4ec9b0;">·</span> 理解偏差可撤回<br>
+                    <span style="color:#4ec9b0;">·</span> 项目完成后可查看个人完成度
+                </div>
+                <div style="font-size:0.7rem;color:#5a6480;line-height:1.6;padding:10px 12px;border-left:2px solid rgba(130,150,255,0.15);">
+                    你的日常任务在四象限里管理，这里只放团队协作的事。等有了伙伴，这里就会活起来。
+                </div>
             </div>
+            <div id="collabList" style="display:none;"></div>
+            <div id="collabEmpty" style="display:none;"></div>
+            <div id="collabFragSection" style="display:none;"></div>
             <div style="margin-top:14px;display:flex;justify-content:flex-end;">
-                <button onclick="closeCollabBoard()" style="padding:6px 18px;border-radius:2px;background:transparent;border:1px solid rgba(130,150,255,0.15);color:#8a94a6;font-size:0.8rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(130,150,255,0.3)';this.style.color='#c7d1ff'" onmouseout="this.style.borderColor='rgba(130,150,255,0.15)';this.style.color='#8a94a6'">完成</button>
+                <button onclick="closeCollabBoard()" style="padding:6px 18px;border-radius:2px;background:transparent;border:1px solid rgba(130,150,255,0.15);color:#8a94a6;font-size:0.8rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(130,150,255,0.3)';this.style.color='#c7d1ff'" onmouseout="this.style.borderColor='rgba(130,150,255,0.15)';this.style.color='#8a94a6'">知道了</button>
             </div>
         </div>
     </div>

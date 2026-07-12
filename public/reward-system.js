@@ -83,8 +83,8 @@
         outing: {
             name: '出去玩', icon: '🌈', unit: 'h', unitLabel: '小时',
             costPerUnit: 1, minUnit: 1,
-            description: '出去探索，感受这个世界最能带给你感觉的某种东西',
-            guide: '出去走走，探索一点什么，或者感受什么在召唤你',
+            description: '探索一个最契合此刻状态的地方',
+            guide: '探索一个最契合此刻状态的地方',
             registerLabel: '实际出去了多久（分钟）', registerUnit: 'min',
             costPerRegisterUnit: 1/60, registerRounding: 30
         },
@@ -99,16 +99,16 @@
         dictionary: {
             name: '日常积累单词', icon: '📖', unit: '词', unitLabel: '个词',
             costPerUnit: 1/3, minUnit: 3,
-            description: '随机翻三页，找到今日最有感觉的三个词——像塔罗牌一样',
-            guide: '随机翻三次，选最有感觉的词。这不是背诵，是相遇',
+            description: '随机翻三页，找出此刻最有感觉的3个词',
+            guide: '随机翻三页，找出此刻最有感觉的3个词',
             registerLabel: '实际翻到几个词', registerUnit: '词',
             costPerRegisterUnit: 1/3, registerRounding: -1
         },
         sleep: {
             name: '睡觉休息', icon: '😴', unit: 'h', unitLabel: '小时',
             costPerUnit: 1, minUnit: 1,
-            description: '躺床上休息，什么都不想，身体会感谢你的',
-            guide: '放下一切，躺平，让身体自己决定要休息多久',
+            description: '休息，平静头脑，极速充电后你将满血复活',
+            guide: '休息，平静头脑，极速充电后你将满血复活',
             registerLabel: '实际躺了多久（分钟）', registerUnit: 'min',
             costPerRegisterUnit: 1/60, registerRounding: 30
         }
@@ -139,6 +139,8 @@
             if (!cfg.selectedKeys) cfg.selectedKeys = Object.keys(DEFAULT_WISH_TYPES);
             if (!cfg.customTypes) cfg.customTypes = {};
             if (!cfg.hiddenDefaults) cfg.hiddenDefaults = [];
+            if (!cfg.displayCount) cfg.displayCount = 3;
+            if (!cfg.randomPickCount) cfg.randomPickCount = 3;
             // 数据迁移：移除旧版 dreamspace key（已从默认类型中删除）
             cfg.selectedKeys = cfg.selectedKeys.filter(function(k) { return k !== 'dreamspace'; });
             if (cfg.hiddenDefaults) cfg.hiddenDefaults = cfg.hiddenDefaults.filter(function(k) { return k !== 'dreamspace'; });
@@ -154,7 +156,9 @@
             selectedKeys: Object.keys(DEFAULT_WISH_TYPES),
             hiddenDefaults: [],
             customTypes: {},
-            randomSeed: []
+            randomSeed: [],
+            displayCount: 3,       // 默认显示3个，最多5个
+            randomPickCount: 3      // 随机模式默认抽3个，可调1~5
         };
     }
 
@@ -324,31 +328,37 @@
          */
         getDisplayWishKeys: function() {
             var config = _loadWishConfig();
+            if (!config.displayCount) config.displayCount = 3;
+            if (!config.randomPickCount) config.randomPickCount = 3;
             if (config.displayMode === 'random') {
                 if (!config.randomSeed || config.randomSeed.length === 0) {
-                    config.randomSeed = this._drawRandom();
+                    config.randomSeed = this._drawRandom(config.randomPickCount);
                     _saveWishConfig(config);
                 }
                 return config.randomSeed.slice();
             }
-            // selected 模式：返回 selectedKeys 中未被隐藏的
+            // selected 模式：返回 selectedKeys 中未被隐藏的，限制 displayCount 个
             var sel = config.selectedKeys || Object.keys(DEFAULT_WISH_TYPES);
             var hidden = config.hiddenDefaults || [];
-            return sel.filter(function(k) { return hidden.indexOf(k) === -1; });
+            var visible = sel.filter(function(k) { return hidden.indexOf(k) === -1; });
+            return visible.slice(0, config.displayCount);
         },
 
         /**
          * 随机从库中抽取3个愿望
          */
-        _drawRandom: function() {
+        _drawRandom: function(count) {
+            var n = count || 3;
+            if (n < 1) n = 1;
+            if (n > 5) n = 5;
             var allTypes = _getMergedTypes();
             var keys = Object.keys(allTypes);
-            // Fisher-Yates 洗牌取前3
+            // Fisher-Yates 洗牌取前 n 个
             for (var i = keys.length - 1; i > 0; i--) {
                 var j = Math.floor(Math.random() * (i + 1));
                 var tmp = keys[i]; keys[i] = keys[j]; keys[j] = tmp;
             }
-            return keys.slice(0, Math.min(3, keys.length));
+            return keys.slice(0, Math.min(n, keys.length));
         },
 
         /**
@@ -356,7 +366,8 @@
          */
         refreshRandomWishes: function() {
             var config = _loadWishConfig();
-            config.randomSeed = this._drawRandom();
+            if (!config.randomPickCount) config.randomPickCount = 3;
+            config.randomSeed = this._drawRandom(config.randomPickCount);
             _saveWishConfig(config);
             return config.randomSeed;
         },
@@ -403,6 +414,21 @@
             _saveWishConfig(config);
         },
 
+        setDisplayCount: function(count) {
+            var config = _loadWishConfig();
+            config.displayCount = Math.max(1, Math.min(5, count));
+            _saveWishConfig(config);
+        },
+
+        setRandomPickCount: function(count) {
+            var config = _loadWishConfig();
+            config.randomPickCount = Math.max(1, Math.min(5, count));
+            // 立即重新抽取
+            config.randomSeed = this._drawRandom(config.randomPickCount);
+            _saveWishConfig(config);
+            return config.randomSeed;
+        },
+
         /**
          * 设置展示模式 'selected' | 'random'
          */
@@ -410,7 +436,8 @@
             var config = _loadWishConfig();
             config.displayMode = mode;
             if (mode === 'random') {
-                config.randomSeed = this._drawRandom();
+                if (!config.randomPickCount) config.randomPickCount = 3;
+                config.randomSeed = this._drawRandom(config.randomPickCount);
             }
             _saveWishConfig(config);
         },

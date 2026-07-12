@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Set Sunflowers</title></head>
+<body style="background:#1a2345;color:#c7d1ff;font-family:Arial;text-align:center;padding:60px;">
+<h2>Setting 100 Sunflowers...</h2>
+<script>
+var d = JSON.parse(localStorage.getItem('ielts_learning_system') || '{}');
+if (!d.rewards) d.rewards = { flowers: 0, sFlowers: 0, history: [], wishes: [], pendingWishes: [] };
+d.rewards.sFlowers = 100;
+d._lastModified = new Date().toISOString();
+localStorage.setItem('ielts_learning_system', JSON.stringify(d));
+document.write('<p style="color:#4ec9b0;font-size:1.2rem;">✅ Done! sFlowers = ' + d.rewards.sFlowers + '</p>');
+document.write('<p>Now close this tab and refresh the main page.</p>');
+</script>
+</body>
+</html>

@@ -121,19 +121,20 @@
         .create-card .ice-cover {
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(100,180,255,0.08), rgba(150,210,255,0.04));
+            background: linear-gradient(135deg, rgba(100,180,255,0.12), rgba(150,210,255,0.06));
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1;
+            z-index: 10;
         }
         .create-card .ice-cover .ice-hint {
             color: #6bb6ff;
-            font-size: 0.8rem;
-            background: rgba(100,180,255,0.1);
-            padding: 4px 12px;
+            font-size: 0.85rem;
+            background: rgba(100,180,255,0.12);
+            padding: 8px 16px;
             border-radius: 8px;
-            border: 1px solid rgba(100,180,255,0.15);
+            border: 1px solid rgba(100,180,255,0.2);
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
         }
         .create-icon { font-size: 2rem; margin-bottom: 8px; }
         .create-text { color: #ffd700; font-size: 0.9rem; font-weight: 500; }
@@ -831,6 +832,237 @@
             color: #8299ff;
         }
 
+        /* ===== 成员颜色三层独立体系 ===== */
+        .member-color-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+        /* 碎片辉光 — 领取人颜色 */
+        .frag-glow {
+            box-shadow: 0 0 8px var(--glow-color, transparent);
+            border-color: var(--glow-color, rgba(130,150,255,0.15)) !important;
+        }
+        /* 子任务方框 — 创建者颜色深色版 */
+        .sub-border {
+            border-left: 3px solid var(--creator-dark, rgba(130,150,255,0.25));
+            padding-left: 6px;
+        }
+        .sub-text-color {
+            color: var(--creator-dark, #c7d1ff);
+        }
+        /* 完成勾+划线 — 完成者颜色 */
+        .done-check {
+            background: var(--completer-color, #4ec9b0) !important;
+            border-color: var(--completer-color, #4ec9b0) !important;
+        }
+        .done-strike {
+            text-decoration: line-through;
+            text-decoration-color: var(--completer-color, #5a6480);
+        }
+        /* 团队成员颜色标签 */
+        .member-color-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.6rem;
+            padding: 1px 6px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+        }
+        /* ===== 个人小卡片（手写信风格） ===== */
+        .personal-card-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex; align-items: flex-start; justify-content: center;
+            padding: 5vh 16px; overflow-y: auto;
+            opacity: 0; transition: opacity 0.25s;
+        }
+        .personal-card-overlay.show { opacity: 1; }
+        .personal-card {
+            background: linear-gradient(135deg, rgba(26,35,69,0.98), rgba(16,22,48,0.98));
+            border: 1px solid var(--card-accent, rgba(130,150,255,0.2));
+            border-radius: 14px;
+            padding: 24px 22px;
+            max-width: 380px; width: 100%;
+            margin: auto;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 20px var(--card-glow, rgba(130,150,255,0.1));
+            transform: translateY(10px);
+            transition: transform 0.25s;
+        }
+        .personal-card-overlay.show .personal-card { transform: translateY(0); }
+        .personal-card-header {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed rgba(130,150,255,0.1);
+        }
+        .personal-card-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--card-accent, rgba(130,150,255,0.2));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+        }
+        .personal-card-name {
+            font-size: 0.9rem; color: var(--card-accent, #c7d1ff);
+            font-weight: 500;
+        }
+        .personal-card-fragment {
+            font-size: 0.68rem; color: #5a6480; margin-top: 2px;
+        }
+        .personal-card-section {
+            margin-bottom: 14px;
+        }
+        .personal-card-label {
+            font-size: 0.65rem; color: #5a6480;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .personal-card-content {
+            font-size: 0.8rem; color: #c7d1ff; line-height: 1.7;
+        }
+        .personal-card-progress {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .personal-card-liquid {
+            position: relative;
+            width: 80px; height: 28px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: rgba(130,153,255,0.06);
+            border: 1px solid rgba(130,153,255,0.12);
+        }
+        .personal-card-liquid .frag-liquid-fill {
+            border-radius: 0 0 14px 14px;
+        }
+        .personal-card-liquid .frag-liquid-text {
+            font-size: 0.6rem;
+        }
+        .personal-card-rounds {
+            font-size: 0.7rem; color: #8a94a6;
+            margin-top: 4px;
+        }
+        .personal-card-timeline {
+            max-height: 200px; overflow-y: auto;
+            padding-right: 4px;
+        }
+        .personal-card-timeline .timeline-entry {
+            padding: 6px 0;
+        }
+        .personal-card-timeline .timeline-text {
+            font-size: 0.75rem;
+        }
+        .personal-card-timeline .timeline-meta {
+            font-size: 0.58rem;
+        }
+        .personal-card-letter {
+            font-size: 0.78rem; color: #8a94a6;
+            line-height: 1.8; font-style: italic;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            border-left: 2px solid var(--card-accent, rgba(130,150,255,0.2));
+        }
+        .personal-card-actions {
+            display: flex; gap: 8px; margin-top: 16px;
+        }
+        .personal-card-btn {
+            flex: 1;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: 1px solid rgba(130,150,255,0.15);
+            background: rgba(130,150,255,0.08);
+            color: #8a94a6;
+            transition: all 0.2s;
+        }
+        .personal-card-btn:hover {
+            border-color: rgba(130,150,255,0.3);
+            color: #c7d1ff;
+        }
+        .personal-card-btn.primary {
+            background: rgba(255,215,0,0.1);
+            border-color: rgba(255,215,0,0.25);
+            color: #ffd700;
+        }
+        .personal-card-btn.primary:hover {
+            background: rgba(255,215,0,0.15);
+        }
+
+        /* ===== 碎片地图横排仪式感 ===== */
+        .puzzle-ritual-row {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .puzzle-ritual-piece {
+            position: relative;
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .puzzle-ritual-piece:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+        .puzzle-ritual-piece.unclaimed {
+            background: rgba(130,150,255,0.03);
+            border: 2px dashed rgba(130,150,255,0.12);
+        }
+        .puzzle-ritual-piece.claimed {
+            background: rgba(130,150,255,0.08);
+            border: 2px solid var(--piece-color, rgba(130,150,255,0.3));
+            box-shadow: 0 0 8px var(--piece-glow, transparent);
+        }
+        .puzzle-ritual-piece.done {
+            background: rgba(78,201,176,0.1);
+            border: 2px solid var(--piece-color, rgba(78,201,176,0.4));
+            box-shadow: 0 0 6px var(--piece-glow, transparent);
+            opacity: 0.85;
+        }
+        .puzzle-ritual-liquid {
+            position: absolute;
+            bottom: 0; left: 2px; right: 2px;
+            border-radius: 0 0 6px 6px;
+            background: linear-gradient(180deg, rgba(100,180,255,0.4) 0%, rgba(60,120,220,0.6) 100%);
+            transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+        .puzzle-ritual-liquid::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: 0; right: 0;
+            height: 2px;
+            background: rgba(180,220,255,0.5);
+            border-radius: 50%;
+            animation: liquidWave 2s ease-in-out infinite;
+        }
+        .puzzle-ritual-name {
+            position: absolute;
+            bottom: -16px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.5rem; color: #5a6480;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .puzzle-ritual-piece:hover .puzzle-ritual-name {
+            opacity: 1;
+        }
+        .puzzle-ritual-check {
+            position: absolute;
+            top: 2px; right: 2px;
+            font-size: 0.55rem;
+            color: var(--completer-color, #4ec9b0);
+        }
+
         /* ===== 竣工星辰 ===== */
         .star-achievement {
             display: flex; flex-direction: column; align-items: center;
@@ -894,7 +1126,11 @@
 
     <div class="create-card" id="createCard" onclick="tryCreateSpace()">
         <div class="ice-cover" id="createIceCover" style="display:none;">
-            <span class="ice-hint">❄️ 集齐 3 🏵️ 解冻</span>
+            <span class="ice-hint">
+                <span style="font-size:1.5rem;">❄️</span>
+                <span>集齐 3 朵 🏵️ 解冻创造</span>
+                <span style="font-size:0.7rem;color:#5a8acc;">当前 <span id="iceSCount">0</span> / 3</span>
+            </span>
         </div>
         <div class="create-icon">✦</div>
         <div class="create-text">创造新空间</div>
@@ -921,8 +1157,12 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="form-label">世界法则（每行一条）</label>
+            <label class="form-label">世界法则（每行一条，选填）</label>
             <textarea class="form-input" id="newSpaceLaws" placeholder="这个世界的基本规则是什么？&#10;例：这里的时间流速是外界的3倍&#10;例：每个人只能携带3件物品"></textarea>
+        </div>
+        <div class="form-group">
+            <label class="form-label">蓝图（选填）</label>
+            <textarea class="form-input" id="newSpaceBlueprint" placeholder="大致描述一下这里是一个什么样的世界" style="min-height:60px;"></textarea>
         </div>
         <div class="modal-cost">✦ 花朵已扣除，填写信息后创造你的世界</div>
         <div class="modal-btns">
@@ -1033,7 +1273,7 @@
             碎片认领
         </h4>
         <div style="font-size:0.72rem;color:#8a94a6;margin-bottom:12px;padding:8px 10px;background:rgba(130,153,255,0.05);border-radius:8px;line-height:1.6;">
-            每个拼图块代表一个工种/碎片。实心=已认领，空心=待认领。点击碎片可查看详情或认领。
+            每个拼图块代表一个工种/碎片。实心=已认领（认领者颜色辉光），虚框=待认领，液体填充=完成进度。点击碎片查看个人卡片。
         </div>
         <div id="fragmentPanelContent"></div>
         <div id="fragmentPanelEmpty" style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:20px 0;">
@@ -1120,7 +1360,7 @@
     <div class="modal" style="max-width:480px;max-height:85vh;overflow-y:auto;">
         <h4 style="display:flex;align-items:center;gap:6px;">🧩 团队地图</h4>
         <div style="font-size:0.72rem;color:#8a94a6;margin-bottom:10px;">
-            所有创造物的碎片总览。虚线=未认领，金色=我认领，绿色=已完成。右上角数字=工作留痕条数。点击碎片查看工作时间线。
+            所有创造物的碎片总览。虚框=未认领，实心=已认领（认领者颜色辉光），✓=已完成。液体填充=当前轮完成度。点击碎片查看个人卡片。
         </div>
         <div id="puzzleMapGrid"></div>
         <div id="puzzleMapEmpty" style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:16px 0;">
@@ -1148,6 +1388,11 @@
     </div>
 </div>
 
+<!-- 个人小卡片弹窗（手写信风格） -->
+<div class="personal-card-overlay" id="personalCardOverlay" onclick="if(event.target===this)closePersonalCard()">
+    <div class="personal-card" id="personalCardContent"></div>
+</div>
+
 <!-- 悬浮刷新按钮 -->
 <button class="float-refresh" onclick="location.reload()" title="刷新">
     <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5" stroke="#ffd700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
@@ -1167,6 +1412,262 @@
             return { uid: user.uid, name: name, email: email, loggedIn: true };
         }
         return { uid: 'me', name: '我', email: '', loggedIn: false };
+    }
+
+    // ===== 成员颜色三层独立体系 =====
+    var MEMBER_COLORS = [
+        { name: 'amber',    glow: '#ffd700', dark: '#b8860b' },
+        { name: 'teal',     glow: '#4ec9b0', dark: '#2d8a78' },
+        { name: 'coral',    glow: '#ff7e6b', dark: '#c44a3a' },
+        { name: 'lavender', glow: '#c9a0ff', dark: '#7d5cc4' },
+        { name: 'sky',      glow: '#7ec8ff', dark: '#3a8bc4' },
+        { name: 'lime',     glow: '#a8e063', dark: '#5a8a2e' },
+        { name: 'rose',     glow: '#ff9ec4', dark: '#c4597d' },
+        { name: 'sand',     glow: '#e8c87a', dark: '#a08840' }
+    ];
+
+    // 获取成员颜色（按团队加入顺序分配）
+    function getMemberColor(space, uid) {
+        if (!space || !space.team || space.team.length === 0) return MEMBER_COLORS[0];
+        // 在 team 中查找该 uid 的索引
+        var teamIdx = -1;
+        for (var i = 0; i < space.team.length; i++) {
+            if (space.team[i].uid === uid) {
+                teamIdx = i;
+                break;
+            }
+        }
+        // 如果找不到，用 uid hash 做一个稳定的索引
+        if (teamIdx === -1) {
+            var hash = 0;
+            for (var c = 0; c < uid.length; c++) {
+                hash = ((hash << 5) - hash + uid.charCodeAt(c)) | 0;
+            }
+            teamIdx = Math.abs(hash) % MEMBER_COLORS.length;
+        }
+        return MEMBER_COLORS[teamIdx % MEMBER_COLORS.length];
+    }
+
+    // 获取碎片认领者颜色
+    function getFragmentAssigneeColor(space, frag) {
+        if (!frag || !frag.assignee) return null;
+        return getMemberColor(space, frag.assignee);
+    }
+
+    // 获取任务完成者颜色
+    function getTaskCompleterColor(space, completedByUid) {
+        if (!completedByUid) return null;
+        return getMemberColor(space, completedByUid);
+    }
+
+    // ===== 个人小卡片 =====
+    var personalCardRef = null; // {cIdx, fIdx}
+
+    function openPersonalCard(cIdx, fIdx) {
+        var spaces = loadData();
+        var space = spaces.find(function(s){ return s.id === currentSpaceId; });
+        if (!space || !space.creations) return;
+        var c = space.creations[cIdx];
+        if (!c || !c.fragments) return;
+        var f = c.fragments[fIdx];
+        if (!f) return;
+
+        personalCardRef = { cIdx: cIdx, fIdx: fIdx };
+
+        var user = getCurrentUser();
+        var isMine = (f.assignee === user.uid);
+        var assigneeColor = getFragmentAssigneeColor(space, f);
+        var accentColor = assigneeColor ? assigneeColor.glow : '#8299ff';
+        var glowColor = assigneeColor ? assigneeColor.glow : 'rgba(130,150,255,0.1)';
+
+        var prog = getFragmentProgress(f);
+        var pct = prog.pct;
+
+        // 构建时间线条目
+        var entries = [];
+        var tl = f.timeline || [];
+        for (var i = 0; i < tl.length; i++) {
+            entries.push({
+                ts: tl[i].createdAt || '',
+                type: 'manual',
+                text: tl[i].text,
+                author: tl[i].author || ''
+            });
+        }
+        if (f.rounds) {
+            for (var ri = 0; ri < f.rounds.length; ri++) {
+                var round = f.rounds[ri];
+                for (var ti = 0; ti < round.tasks.length; ti++) {
+                    var task = round.tasks[ti];
+                    if (task.done && task.completedAt) {
+                        var completerColor = getTaskCompleterColor(space, task.completedByUid);
+                        entries.push({
+                            ts: task.completedAt,
+                            type: 'task',
+                            text: '完成「' + task.name + '」（第' + round.roundNum + '轮）',
+                            author: task.completedBy || '',
+                            authorUid: task.completedByUid || '',
+                            completerColor: completerColor
+                        });
+                    }
+                }
+            }
+        }
+        entries.sort(function(a, b) {
+            if (!a.ts) return 1;
+            if (!b.ts) return -1;
+            return b.ts.localeCompare(a.ts);
+        });
+
+        // 构建手写信文案
+        var letterText = '';
+        if (!f.assignee) {
+            letterText = '这块碎片还在等待它的主人。';
+            if (f.rounds && f.rounds.length > 0) {
+                var lastRound = f.rounds[f.rounds.length - 1];
+                letterText += ' 目前有 ' + lastRound.tasks.length + ' 个任务待启动。';
+            }
+        } else if (isMine) {
+            letterText = '这是你领取的碎片。';
+            if (prog.total > 0) {
+                letterText += '已完成 ' + prog.done + '/' + prog.total;
+                if (pct === 100) letterText += '，全部搞定！';
+                else letterText += '，继续加油。';
+            } else {
+                letterText += '还没发布任务，可以先发布一轮试试。';
+            }
+            if (f.rounds && f.rounds.length > 1) {
+                letterText += ' 经历了 ' + f.rounds.length + ' 轮任务。';
+            }
+        } else {
+            letterText = '这块碎片由 ' + (f.assigneeName || f.assignee) + ' 领取。';
+            if (prog.total > 0) {
+                letterText += ' 进度 ' + prog.done + '/' + prog.total + '。';
+            }
+        }
+
+        // 构建HTML
+        var html = '';
+        html += '<div class="personal-card-header">';
+        html += '<div class="personal-card-avatar" style="background:' + accentColor + '20;color:' + accentColor + ';">';
+        html += isMine ? '🙋' : (f.done ? '✅' : (f.assignee ? '🔒' : '🧩'));
+        html += '</div>';
+        html += '<div>';
+        html += '<div class="personal-card-name" style="color:' + accentColor + ';">' + esc(f.assigneeName || (f.assignee ? f.assignee : '未认领')) + '</div>';
+        html += '<div class="personal-card-fragment">来自「' + esc(c.name) + '」· ' + esc(f.name) + '</div>';
+        html += '</div>';
+        html += '</div>';
+
+        // 手写信
+        html += '<div class="personal-card-letter" style="border-left-color:' + accentColor + ';">' + esc(letterText) + '</div>';
+
+        // 进度
+        if (prog.total > 0) {
+            html += '<div class="personal-card-section" style="margin-top:14px;">';
+            html += '<div class="personal-card-label">完成进度</div>';
+            html += '<div class="personal-card-progress">';
+            html += '<div class="personal-card-liquid">';
+            html += '<div class="frag-liquid-fill" style="height:' + pct + '%;"></div>';
+            html += generateStarlights(pct);
+            html += '<span class="frag-liquid-text">' + prog.done + '/' + prog.total + '</span>';
+            html += '</div>';
+            html += '<span style="font-size:0.72rem;color:#8a94a6;">' + pct + '%</span>';
+            if (f.rounds && f.rounds.length > 0) {
+                html += '<span class="personal-card-rounds">' + f.rounds.length + ' 轮任务</span>';
+            }
+            html += '</div>';
+            html += '</div>';
+        }
+
+        // 时间线
+        if (entries.length > 0) {
+            html += '<div class="personal-card-section">';
+            html += '<div class="personal-card-label">工作留痕</div>';
+            html += '<div class="personal-card-timeline">';
+            for (var k = 0; k < Math.min(entries.length, 8); k++) {
+                var e = entries[k];
+                var dt = e.ts ? new Date(e.ts).toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+                var dotStyle = '';
+                var prefix = '';
+                if (e.type === 'task') {
+                    var cColor = e.completerColor ? e.completerColor.glow : '#4ec9b0';
+                    dotStyle = ' style="background:' + cColor + ';"';
+                    prefix = '<span style="color:' + cColor + ';">✓</span> ';
+                }
+                html += '<div class="timeline-entry">';
+                html += '<div class="timeline-dot"' + dotStyle + '></div>';
+                html += '<div class="timeline-content">';
+                html += '<div class="timeline-text">' + prefix + esc(e.text) + '</div>';
+                html += '<div class="timeline-meta">' + dt + (e.author ? ' · ' + esc(e.author) : '') + '</div>';
+                html += '</div></div>';
+            }
+            if (entries.length > 8) {
+                html += '<div style="font-size:0.62rem;color:#5a6480;text-align:center;padding:6px 0;">还有 ' + (entries.length - 8) + ' 条记录…</div>';
+            }
+            html += '</div>';
+            html += '</div>';
+        }
+
+        // 操作按钮
+        html += '<div class="personal-card-actions">';
+        if (!f.assignee) {
+            html += '<button class="personal-card-btn primary" onclick="claimFragment(' + cIdx + ',' + fIdx + ');closePersonalCard();">认领这块碎片</button>';
+        } else if (isMine && !f.done) {
+            html += '<button class="personal-card-btn" onclick="closePersonalCard();openFragmentTimeline(' + cIdx + ',' + fIdx + ');">查看完整时间线</button>';
+            html += '<button class="personal-card-btn primary" onclick="closePersonalCard();publishTaskRound(' + cIdx + ',' + fIdx + ');">发布任务</button>';
+        } else {
+            html += '<button class="personal-card-btn" onclick="closePersonalCard();openFragmentTimeline(' + cIdx + ',' + fIdx + ');">查看完整时间线</button>';
+        }
+        html += '</div>';
+
+        var overlay = document.getElementById('personalCardOverlay');
+        var card = document.getElementById('personalCardContent');
+        card.style.setProperty('--card-accent', accentColor);
+        card.style.setProperty('--card-glow', glowColor + '20');
+        card.innerHTML = html;
+        overlay.classList.add('show');
+    }
+
+    function closePersonalCard() {
+        document.getElementById('personalCardOverlay').classList.remove('show');
+        personalCardRef = null;
+    }
+
+    // ===== 自定义弹窗（替代 alert/confirm）=====
+    function customAlert(msg, title) {
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;';
+        overlay.innerHTML = '<div style="background:rgba(26,35,69,0.95);border:1px solid rgba(130,150,255,0.25);border-radius:14px;padding:24px 28px;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:scale(0.92);transition:transform .2s;">' +
+            (title ? '<div style="font-size:0.9rem;color:#c7d1ff;font-weight:600;margin-bottom:10px;">' + title + '</div>' : '') +
+            '<div style="font-size:0.82rem;color:#8a94a6;line-height:1.6;margin-bottom:18px;">' + msg + '</div>' +
+            '<button style="padding:6px 24px;border-radius:8px;background:rgba(130,150,255,0.15);border:1px solid rgba(130,150,255,0.3);color:#c7d1ff;font-size:0.8rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.background=\'rgba(130,150,255,0.25)\'" onmouseout="this.style.background=\'rgba(130,150,255,0.15)\'">好的</button>' +
+            '</div>';
+        document.body.appendChild(overlay);
+        requestAnimationFrame(function() { overlay.style.opacity = '1'; overlay.querySelector('div').style.transform = 'scale(1)'; });
+        var btn = overlay.querySelector('button');
+        btn.onclick = function() {
+            overlay.style.opacity = '0';
+            setTimeout(function() { overlay.remove(); }, 200);
+        };
+        btn.focus();
+    }
+
+    function customConfirm(msg, title, onConfirm, onCancel) {
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;';
+        overlay.innerHTML = '<div style="background:rgba(26,35,69,0.95);border:1px solid rgba(130,150,255,0.25);border-radius:14px;padding:24px 28px;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:scale(0.92);transition:transform .2s;">' +
+            (title ? '<div style="font-size:0.9rem;color:#c7d1ff;font-weight:600;margin-bottom:10px;">' + title + '</div>' : '') +
+            '<div style="font-size:0.82rem;color:#8a94a6;line-height:1.6;margin-bottom:18px;">' + msg + '</div>' +
+            '<div style="display:flex;gap:10px;justify-content:center;">' +
+            '<button id="ccCancel" style="padding:6px 18px;border-radius:8px;background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.15);color:#5a6480;font-size:0.8rem;cursor:pointer;transition:all .2s;">取消</button>' +
+            '<button id="ccOk" style="padding:6px 18px;border-radius:8px;background:rgba(130,150,255,0.15);border:1px solid rgba(130,150,255,0.3);color:#c7d1ff;font-size:0.8rem;cursor:pointer;transition:all .2s;">确认</button>' +
+            '</div></div>';
+        document.body.appendChild(overlay);
+        requestAnimationFrame(function() { overlay.style.opacity = '1'; overlay.querySelector('div').style.transform = 'scale(1)'; });
+        function close() { overlay.style.opacity = '0'; setTimeout(function() { overlay.remove(); }, 200); }
+        overlay.querySelector('#ccCancel').onclick = function() { close(); if (onCancel) onCancel(); };
+        overlay.querySelector('#ccOk').onclick = function() { close(); if (onConfirm) onConfirm(); };
+        overlay.querySelector('#ccOk').focus();
     }
 
     // ===== 数据 =====
@@ -1301,7 +1802,7 @@
     }
     function confirmCreateType() {
         var label = document.getElementById('ctLabel').value.trim();
-        if (!label) { alert('请输入标签名称'); return; }
+        if (!label) { customAlert('请输入标签名称'); return; }
         var icon = document.getElementById('ctIcon').value.trim() || '⭐';
         var fieldsRaw = document.getElementById('ctFields').value.trim();
         var fields = [];
@@ -1375,12 +1876,13 @@
         if (!t) return;
         var isDefault = !!DEFAULT_CREATION_TYPES[key];
         var msg = isDefault
-            ? '确定删除默认标签「' + (t.label || key) + '」吗？\n删除后可随时从"已删除的默认标签"中恢复。'
-            : '确定删除自定义标签「' + (t.label || key) + '」吗？\n此操作不可恢复。';
-        if (!confirm(msg)) return;
-        removeCreationType(key);
-        renderManageTypesList();
-        renderCreationTypeBtns();
+            ? '确定删除默认标签「' + (t.label || key) + '」吗？<br>删除后可随时从"已删除的默认标签"中恢复。'
+            : '确定删除自定义标签「' + (t.label || key) + '」吗？<br>此操作不可恢复。';
+        customConfirm(msg, '删除标签', function() {
+            removeCreationType(key);
+            renderManageTypesList();
+            renderCreationTypeBtns();
+        });
     }
     function restoreType(key) {
         restoreCreationType(key);
@@ -1413,7 +1915,7 @@
     function confirmSplit() {
         if (splitCreationIdx < 0) return;
         var raw = document.getElementById('splitFragments').value.trim();
-        if (!raw) { alert('请至少输入一个碎片名称'); return; }
+        if (!raw) { customAlert('请至少输入一个碎片名称'); return; }
         var lines = raw.split('\n');
         var newFrags = [];
         for (var i = 0; i < lines.length; i++) {
@@ -1449,8 +1951,10 @@
         var space = spaces.find(s => s.id === currentSpaceId);
         if (!space || !space.creations[cIdx] || !space.creations[cIdx].fragments) return;
         var user = getCurrentUser();
+        var color = getMemberColor(space, user.uid);
         space.creations[cIdx].fragments[fIdx].assignee = user.uid;
         space.creations[cIdx].fragments[fIdx].assigneeName = user.name;
+        space.creations[cIdx].fragments[fIdx].assigneeColor = color.name;
         space.creations[cIdx].fragments[fIdx].done = false;
         saveData(spaces);
         openSpaceDetail(currentSpaceId);
@@ -1836,6 +2340,7 @@
             return;
         }
         var pieces = [];
+        var maxRounds = 0;
         for (var i = 0; i < space.creations.length; i++) {
             var c = space.creations[i];
             if (!c.fragments) continue;
@@ -1845,6 +2350,10 @@
                 if (f.done) state = 'done';
                 else if (f.assignee === getCurrentUser().uid) state = 'claimed-by-me';
                 else if (f.assignee) state = 'claimed';
+                var assigneeColor = getFragmentAssigneeColor(space, f);
+                var prog = getFragmentProgress(f);
+                var roundCount = f.rounds ? f.rounds.length : 0;
+                if (roundCount > maxRounds) maxRounds = roundCount;
                 pieces.push({
                     cIdx: i, fIdx: j,
                     name: f.name,
@@ -1852,7 +2361,10 @@
                     state: state,
                     assignee: f.assignee,
                     assigneeName: f.assigneeName || '',
-                    timelineCount: (f.timeline || []).length
+                    timelineCount: (f.timeline || []).length,
+                    color: assigneeColor,
+                    prog: prog,
+                    roundCount: roundCount
                 });
             }
         }
@@ -1862,25 +2374,85 @@
             return;
         }
         emptyEl.style.display = 'none';
-        var html = '<div class="puzzle-grid">';
+
+        // 多轮任务标题标注
+        var titleNote = '';
+        if (maxRounds > 0) {
+            titleNote = '<div style="font-size:0.65rem;color:#5a6480;margin-bottom:8px;">最高 ' + maxRounds + ' 轮任务</div>';
+        }
+
+        var html = titleNote;
+        // Group by creation
+        var groups = {};
+        var groupOrder = [];
         for (var k = 0; k < pieces.length; k++) {
             var p = pieces[k];
-            var assigneeLabel = '';
-            if (p.state === 'done') assigneeLabel = '<span class="puzzle-piece-assignee done">✅ 已完成</span>';
-            else if (p.state === 'claimed-by-me') assigneeLabel = '<span class="puzzle-piece-assignee mine">🙋 我认领</span>';
-            else if (p.state === 'claimed') assigneeLabel = '<span class="puzzle-piece-assignee">🔒 ' + esc(p.assigneeName || p.assignee) + '</span>';
-            else assigneeLabel = '<span class="puzzle-piece-assignee">未认领</span>';
-            var tlBadge = p.timelineCount > 0
-                ? '<span style="position:absolute;top:4px;right:6px;font-size:0.6rem;background:rgba(100,200,100,0.2);color:#4caf50;border-radius:8px;padding:1px 5px;">' + p.timelineCount + '条</span>'
-                : '';
-            html += '<div class="puzzle-piece ' + p.state + '" onclick="openFragmentTimeline(' + p.cIdx + ',' + p.fIdx + ')">' +
-                tlBadge +
-                '<span class="puzzle-piece-name">' + esc(p.name) + '</span>' +
-                assigneeLabel +
-                '<span class="puzzle-piece-source">来自「' + esc(p.creationName) + '」</span>' +
-                '</div>';
+            if (!groups[p.creationName]) {
+                groups[p.creationName] = [];
+                groupOrder.push(p.creationName);
+            }
+            groups[p.creationName].push(p);
         }
-        html += '</div>';
+
+        for (var gi = 0; gi < groupOrder.length; gi++) {
+            var gName = groupOrder[gi];
+            var gPieces = groups[gName];
+            html += '<div style="margin-bottom:14px;">';
+            html += '<div style="font-size:0.72rem;color:#8299ff;margin-bottom:6px;">' + esc(gName) + '</div>';
+            // 横排仪式感
+            html += '<div class="puzzle-ritual-row">';
+            for (var pi = 0; pi < gPieces.length; pi++) {
+                var pp = gPieces[pi];
+                var pieceState = pp.state === 'done' ? 'done' : (pp.state === 'unclaimed' ? 'unclaimed' : 'claimed');
+                var glowColor = pp.color ? pp.color.glow : 'rgba(130,150,255,0.3)';
+                var darkColor = pp.color ? pp.color.dark : 'rgba(130,150,255,0.3)';
+                var liquidHtml = '';
+                if (pp.prog.total > 0 && pp.prog.pct > 0) {
+                    liquidHtml = '<div class="puzzle-ritual-liquid" style="height:' + Math.min(pp.prog.pct, 100) + '%;"></div>';
+                }
+                var checkHtml = '';
+                if (pp.state === 'done') {
+                    checkHtml = '<span class="puzzle-ritual-check">✓</span>';
+                }
+                html += '<div class="puzzle-ritual-piece ' + pieceState + '" ' +
+                    'style="--piece-color:' + darkColor + ';--piece-glow:' + glowColor + '40;" ' +
+                    'onclick="openPersonalCard(' + pp.cIdx + ',' + pp.fIdx + ')" ' +
+                    'title="' + esc(pp.name) + ' — ' + (pp.state === 'done' ? '已完成' : pp.state === 'unclaimed' ? '未认领' : esc(pp.assigneeName)) + '">' +
+                    liquidHtml + checkHtml +
+                    '<span class="puzzle-ritual-name">' + esc(pp.name) + '</span>' +
+                    '</div>';
+            }
+            html += '</div>';
+
+            // 传统卡片列表（保留，下方显示认领详情）
+            html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">';
+            for (var pi2 = 0; pi2 < gPieces.length; pi2++) {
+                var pp2 = gPieces[pi2];
+                var assigneeLabel = '';
+                if (pp2.state === 'done') assigneeLabel = '<span class="puzzle-piece-assignee done">✅ 已完成</span>';
+                else if (pp2.state === 'claimed-by-me') assigneeLabel = '<span class="puzzle-piece-assignee mine">🙋 我认领</span>';
+                else if (pp2.state === 'claimed') {
+                    var gColor = pp2.color ? pp2.color.glow : '#8a94a6';
+                    assigneeLabel = '<span class="puzzle-piece-assignee" style="color:' + gColor + ';">🔒 ' + esc(pp2.assigneeName || pp2.assignee) + '</span>';
+                }
+                else assigneeLabel = '<span class="puzzle-piece-assignee">未认领</span>';
+                var tlBadge = pp2.timelineCount > 0
+                    ? '<span style="position:absolute;top:4px;right:6px;font-size:0.6rem;background:rgba(100,200,100,0.2);color:#4caf50;border-radius:8px;padding:1px 5px;">' + pp2.timelineCount + '条</span>'
+                    : '';
+                var glowStyle = '';
+                if (pp2.color && pp2.state !== 'unclaimed') {
+                    glowStyle = ' style="box-shadow:0 0 8px ' + pp2.color.glow + '30;border-color:' + pp2.color.dark + '50;"';
+                }
+                html += '<div class="puzzle-piece ' + pp2.state + '"' + glowStyle + ' onclick="openPersonalCard(' + pp2.cIdx + ',' + pp2.fIdx + ')">' +
+                    tlBadge +
+                    '<span class="puzzle-piece-name">' + esc(pp2.name) + '</span>' +
+                    assigneeLabel +
+                    '<span class="puzzle-piece-source">来自「' + esc(pp2.creationName) + '」</span>' +
+                    '</div>';
+            }
+            html += '</div>';
+            html += '</div>';
+        }
         grid.innerHTML = html;
     }
 
@@ -1905,8 +2477,10 @@
         var emptyEl = document.getElementById('fragmentTimelineEmpty');
         var infoEl = document.getElementById('fragmentTimelineInfo');
         document.getElementById('fragmentTimelineTitle').textContent = '🕐 ' + f.name;
+        var fragColor = getFragmentAssigneeColor(space, f);
+        var infoColor = fragColor ? fragColor.glow : '#8a94a6';
         infoEl.innerHTML = '来自「' + esc(c.name) + '」' +
-            (f.done ? ' · <span style="color:#4caf50;">已完成</span>' : f.assignee === getCurrentUser().uid ? ' · <span style="color:#ffd700;">我认领</span>' : (f.assignee ? ' · <span style="color:#8a94a6;">' + esc(f.assigneeName || f.assignee) + ' 认领</span>' : ' · 未认领'));
+            (f.done ? ' · <span style="color:' + infoColor + ';">已完成</span>' : f.assignee === getCurrentUser().uid ? ' · <span style="color:' + infoColor + ';">我认领</span>' : (f.assignee ? ' · <span style="color:' + infoColor + ';">' + esc(f.assigneeName || f.assignee) + ' 认领</span>' : ' · 未认领'));
 
         // Build unified timeline: merge manual entries + round task completions
         var entries = [];
@@ -1930,12 +2504,14 @@
                 for (var ti = 0; ti < round.tasks.length; ti++) {
                     var task = round.tasks[ti];
                     if (task.done && task.completedAt) {
+                        var completerColor = getTaskCompleterColor(space, task.completedByUid);
                         entries.push({
                             ts: task.completedAt,
                             type: 'task',
                             text: '完成「' + task.name + '」（第' + round.roundNum + '轮）',
                             author: task.completedBy || '',
-                            authorUid: task.completedByUid || ''
+                            authorUid: task.completedByUid || '',
+                            completerColor: completerColor
                         });
                     }
                 }
@@ -1959,8 +2535,13 @@
         for (var k = 0; k < entries.length; k++) {
             var e = entries[k];
             var dt = e.ts ? new Date(e.ts).toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
-            var dotStyle = e.type === 'task' ? ' style="background:#4ec9b0;"' : '';
-            var prefix = e.type === 'task' ? '<span style="color:#4ec9b0;">✓</span> ' : '';
+            var dotStyle = '';
+            var prefix = '';
+            if (e.type === 'task') {
+                var cColor = e.completerColor ? e.completerColor.glow : '#4ec9b0';
+                dotStyle = ' style="background:' + cColor + ';"';
+                prefix = '<span style="color:' + cColor + ';">✓</span> ';
+            }
             html += '<div class="timeline-entry">' +
                 '<div class="timeline-dot"' + dotStyle + '></div>' +
                 '<div class="timeline-content">' +
@@ -2013,6 +2594,8 @@
         const iceCover = document.getElementById('createIceCover');
         const sCountEl = document.getElementById('createSCount');
         if (sCountEl) sCountEl.textContent = sFlowers;
+        const iceSCountEl = document.getElementById('iceSCount');
+        if (iceSCountEl) iceSCountEl.textContent = sFlowers;
         if (sFlowers >= 3) {
             createCard.classList.remove('frozen');
             if (iceCover) iceCover.style.display = 'none';
@@ -2022,7 +2605,7 @@
         }
 
         if (spaces.length === 0) {
-            container.innerHTML = `<div class="empty-hint">还没有空间<br>用 S级小红花 创造你的第一个世界吧</div>`;
+            container.innerHTML = `<div class="empty-hint">还没有创造空间<br>集齐 3 朵 🏵️ 即可解锁</div>`;
             return;
         }
 
@@ -2072,18 +2655,46 @@
     }
 
     function openCreateModal() {
-        document.getElementById('newSpaceName').value = '';
-        document.getElementById('newSpaceLaws').value = '';
-        newSpaceType = 'theme';
+        // 恢复草稿
+        var draft = null;
+        try { draft = JSON.parse(localStorage.getItem('dreamspace_create_draft') || 'null'); } catch(e) {}
+        document.getElementById('newSpaceName').value = (draft && draft.name) || '';
+        document.getElementById('newSpaceLaws').value = (draft && draft.laws) || '';
+        var bpInput = document.getElementById('newSpaceBlueprint');
+        if (bpInput) bpInput.value = (draft && draft.blueprint) || '';
+        newSpaceType = (draft && draft.type) || 'theme';
         document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
-        document.querySelector('.type-option[data-type="theme"]').classList.add('selected');
+        document.querySelector('.type-option[data-type="' + newSpaceType + '"]').classList.add('selected');
         document.getElementById('createModal').classList.add('active');
+
+        // 绑定自动保存草稿
+        var nameInput = document.getElementById('newSpaceName');
+        var lawsInput = document.getElementById('newSpaceLaws');
+        var bpInput = document.getElementById('newSpaceBlueprint');
+        function saveDraft() {
+            var d = { name: nameInput.value, laws: lawsInput.value, type: newSpaceType, blueprint: bpInput ? bpInput.value : '' };
+            localStorage.setItem('dreamspace_create_draft', JSON.stringify(d));
+        }
+        nameInput.oninput = saveDraft;
+        lawsInput.oninput = saveDraft;
+        if (bpInput) bpInput.oninput = saveDraft;
+    }
+
+    function clearCreateDraft() {
+        localStorage.removeItem('dreamspace_create_draft');
+        var nameInput = document.getElementById('newSpaceName');
+        var lawsInput = document.getElementById('newSpaceLaws');
+        var bpInput = document.getElementById('newSpaceBlueprint');
+        if (nameInput) nameInput.oninput = null;
+        if (lawsInput) lawsInput.oninput = null;
+        if (bpInput) bpInput.oninput = null;
     }
 
     function closeCreateModal() {
         document.getElementById('createModal').classList.remove('active');
-        // 取消则退还花朵
+        // 取消则退还花朵并清除草稿
         refundSFlowers(3);
+        clearCreateDraft();
         renderSpaceList();
     }
 
@@ -2095,20 +2706,21 @@
 
     function confirmCreate() {
         const name = document.getElementById('newSpaceName').value.trim();
-        if (!name) { alert('给空间起个名字吧'); return; }
+        if (!name) { customAlert('给空间起个名字吧'); return; }
 
         // 花朵已在 tryCreateSpace 中扣除，这里只创建空间数据
         const lawsText = document.getElementById('newSpaceLaws').value.trim();
         const laws = lawsText ? lawsText.split('\n').map(l => l.trim()).filter(l => l) : [];
+        const blueprint = (document.getElementById('newSpaceBlueprint') && document.getElementById('newSpaceBlueprint').value.trim()) || '';
 
         const space = {
             id: 'ds_' + Date.now(),
             name: name,
             type: newSpaceType,
             laws: laws,
+            blueprint: blueprint,
             creations: [],
             team: [],
-            blueprint: '',
             createdAt: new Date().toISOString()
         };
 
@@ -2116,6 +2728,8 @@
         spaces.unshift(space);
         saveData(spaces);
 
+        // 清除草稿
+        clearCreateDraft();
         // 关闭弹窗（不退款，因为已经创建了空间）
         document.getElementById('createModal').classList.remove('active');
         if (window.SFX) SFX.master();
@@ -2144,6 +2758,19 @@
                 <span class="space-type-badge ${typeClass}">${typeLabel}</span>
                 <button onclick="openPuzzleMap()" title="团队地图" style="background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.15);color:#8299ff;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:0.75rem;white-space:nowrap;">🧩 地图</button>
             </div>
+
+            <!-- 蓝图 -->
+            ${space.blueprint ? `
+            <div class="sub-section">
+                <div class="sub-header" onclick="toggleSub(this)">
+                    <span class="sub-title">🗺️ 蓝图</span>
+                    <svg class="sub-chevron" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#5a6480" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+                </div>
+                <div class="sub-body open">
+                    <div style="font-size:0.82rem;color:#8a94a6;line-height:1.7;padding:4px 0;">${esc(space.blueprint)}</div>
+                </div>
+            </div>
+            ` : ''}
 
             <!-- 世界法则 -->
             <div class="sub-section">
@@ -2266,6 +2893,9 @@
         const allTypes = getCreationTypes();
         const t = allTypes[c.type] || { label: c.type, icon: '⭐', fields: [] };
         const cls = 'creation-type-tag';
+        // 查找当前空间用于成员颜色查找
+        var _spaces = loadData();
+        var space = _spaces.find(function(s){ return s.id === currentSpaceId; });
 
         // 竣工态：显示星辰
         if (c.completed) {
@@ -2340,10 +2970,23 @@
                 else if (f.assignee === getCurrentUser().uid) dotClass += ' claimed-by-me';
                 else if (f.assignee) dotClass += ' claimed';
 
+                // 成员颜色：领取人辉光
+                var fragColor = getFragmentAssigneeColor(space, f);
+                var dotStyle = '';
+                if (fragColor && f.assignee) {
+                    dotStyle = ' style="background:' + fragColor.glow + ';box-shadow:0 0 6px ' + fragColor.glow + '80;"';
+                }
+
                 var assigneeText = '';
-                if (f.done) assigneeText = '<span class="fragment-assignee">✓ 已完成</span>';
+                if (f.done) {
+                    var doneColor = fragColor ? fragColor.glow : '#4ec9b0';
+                    assigneeText = '<span class="fragment-assignee" style="color:' + doneColor + ';">✓ 已完成</span>';
+                }
                 else if (f.assignee === getCurrentUser().uid) assigneeText = '<span class="fragment-assignee me">我</span>';
-                else if (f.assignee) assigneeText = '<span class="fragment-assignee">' + esc(f.assigneeName || f.assignee) + '</span>';
+                else if (f.assignee) {
+                    var aColor = fragColor ? fragColor.glow : '#8a94a6';
+                    assigneeText = '<span class="fragment-assignee" style="color:' + aColor + ';">' + esc(f.assigneeName || f.assignee) + '</span>';
+                }
                 else assigneeText = '<span class="fragment-assignee">未认领</span>';
 
                 var actions = '<div class="fragment-actions">';
@@ -2358,6 +3001,8 @@
                 if (f.assignee === getCurrentUser().uid && !f.done) {
                     actions += '<button class="frag-btn" style="font-size:0.6rem;padding:2px 6px;background:rgba(130,153,255,0.1);color:#8299ff;border-color:rgba(130,153,255,0.2);" onclick="publishTaskRound(' + idx + ',' + fi + ')">+ 发布任务</button>';
                 }
+                // 个人小卡片入口
+                actions += '<button class="frag-btn" style="font-size:0.6rem;padding:2px 6px;background:rgba(255,215,0,0.06);color:#8a94a6;border-color:rgba(255,215,0,0.1);" onclick="openPersonalCard(' + idx + ',' + fi + ')" title="查看详情">卡片</button>';
                 actions += '</div>';
 
                 var progressHtml = '';
@@ -2401,7 +3046,7 @@
                 }
 
                 fragmentHtml += '<div class="fragment-row">' +
-                    '<span class="' + dotClass + '"></span>' +
+                    '<span class="' + dotClass + '"' + dotStyle + '></span>' +
                     '<span class="fragment-name">' + esc(f.name) + '</span>' +
                     assigneeText +
                     progressHtml +
@@ -2707,7 +3352,7 @@
         var c = space.creations[idx];
         var elements = c.elements || [];
         if (elements.length === 0) {
-            alert('请先在创造物中添加关键要素');
+            customAlert('请先在创造物中添加关键要素');
             return;
         }
         // Pre-fill split modal with element names
@@ -2768,17 +3413,30 @@
             html += '<div class="frag-panel-section-title">' + esc(gr.creation.name) +
                 ' <span style="color:#5a6480;font-size:0.68rem;">' + claimed + '/' + gr.fragments.length + ' 认领 · ' + done + ' 完成</span></div>';
 
-            // Horizontal row of puzzle pieces
-            html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">';
+            // 横排仪式感拼图碎片 — 使用成员颜色
+            html += '<div class="puzzle-ritual-row">';
             for (var fi = 0; fi < gr.fragments.length; fi++) {
                 var frag = gr.fragments[fi];
-                var piece = svgPieceEmpty;
-                var title = frag.name + ' — 未认领';
-                if (frag.done) { piece = svgPieceDone; title = frag.name + ' — 已完成'; }
-                else if (frag.assignee === getCurrentUser().uid) { piece = svgPiece; title = frag.name + ' — 我认领'; }
-                else if (frag.assignee) { piece = svgPiece; title = frag.name + ' — ' + (frag.assigneeName || frag.assignee) + ' 认领'; }
+                var fragColor = getFragmentAssigneeColor(space, frag);
+                var pieceState = frag.done ? 'done' : (frag.assignee ? 'claimed' : 'unclaimed');
+                var glowColor = fragColor ? fragColor.glow : 'rgba(130,150,255,0.3)';
+                var darkColor = fragColor ? fragColor.dark : 'rgba(130,150,255,0.3)';
 
-                html += '<span title="' + esc(title) + '" style="cursor:pointer;" onclick="openFragmentTimeline(' + gr.cIdx + ',' + fi + ')">' + piece + '</span>';
+                var prog = getFragmentProgress(frag);
+                var liquidHtml = '';
+                if (prog.total > 0 && prog.pct > 0) {
+                    liquidHtml = '<div class="puzzle-ritual-liquid" style="height:' + Math.min(prog.pct, 100) + '%;"></div>';
+                }
+                var checkHtml = frag.done ? '<span class="puzzle-ritual-check">✓</span>' : '';
+                var title = frag.name + ' — ' + (frag.done ? '已完成' : (frag.assignee ? (frag.assigneeName || frag.assignee) + ' 认领' : '未认领'));
+
+                html += '<div class="puzzle-ritual-piece ' + pieceState + '" ' +
+                    'style="--piece-color:' + darkColor + ';--piece-glow:' + glowColor + '40;" ' +
+                    'onclick="openPersonalCard(' + gr.cIdx + ',' + fi + ')" ' +
+                    'title="' + esc(title) + '">' +
+                    liquidHtml + checkHtml +
+                    '<span class="puzzle-ritual-name">' + esc(frag.name) + '</span>' +
+                    '</div>';
             }
             html += '</div>';
 
@@ -2786,10 +3444,20 @@
             html += '<div style="font-size:0.68rem;color:#5a6480;">';
             for (var fj = 0; fj < gr.fragments.length; fj++) {
                 var fr = gr.fragments[fj];
+                var frColor = getFragmentAssigneeColor(space, fr);
                 var status = '⬜ 未认领';
-                if (fr.done) status = '✅ 已完成';
-                else if (fr.assignee === getCurrentUser().uid) status = '🔵 我认领';
-                else if (fr.assignee) status = '🔒 ' + esc(fr.assigneeName || fr.assignee);
+                if (fr.done) {
+                    var dColor = frColor ? frColor.glow : '#4ec9b0';
+                    status = '<span style="color:' + dColor + ';">✓ 已完成</span>';
+                }
+                else if (fr.assignee === getCurrentUser().uid) {
+                    var mColor = frColor ? frColor.glow : '#ffd700';
+                    status = '<span style="color:' + mColor + ';">● 我认领</span>';
+                }
+                else if (fr.assignee) {
+                    var oColor = frColor ? frColor.glow : '#8a94a6';
+                    status = '<span style="color:' + oColor + ';">🔒 ' + esc(fr.assigneeName || fr.assignee) + '</span>';
+                }
                 
                 // Liquid progress bar
                 var prog = getFragmentProgress(fr);
@@ -2832,15 +3500,17 @@
             var done = c.fragments.filter(function(f){return f.done;}).length;
             fragInfo = '\n\n当前碎片完成度：' + done + '/' + c.fragments.length;
             if (done < c.fragments.length) {
-                fragInfo += '\n注意：部分碎片未完成，竣工后成果将记录当前完成度。';
+                fragInfo += '<br>注意：部分碎片未完成，竣工后成果将记录当前完成度。';
             }
         }
-        if (!confirm('确认「' + c.name + '」竣工？\n竣工后碎片将合为星辰，成果将作为独立个体存在。' + fragInfo)) return;
-        c.completed = true;
-        c.completedAt = new Date().toISOString();
-        saveData(spaces);
-        if (window.SFX) SFX.master();
-        openSpaceDetail(currentSpaceId);
+        var confirmMsg = '确认「' + c.name + '」竣工？<br>竣工后碎片将合为星辰，成果将作为独立个体存在。' + fragInfo;
+        customConfirm(confirmMsg, '竣工确认', function() {
+            c.completed = true;
+            c.completedAt = new Date().toISOString();
+            saveData(spaces);
+            if (window.SFX) SFX.master();
+            openSpaceDetail(currentSpaceId);
+        });
     }
 
     function uncompleteCreation(idx) {
@@ -2867,7 +3537,7 @@
         const role = document.getElementById('memberRole').value.trim();
         const resp = document.getElementById('memberResp').value.trim();
         const emoji = document.getElementById('memberEmoji').value.trim() || '🧑';
-        if (!role) { alert('请输入角色'); return; }
+        if (!role) { customAlert('请输入角色'); return; }
 
         const spaces = loadData();
         const space = spaces.find(s => s.id === currentSpaceId);
