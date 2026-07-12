@@ -37,6 +37,129 @@
         /* Firefox */
         * { scrollbar-width: thin; scrollbar-color: rgba(130,150,255,0.12) transparent; }
 
+        /* === 侧边栏导航 === */
+        .sidebar-overlay {
+            position: fixed; inset: 0;
+            background: rgba(5,7,20,0.5);
+            backdrop-filter: blur(3px);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 199;
+        }
+        .sidebar-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 260px;
+            background: rgba(10,16,40,0.97);
+            backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(130,150,255,0.1);
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            z-index: 200;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar.open { transform: translateX(0); }
+
+        .sidebar-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(130,150,255,0.08);
+            flex-shrink: 0;
+        }
+        .sidebar-title {
+            font-size: 0.85rem; color: #ffd700; font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .sidebar-close {
+            background: rgba(130,150,255,0.08); border: 1px solid rgba(130,150,255,0.12);
+            border-radius: 6px; padding: 4px 8px; cursor: pointer;
+            color: #8a94a6; font-size: 0.7rem; transition: all 0.2s;
+        }
+        .sidebar-close:hover { color: #c7d1ff; background: rgba(130,150,255,0.15); }
+
+        .sidebar-body {
+            flex: 1; overflow-y: auto; overflow-x: hidden;
+            padding: 8px 0;
+        }
+
+        /* 树节点 */
+        .tree-node { user-select: none; }
+        .tree-row {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 12px; cursor: pointer;
+            transition: background 0.15s;
+            min-height: 32px;
+        }
+        .tree-row:hover { background: rgba(130,150,255,0.06); }
+        .tree-row.active {
+            background: rgba(255,215,0,0.06);
+            box-shadow: inset 2px 0 0 #ffd700;
+        }
+        .tree-chevron {
+            flex-shrink: 0; width: 14px; height: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: #5a6480; transition: transform 0.2s;
+        }
+        .tree-chevron.open { transform: rotate(90deg); }
+        .tree-chevron.hidden { visibility: hidden; }
+        .tree-icon { flex-shrink: 0; font-size: 0.85rem; width: 18px; text-align: center; }
+        .tree-label {
+            flex: 1; font-size: 0.78rem; color: #c7d1ff;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .tree-row.active .tree-label { color: #ffd700; }
+        .tree-pin {
+            flex-shrink: 0; width: 14px; height: 14px;
+            opacity: 0; transition: opacity 0.2s;
+            cursor: pointer; color: #5a6480;
+        }
+        .tree-row:hover .tree-pin { opacity: 0.5; }
+        .tree-pin.pinned { opacity: 1; color: #ffd700; }
+        .tree-pin:hover { opacity: 1 !important; }
+
+        .tree-children {
+            display: none; padding-left: 14px;
+            border-left: 1px dashed rgba(130,150,255,0.08);
+            margin-left: 18px;
+        }
+        .tree-children.open { display: block; }
+
+        .tree-empty {
+            padding: 20px 16px;
+            text-align: center;
+            color: #3d4a6a; font-size: 0.72rem;
+        }
+
+        /* 汉堡按钮 */
+        .hamburger-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px;
+            background: rgba(130,150,255,0.08);
+            border: 1px solid rgba(130,150,255,0.12);
+            border-radius: 8px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .hamburger-btn:hover { background: rgba(130,150,255,0.15); }
+        .hamburger-btn svg { color: #8a94a6; }
+        .hamburger-btn:hover svg { color: #c7d1ff; }
+
+        /* 页面内 pin 按钮（右上角固定） */
+        .page-pin-btn {
+            position: fixed; top: 60px; right: 16px;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(10,16,40,0.8); backdrop-filter: blur(8px);
+            border: 1px solid rgba(130,150,255,0.12);
+            border-radius: 8px; cursor: pointer;
+            z-index: 90; transition: all 0.2s;
+            color: #5a6480;
+        }
+        .page-pin-btn:hover { color: #c7d1ff; border-color: rgba(130,150,255,0.2); }
+        .page-pin-btn.pinned { color: #ffd700; border-color: rgba(255,215,0,0.2); background: rgba(255,215,0,0.06); }
+
         /* 顶部导航 */
         .top-bar {
             position: sticky; top: 0;
@@ -1495,12 +1618,34 @@
 </head>
 <body>
 
+<!-- 侧边栏遮罩 -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+
+<!-- 侧边栏 -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <span class="sidebar-title">🧭 导航</span>
+        <button class="sidebar-close" onclick="toggleSidebar(false)">✕</button>
+    </div>
+    <div class="sidebar-body" id="sidebarBody"></div>
+</div>
+
+<!-- 页面 pin 按钮 -->
+<div class="page-pin-btn" id="pagePinBtn" onclick="toggleCurrentPagePin()" title="固定到侧边栏" style="display:none;">
+    <svg width="16" height="16" viewBox="0 0 24 24"><path d="M9 4h6l-1 7 3 3v2h-4v4l-1 1-1-1v-4H7v-2l3-3-1-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+</div>
+
 <!-- 顶部导航 -->
 <div class="top-bar">
-    <button class="back-btn" onclick="location.href='index.html'">
-        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-        返回
-    </button>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <button class="hamburger-btn" onclick="toggleSidebar()" title="导航列表">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="back-btn" onclick="location.href='index.html'">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            返回
+        </button>
+    </div>
     <span class="top-title">🏵️ 创造空间</span>
     <div style="display:flex;align-items:center;gap:12px;">
         <span class="top-s-info">🏵️ <span id="sFlowerBalance">0</span></span>
@@ -1862,6 +2007,312 @@
     const STORAGE_KEY = 'ielts_learning_system';
     let currentSpaceId = null;
     let newSpaceType = 'theme';
+
+    // ===== 侧边栏导航 =====
+    var sidebarPins = {};      // pinned node keys
+    var sidebarTreeState = {}; // expanded/collapsed state per node key
+    var sidebarActiveKey = null;
+
+    // Load pins from localStorage
+    function loadSidebarPins() {
+        try {
+            var saved = localStorage.getItem('sidebar_pins');
+            if (saved) sidebarPins = JSON.parse(saved);
+        } catch(e) { sidebarPins = {}; }
+    }
+    function saveSidebarPins() {
+        try { localStorage.setItem('sidebar_pins', JSON.stringify(sidebarPins)); } catch(e) {}
+    }
+
+    function toggleSidebar(forceState) {
+        var sb = document.getElementById('sidebar');
+        var ov = document.getElementById('sidebarOverlay');
+        var isOpen = forceState !== undefined ? forceState : !sb.classList.contains('open');
+        if (isOpen) {
+            sb.classList.add('open');
+            ov.classList.add('show');
+            renderSidebar();
+        } else {
+            sb.classList.remove('open');
+            ov.classList.remove('show');
+        }
+    }
+
+    // Generate unique key for a tree node
+    function sidebarKey(type, spaceId, cIdx, fIdx) {
+        var parts = [type];
+        if (spaceId) parts.push(spaceId);
+        if (cIdx !== undefined) parts.push('c' + cIdx);
+        if (fIdx !== undefined) parts.push('f' + fIdx);
+        return parts.join('_');
+    }
+
+    // Toggle tree node expand/collapse
+    function toggleTreeNode(key) {
+        sidebarTreeState[key] = !sidebarTreeState[key];
+        var el = document.getElementById('treeChildren_' + key);
+        var chev = document.getElementById('treeChev_' + key);
+        if (el) el.classList.toggle('open', sidebarTreeState[key]);
+        if (chev) chev.classList.toggle('open', sidebarTreeState[key]);
+    }
+
+    // Toggle pin for a node
+    function togglePin(key, ev) {
+        if (ev) ev.stopPropagation();
+        if (sidebarPins[key]) {
+            delete sidebarPins[key];
+        } else {
+            sidebarPins[key] = true;
+            // Auto-expand pinned node
+            sidebarTreeState[key] = true;
+        }
+        saveSidebarPins();
+        renderSidebar();
+        updatePagePinBtn();
+    }
+
+    // Navigate to a node
+    function sidebarNavigate(type, spaceId, cIdx, fIdx) {
+        var key = sidebarKey(type, spaceId, cIdx, fIdx);
+        sidebarActiveKey = key;
+        // Update active highlight
+        var rows = document.querySelectorAll('.tree-row');
+        rows.forEach(function(r) { r.classList.remove('active'); });
+        var activeRow = document.getElementById('treeRow_' + key);
+        if (activeRow) activeRow.classList.add('active');
+
+        switch(type) {
+            case 'home':
+                if (currentSpaceId) backToList();
+                break;
+            case 'space':
+                if (currentSpaceId !== spaceId) openSpaceDetail(spaceId);
+                break;
+            case 'blueprint':
+                if (currentSpaceId !== spaceId) openSpaceDetail(spaceId);
+                setTimeout(function() {
+                    var el = document.getElementById('blueprintView') || document.querySelector('.blueprint-bar');
+                    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+                }, 100);
+                break;
+            case 'laws':
+                if (currentSpaceId !== spaceId) openSpaceDetail(spaceId);
+                setTimeout(function() {
+                    var el = document.querySelector('.sub-section .sub-title');
+                    var sec = document.querySelectorAll('.sub-section')[1];
+                    if (sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
+                }, 100);
+                break;
+            case 'creation':
+                if (currentSpaceId !== spaceId) openSpaceDetail(spaceId);
+                setTimeout(function() {
+                    var el = document.getElementById('creation_' + cIdx);
+                    if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+                    else {
+                        var list = document.getElementById('creationsList');
+                        if (list) list.scrollIntoView({behavior:'smooth', block:'start'});
+                    }
+                }, 100);
+                break;
+            case 'fragment':
+                if (currentSpaceId !== spaceId) openSpaceDetail(spaceId);
+                setTimeout(function() {
+                    openFragmentTimeline(cIdx, fIdx);
+                }, 100);
+                break;
+        }
+        // On mobile, close sidebar after navigation
+        if (window.innerWidth < 700) toggleSidebar(false);
+    }
+
+    // Render the sidebar tree
+    function renderSidebar() {
+        var body = document.getElementById('sidebarBody');
+        if (!body) return;
+        var spaces = loadData();
+        var html = '';
+
+        // Home node
+        var homeKey = sidebarKey('home');
+        var homePinned = !!sidebarPins[homeKey];
+        html += '<div class="tree-node">';
+        html += '<div class="tree-row' + (sidebarActiveKey === homeKey ? ' active' : '') + '" id="treeRow_' + homeKey + '" onclick="sidebarNavigate(\'home\')">';
+        html += '<div class="tree-chevron hidden"></div>';
+        html += '<span class="tree-icon">🏠</span>';
+        html += '<span class="tree-label">主页</span>';
+        html += '<svg class="tree-pin' + (homePinned ? ' pinned' : '') + '" onclick="togglePin(\'' + homeKey + '\',event)" viewBox="0 0 24 24"><path d="M9 4h6l-1 7 3 3v2h-4v4l-1 1-1-1v-4H7v-2l3-3-1-7z" fill="' + (homePinned ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+        html += '</div>';
+        html += '</div>';
+
+        // Each space
+        for (var si = 0; si < spaces.length; si++) {
+            var sp = spaces[si];
+            var spKey = sidebarKey('space', sp.id);
+            var spPinned = !!sidebarPins[spKey];
+            var spOpen = !!sidebarTreeState[spKey] || spPinned;
+            var hasChildren = (sp.creations && sp.creations.length > 0) || (sp.laws && sp.laws.length > 0) || (sp.blueprint || sp.vision);
+            var isActive = (currentSpaceId === sp.id);
+
+            html += '<div class="tree-node">';
+            html += '<div class="tree-row' + (isActive ? ' active' : '') + '" id="treeRow_' + spKey + '" onclick="sidebarNavigate(\'space\',\'' + sp.id + '\')">';
+            html += '<div class="tree-chevron' + (spOpen ? ' open' : '') + (hasChildren ? '' : ' hidden') + '" id="treeChev_' + spKey + '" onclick="toggleTreeNode(\'' + spKey + '\')">';
+            html += '<svg width="10" height="10" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>';
+            html += '</div>';
+            html += '<span class="tree-icon">' + (sp.type === 'project' ? '⚙️' : '🌌') + '</span>';
+            html += '<span class="tree-label">' + esc(sp.name) + '</span>';
+            html += '<svg class="tree-pin' + (spPinned ? ' pinned' : '') + '" onclick="togglePin(\'' + spKey + '\',event)" viewBox="0 0 24 24"><path d="M9 4h6l-1 7 3 3v2h-4v4l-1 1-1-1v-4H7v-2l3-3-1-7z" fill="' + (spPinned ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+            html += '</div>';
+
+            // Space children
+            if (hasChildren) {
+                html += '<div class="tree-children' + (spOpen ? ' open' : '') + '" id="treeChildren_' + spKey + '">';
+
+                // Blueprint node
+                if (sp.blueprint || sp.vision) {
+                    var bpKey = sidebarKey('blueprint', sp.id);
+                    var bpPinned = !!sidebarPins[bpKey];
+                    html += '<div class="tree-node">';
+                    html += '<div class="tree-row' + (sidebarActiveKey === bpKey ? ' active' : '') + '" id="treeRow_' + bpKey + '" onclick="sidebarNavigate(\'blueprint\',\'' + sp.id + '\')">';
+                    html += '<div class="tree-chevron hidden"></div>';
+                    html += '<span class="tree-icon">🗺️</span>';
+                    html += '<span class="tree-label">蓝图</span>';
+                    html += '<svg class="tree-pin' + (bpPinned ? ' pinned' : '') + '" onclick="togglePin(\'' + bpKey + '\',event)" viewBox="0 0 24 24"><path d="M9 4h6l-1 7 3 3v2h-4v4l-1 1-1-1v-4H7v-2l3-3-1-7z" fill="' + (bpPinned ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+                    html += '</div></div>';
+                }
+
+                // World laws node
+                if (sp.laws && sp.laws.length > 0) {
+                    var lawsKey = sidebarKey('laws', sp.id);
+                    var lawsPinned = !!sidebarPins[lawsKey];
+                    html += '<div class="tree-node">';
+                    html += '<div class="tree-row' + (sidebarActiveKey === lawsKey ? ' active' : '') + '" id="treeRow_' + lawsKey + '" onclick="sidebarNavigate(\'laws\',\'' + sp.id + '\')">';
+                    html += '<div class="tree-chevron hidden"></div>';
+                    html += '<span class="tree-icon">📜</span>';
+                    html += '<span class="tree-label">世界法则 (' + sp.laws.length + ')</span>';
+                    html += '<svg class="tree-pin' + (lawsPinned ? ' pinned' : '') + '" onclick="togglePin(\'' + lawsKey + '\',event)" viewBox="0 0 24 24"><path d="M9 4h6l-1 7 3 3v2h-4v4l-1 1-1-1v-4H7v-2l3-3-1-7z" fill="' + (lawsPinned ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+                    html += '</div></div>';
+                }
+
+                // Creations (创造盒子) node — group container
+                var creations = sp.creations || [];
+                var cbKey = sidebarKey('creationbox', sp.id);
+                var cbPinned = !!sidebarPins[cbKey];
+                var cbOpen = !!sidebarTreeState[cbKey] || cbPinned;
+                var cbHasChildren = creations.length > 0;
+
+                html += '<div class="tree-node">';
+                html += '<div class="tree-row' + (sidebarActiveKey === cbKey ? ' active' : '') + '" id="treeRow_' + cbKey + '" onclick="sidebarNavigate(\'space\',\'' + sp.id + '\')">';
+                html += '<div class="tree-chevron' + (cbOpen ? ' open' : '') + (cbHasChildren ? '' : ' hidden') + '" id="treeChev_' + cbKey + '" onclick="toggleTreeNode(\'' + cbKey + '\')">';
+                html += '<svg width="10" height="10" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>';
+                html += '</div>';
+                html += '<span class="tree-icon">🎁</span>';
+                html += '<span class="tree-label">创造盒子 (' + creations.length + ')</span>';
+                html += '<svg class="tree-pin' + (cbPinned ? ' pinned' : '') + '" onclick="togglePin(\'' + cbKey + '\',event)" viewBox="0 0 24 24"><path d="M9 4h6l-1 7 3 3v2h-4v4l-1 1-1-1v-4H7v-2l3-3-1-7z" fill="' + (cbPinned ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+                html += '</div>';
+
+                // Creation items
+                if (cbHasChildren) {
+                    html += '<div class="tree-children' + (cbOpen ? ' open' : '') + '" id="treeChildren_' + cbKey + '">';
+                    for (var ci = 0; ci < creations.length; ci++) {
+                        var c = creations[ci];
+                        var cKey = sidebarKey('creation', sp.id, ci);
+                        var cPinned = !!sidebarPins[cKey];
+                        var cOpen = !!sidebarTreeState[cKey] || cPinned;
+                        var frags = c.fragments || [];
+                        var cHasChildren = frags.length > 0;
+                        var allTypes = getCreationTypes();
+                        var ct = allTypes[c.type] || {icon:'⭐', label:c.type};
+
+                        html += '<div class="tree-node">';
+                        html += '<div class="tree-row' + (sidebarActiveKey === cKey ? ' active' : '') + '" id="treeRow_' + cKey + '" onclick="sidebarNavigate(\'creation\',\'' + sp.id + '\',' + ci + ')">';
+                        html += '<div class="tree-chevron' + (cOpen ? ' open' : '') + (cHasChildren ? '' : ' hidden') + '" id="treeChev_' + cKey + '" onclick="toggleTreeNode(\'' + cKey + '\')">';
+                        html += '<svg width="10" height="10" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>';
+                        html += '</div>';
+                        html += '<span class="tree-icon">' + (ct.icon || '⭐') + '</span>';
+                        html += '<span class="tree-label">' + esc(c.name || '未命名') + '</span>';
+                        html += '<svg class="tree-pin' + (cPinned ? ' pinned' : '') + '" onclick="togglePin(\'' + cKey + '\',event)" viewBox="0 0 24 24"><path d="M9 4h6l-1 7 3 3v2h-4v4l-1 1-1-1v-4H7v-2l3-3-1-7z" fill="' + (cPinned ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+                        html += '</div>';
+
+                        // Fragment items
+                        if (cHasChildren) {
+                            html += '<div class="tree-children' + (cOpen ? ' open' : '') + '" id="treeChildren_' + cKey + '">';
+                            for (var fi = 0; fi < frags.length; fi++) {
+                                var f = frags[fi];
+                                var fKey = sidebarKey('fragment', sp.id, ci, fi);
+                                var fPinned = !!sidebarPins[fKey];
+                                var dotColor = f.done ? '#4ec9b0' : (f.assignee ? '#8299ff' : '#5a6480');
+                                html += '<div class="tree-node">';
+                                html += '<div class="tree-row' + (sidebarActiveKey === fKey ? ' active' : '') + '" id="treeRow_' + fKey + '" onclick="sidebarNavigate(\'fragment\',\'' + sp.id + '\',' + ci + ',' + fi + ')">';
+                                html += '<div class="tree-chevron hidden"></div>';
+                                html += '<span class="tree-icon" style="color:' + dotColor + ';">●</span>';
+                                html += '<span class="tree-label">' + esc(f.name || ('碎片' + (fi+1))) + '</span>';
+                                if (f.done) html += '<span style="font-size:0.55rem;color:#4ec9b0;">✓</span>';
+                                html += '<svg class="tree-pin' + (fPinned ? ' pinned' : '') + '" onclick="togglePin(\'' + fKey + '\',event)" viewBox="0 0 24 24"><path d="M9 4h6l-1 7 3 3v2h-4v4l-1 1-1-1v-4H7v-2l3-3-1-7z" fill="' + (fPinned ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+                                html += '</div></div>';
+                            }
+                            html += '</div>';
+                        }
+                        html += '</div>'; // end creation node
+                    }
+                    html += '</div>'; // end creationbox children
+                }
+                html += '</div>'; // end creationbox node
+
+                html += '</div>'; // end space children
+            }
+            html += '</div>'; // end space node
+        }
+
+        if (spaces.length === 0) {
+            html += '<div class="tree-empty">还没有创建任何空间</div>';
+        }
+
+        body.innerHTML = html;
+    }
+
+    // Update page pin button based on current context
+    function updatePagePinBtn() {
+        var btn = document.getElementById('pagePinBtn');
+        if (!btn) return;
+        var key = getCurrentNavKey();
+        if (key && sidebarPins[key]) {
+            btn.classList.add('pinned');
+            btn.title = '已固定 — 点击取消固定';
+        } else {
+            btn.classList.remove('pinned');
+            btn.title = '固定到侧边栏';
+        }
+    }
+
+    // Get current navigation context key
+    function getCurrentNavKey() {
+        if (!currentSpaceId) return sidebarKey('home');
+        // Check if we're looking at a fragment timeline
+        if (window._currentFragmentView && window._currentFragmentView.cIdx !== undefined) {
+            return sidebarKey('fragment', currentSpaceId, window._currentFragmentView.cIdx, window._currentFragmentView.fIdx);
+        }
+        return sidebarKey('space', currentSpaceId);
+    }
+
+    // Toggle pin for current page context
+    function toggleCurrentPagePin() {
+        var key = getCurrentNavKey();
+        if (!key) return;
+        if (sidebarPins[key]) {
+            delete sidebarPins[key];
+        } else {
+            sidebarPins[key] = true;
+            sidebarTreeState[key] = true;
+        }
+        saveSidebarPins();
+        updatePagePinBtn();
+        renderSidebar();
+    }
+
+    // Initialize sidebar on page load
+    function initSidebar() {
+        loadSidebarPins();
+    }
 
     // ===== 用户身份 =====
     function getCurrentUser() {
@@ -3373,13 +3824,19 @@
 
     function openFragmentTimeline(cIdx, fIdx) {
         currentFragmentRef = { cIdx: cIdx, fIdx: fIdx };
+        window._currentFragmentView = { cIdx: cIdx, fIdx: fIdx };
+        sidebarActiveKey = sidebarKey('fragment', currentSpaceId, cIdx, fIdx);
         renderFragmentTimeline();
         closePuzzleMap();
         document.getElementById('fragmentTimelineModal').classList.add('active');
+        renderSidebar();
+        updatePagePinBtn();
     }
     function closeFragmentTimeline() {
         document.getElementById('fragmentTimelineModal').classList.remove('active');
         currentFragmentRef = null;
+        window._currentFragmentView = null;
+        sidebarActiveKey = sidebarKey('space', currentSpaceId);
         openSpaceDetail(currentSpaceId);
     }
 
@@ -3450,6 +3907,7 @@
         const container = document.getElementById('spaceListContainer');
         const sFlowers = getSFlowers();
         document.getElementById('sFlowerBalance').textContent = sFlowers;
+        document.getElementById('pagePinBtn').style.display = 'none';
 
         // 更新创造卡片冰冻状态
         const createCard = document.getElementById('createCard');
@@ -3602,6 +4060,8 @@
     // ===== 空间详情 =====
     function openSpaceDetail(id) {
         currentSpaceId = id;
+        sidebarActiveKey = sidebarKey('space', id);
+        window._currentFragmentView = null;
         const spaces = loadData();
         const space = spaces.find(s => s.id === id);
         if (!space) return;
@@ -3609,6 +4069,7 @@
         document.getElementById('spaceListView').style.display = 'none';
         const detail = document.getElementById('spaceDetailView');
         detail.classList.add('active');
+        document.getElementById('pagePinBtn').style.display = 'flex';
 
         const typeLabel = space.type === 'project' ? '⚙️ 项目制' : '🌌 主题式';
         const typeClass = space.type === 'project' ? 'project' : '';
@@ -3686,6 +4147,8 @@
 
         `;
         renderCreationTypeBtns();
+        renderSidebar();
+        updatePagePinBtn();
     }
 
     function renderCreationTypeBtns() {
@@ -4021,9 +4484,12 @@
 
     function backToList() {
         currentSpaceId = null;
+        sidebarActiveKey = sidebarKey('home');
         document.getElementById('spaceDetailView').classList.remove('active');
         document.getElementById('spaceListView').style.display = 'block';
         renderSpaceList();
+        renderSidebar();
+        updatePagePinBtn();
     }
 
     function deleteSpace(id) {
@@ -4851,6 +5317,7 @@
 
     // ===== 初始化 =====
     document.addEventListener('DOMContentLoaded', function() {
+        initSidebar();
         renderSpaceList();
         updateTaskBoardBadge();
         // 检查URL参数，自动打开指定空间
