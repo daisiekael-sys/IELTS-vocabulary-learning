@@ -1216,6 +1216,154 @@
             color: #ffd700;
         }
         .float-refresh:hover { background: rgba(255,215,0,0.2); }
+
+        /* ===== 团队地图 ===== */
+        .tm-project-card {
+            background: rgba(130,150,255,0.04);
+            border: 1px solid rgba(130,150,255,0.1);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tm-project-card:hover { background: rgba(130,150,255,0.08); border-color: rgba(130,150,255,0.2); }
+        .tm-project-header {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .tm-project-name { font-size: 0.8rem; font-weight: 500; color: #4a5578; flex: 1; }
+        .tm-prog-pieces {
+            display: flex; gap: 3px; align-items: center;
+        }
+        .tm-prog-piece {
+            width: 16px; height: 16px;
+            border-radius: 3px;
+            font-size: 0.55rem;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+        }
+        .tm-prog-pct {
+            font-size: 0.68rem; font-weight: 600;
+            color: #4ec9b0;
+            min-width: 32px; text-align: right;
+        }
+        .tm-member-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .tm-member-row:hover { background: rgba(130,150,255,0.05); }
+        .tm-member-avatar {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem;
+            border: 2px solid;
+        }
+        .tm-member-info { flex: 1; }
+        .tm-member-name { font-size: 0.78rem; font-weight: 500; }
+        .tm-member-stats { font-size: 0.65rem; color: #8a94a6; }
+        .tm-member-pct {
+            font-size: 0.75rem; font-weight: 600;
+            min-width: 36px; text-align: right;
+        }
+        .tm-member-detail {
+            padding: 6px 10px 10px 46px;
+            display: none;
+        }
+        .tm-member-detail.open { display: block; }
+        .tm-frag-item {
+            padding: 6px 8px;
+            border-left: 3px solid;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 4px;
+            background: rgba(130,150,255,0.03);
+        }
+        .tm-frag-name { font-size: 0.72rem; font-weight: 500; }
+        .tm-frag-tasks { margin-top: 4px; }
+        .tm-task-item {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-bottom: 2px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .tm-task-check {
+            width: 12px; height: 12px;
+            border-radius: 2px;
+            border: 1.5px solid;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.55rem;
+            flex-shrink: 0;
+        }
+
+        /* ===== 个人完成度 ===== */
+        .my-completion-btn {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            background: rgba(130,150,255,0.08);
+            color: #8299ff;
+            border: 1px solid rgba(130,150,255,0.15);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .my-completion-btn:hover { background: rgba(130,150,255,0.15); }
+        .my-comp-stage {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            background: rgba(130,150,255,0.03);
+            margin-bottom: 4px;
+        }
+        .my-comp-stage-num {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: rgba(130,150,255,0.1);
+            color: #8299ff;
+            font-size: 0.6rem;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .my-comp-bar {
+            flex: 1; height: 6px;
+            background: rgba(130,150,255,0.08);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .my-comp-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.4s;
+        }
+
+        /* ===== 星球 ===== */
+        .planet-svg {
+            display: block;
+            margin: 0 auto;
+        }
+        .planet-achievement {
+            text-align: center;
+            padding: 16px 0;
+        }
+        .planet-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #ffd700;
+            margin-top: 6px;
+        }
+        .planet-id {
+            font-size: 0.6rem;
+            color: #8a94a6;
+            margin-top: 2px;
+            font-family: monospace;
+        }
+        .planet-comp {
+            font-size: 0.7rem;
+            color: #4ec9b0;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -1491,15 +1639,9 @@
 
 <!-- 团队地图可视化弹窗 -->
 <div class="modal-overlay" id="puzzleMapModal">
-    <div class="modal" style="max-width:480px;max-height:85vh;overflow-y:auto;">
+    <div class="modal" style="max-width:520px;max-height:85vh;overflow-y:auto;">
         <h4 style="display:flex;align-items:center;gap:6px;">🧩 团队地图</h4>
-        <div style="font-size:0.72rem;color:#8a94a6;margin-bottom:10px;">
-            所有创造盒子的碎片总览。虚框=未认领，实心=已认领（认领者颜色辉光），✓=已完成。液体填充=当前轮完成度。点击碎片查看个人卡片。
-        </div>
-        <div id="puzzleMapGrid"></div>
-        <div id="puzzleMapEmpty" style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:16px 0;">
-            还没有碎片。去创造盒子中拆分碎片后，拼图会出现在这里。
-        </div>
+        <div id="teamMapContent"></div>
         <div class="modal-btns">
             <button class="modal-btn cancel" onclick="closePuzzleMap()">关闭</button>
         </div>
@@ -1557,6 +1699,18 @@
         </div>
         <div class="modal-btns">
             <button class="modal-btn cancel" onclick="closePuzzleLayout()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 个人完成度弹窗 -->
+<div class="modal-overlay" id="myCompletionModal">
+    <div class="modal" style="max-width:420px;max-height:85vh;overflow-y:auto;">
+        <h4 id="myCompTitle">📊 我的完成度</h4>
+        <div id="myCompInfo" style="font-size:0.75rem;color:#8a94a6;margin-bottom:10px;padding:8px 10px;background:rgba(130,150,255,0.05);border-radius:8px;"></div>
+        <div id="myCompBody"></div>
+        <div class="modal-btns">
+            <button class="modal-btn cancel" onclick="closeMyCompletion()">关闭</button>
         </div>
     </div>
 </div>
@@ -1901,7 +2055,13 @@
         novel:      { label: '小说', icon: '📖', fields: ['genre:题材', 'synopsis:简介', 'characters:角色'] },
         invention:  { label: '发明', icon: '🔧', fields: ['function:功能', 'structure:结构', 'color:花色', 'cost:成本', 'price:定价'] },
         event:      { label: '活动', icon: '🎪', fields: ['flow:活动流程', 'participants:参与人', 'scene:场景'] },
-        shop:       { label: '主题店', icon: '🏪', fields: ['concept:概念', 'products:产品', 'cost:成本', 'pricing:定价', 'profit:盈利计算'] }
+        shop:       { label: '主题店', icon: '🏪', fields: ['concept:概念', 'products:产品', 'cost:成本', 'pricing:定价', 'profit:盈利计算'] },
+        fashion:    { label: '服装', icon: '👗', fields: ['style:风格', 'material:材质', 'season:季节', 'occasion:场景'] },
+        architecture:{ label: '建筑', icon: '🏗️', fields: ['style:风格', 'function:功能', 'location:选址', 'scale:规模'] },
+        art:        { label: '艺术', icon: '🎨', fields: ['medium:媒介', 'theme:主题', 'style:风格'] },
+        music:      { label: '音乐', icon: '🎵', fields: ['genre:曲风', 'instrument:乐器', 'mood:情绪'] },
+        game:       { label: '游戏', icon: '🎮', fields: ['type:类型', 'mechanic:核心玩法', 'platform:平台'] },
+        food:       { label: '美食', icon: '🍜', fields: ['cuisine:菜系', 'flavor:口味', 'ingredient:食材'] }
     };
 
     function getCreationTypes() {
@@ -2772,128 +2932,173 @@
     function renderPuzzleMap() {
         var spaces = loadData();
         var space = spaces.find(function(s){ return s.id === currentSpaceId; });
-        var grid = document.getElementById('puzzleMapGrid');
-        var emptyEl = document.getElementById('puzzleMapEmpty');
-        if (!space || !space.creations) {
-            grid.innerHTML = '';
-            emptyEl.style.display = 'block';
-            return;
-        }
-        var pieces = [];
-        var maxRounds = 0;
-        for (var i = 0; i < space.creations.length; i++) {
-            var c = space.creations[i];
-            if (!c.fragments) continue;
-            for (var j = 0; j < c.fragments.length; j++) {
-                var f = c.fragments[j];
-                var state = 'unclaimed';
-                if (f.done) state = 'done';
-                else if (f.assignee === getCurrentUser().uid) state = 'claimed-by-me';
-                else if (f.assignee) state = 'claimed';
-                var assigneeColor = getFragmentAssigneeColor(space, f);
-                var prog = getFragmentProgress(f);
-                var roundCount = f.rounds ? f.rounds.length : 0;
-                if (roundCount > maxRounds) maxRounds = roundCount;
-                pieces.push({
-                    cIdx: i, fIdx: j,
-                    name: f.name,
-                    creationName: c.name,
-                    state: state,
-                    assignee: f.assignee,
-                    assigneeName: f.assigneeName || '',
-                    timelineCount: (f.timeline || []).length,
-                    color: assigneeColor,
-                    prog: prog,
-                    roundCount: roundCount
-                });
+        var container = document.getElementById('teamMapContent');
+        if (!container) return;
+        if (!space) { container.innerHTML = ''; return; }
+
+        var html = '';
+
+        // ===== Section 1: 进行中的项目（进度%+小拼图碎片） =====
+        var activeCreations = (space.creations || []).filter(function(c){ return !c.completed; });
+        if (activeCreations.length > 0) {
+            html += '<div style="font-size:0.72rem;color:#8299ff;margin-bottom:8px;font-weight:500;">📦 进行中的项目</div>';
+            for (var ci = 0; ci < activeCreations.length; ci++) {
+                var c = activeCreations[ci];
+                var frags = c.fragments || [];
+                var totalFrags = frags.length;
+                var doneFrags = frags.filter(function(f){ return f.done; }).length;
+                var claimedFrags = frags.filter(function(f){ return f.assignee; }).length;
+                var pct = totalFrags > 0 ? Math.round((doneFrags / totalFrags) * 100) : 0;
+
+                // 小拼图碎片图标
+                var piecesHtml = '';
+                for (var fi = 0; fi < frags.length; fi++) {
+                    var f = frags[fi];
+                    var fColor = getFragmentAssigneeColor(space, f);
+                    var pBg = f.done ? '#4ec9b0' : (f.assignee ? (fColor ? fColor.glow : '#8299ff') : 'rgba(130,150,255,0.15)');
+                    var pText = f.done ? '✓' : (fi + 1);
+                    piecesHtml += '<div class="tm-prog-piece" style="background:' + pBg + ';">' + pText + '</div>';
+                }
+
+                html += '<div class="tm-project-card" onclick="openPersonalCard(0,' + 0 + ')" >' +
+                    '<div class="tm-project-header">' +
+                        '<span class="tm-project-name">' + esc(c.name) + '</span>' +
+                        '<div class="tm-prog-pieces">' + piecesHtml + '</div>' +
+                        '<span class="tm-prog-pct">' + pct + '%</span>' +
+                    '</div>' +
+                    '<div style="font-size:0.62rem;color:#8a94a6;margin-top:4px;">' +
+                        totalFrags + '碎片 · 已认领' + claimedFrags + ' · 已完成' + doneFrags +
+                    '</div>' +
+                '</div>';
             }
         }
-        if (pieces.length === 0) {
-            grid.innerHTML = '';
-            emptyEl.style.display = 'block';
-            return;
-        }
-        emptyEl.style.display = 'none';
 
-        // 多轮任务标题标注
-        var titleNote = '';
-        if (maxRounds > 0) {
-            titleNote = '<div style="font-size:0.65rem;color:#5a6480;margin-bottom:8px;">最高 ' + maxRounds + ' 轮任务</div>';
-        }
-
-        var html = titleNote;
-        // Group by creation
-        var groups = {};
-        var groupOrder = [];
-        for (var k = 0; k < pieces.length; k++) {
-            var p = pieces[k];
-            if (!groups[p.creationName]) {
-                groups[p.creationName] = [];
-                groupOrder.push(p.creationName);
+        // ===== Section 2: 成员分工详情 =====
+        var teamMap = {};
+        var teamOrder = [];
+        // Collect from team array
+        for (var ti = 0; ti < (space.team || []).length; ti++) {
+            var tm = space.team[ti];
+            var key = tm.uid || tm.role;
+            if (!teamMap[key]) {
+                teamMap[key] = { uid: tm.uid, role: tm.role, emoji: tm.emoji || '🧑', fragments: [] };
+                teamOrder.push(key);
             }
-            groups[p.creationName].push(p);
+        }
+        // Collect from fragment assignees
+        for (var ci2 = 0; ci2 < (space.creations || []).length; ci2++) {
+            var c2 = space.creations[ci2];
+            var frags2 = c2.fragments || [];
+            for (var fi2 = 0; fi2 < frags2.length; fi2++) {
+                var f2 = frags2[fi2];
+                if (f2.assignee) {
+                    var key2 = f2.assignee;
+                    if (!teamMap[key2]) {
+                        teamMap[key2] = { uid: f2.assignee, role: f2.assigneeName || f2.assignee, emoji: '🧑', fragments: [] };
+                        teamOrder.push(key2);
+                    }
+                    teamMap[key2].fragments.push({
+                        cIdx: ci2, fIdx: fi2,
+                        name: f2.name,
+                        done: f2.done,
+                        creationName: c2.name,
+                        rounds: f2.rounds || [],
+                        assigneeName: f2.assigneeName || '',
+                        fragRef: f2
+                    });
+                }
+            }
         }
 
-        for (var gi = 0; gi < groupOrder.length; gi++) {
-            var gName = groupOrder[gi];
-            var gPieces = groups[gName];
-            html += '<div style="margin-bottom:14px;">';
-            html += '<div style="font-size:0.72rem;color:#8299ff;margin-bottom:6px;">' + esc(gName) + '</div>';
-            // 横排仪式感
-            html += '<div class="puzzle-ritual-row">';
-            for (var pi = 0; pi < gPieces.length; pi++) {
-                var pp = gPieces[pi];
-                var pieceState = pp.state === 'done' ? 'done' : (pp.state === 'unclaimed' ? 'unclaimed' : 'claimed');
-                var glowColor = pp.color ? pp.color.glow : 'rgba(130,150,255,0.3)';
-                var darkColor = pp.color ? pp.color.dark : 'rgba(130,150,255,0.3)';
-                var liquidHtml = '';
-                if (pp.prog.total > 0 && pp.prog.pct > 0) {
-                    liquidHtml = '<div class="puzzle-ritual-liquid" style="height:' + Math.min(pp.prog.pct, 100) + '%;"></div>';
-                }
-                var checkHtml = '';
-                if (pp.state === 'done') {
-                    checkHtml = '<span class="puzzle-ritual-check">✓</span>';
-                }
-                html += '<div class="puzzle-ritual-piece ' + pieceState + '" ' +
-                    'style="--piece-color:' + darkColor + ';--piece-glow:' + glowColor + '40;" ' +
-                    'onclick="openPersonalCard(' + pp.cIdx + ',' + pp.fIdx + ')" ' +
-                    'title="' + esc(pp.name) + ' — ' + (pp.state === 'done' ? '已完成' : pp.state === 'unclaimed' ? '未认领' : esc(pp.assigneeName)) + '">' +
-                    liquidHtml + checkHtml +
-                    '<span class="puzzle-ritual-name">' + esc(pp.name) + '</span>' +
-                    '</div>';
-            }
-            html += '</div>';
+        if (teamOrder.length > 0) {
+            html += '<div style="font-size:0.72rem;color:#8299ff;margin:12px 0 8px;font-weight:500;">👥 成员分工</div>';
 
-            // 传统卡片列表（保留，下方显示认领详情）
-            html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">';
-            for (var pi2 = 0; pi2 < gPieces.length; pi2++) {
-                var pp2 = gPieces[pi2];
-                var assigneeLabel = '';
-                if (pp2.state === 'done') assigneeLabel = '<span class="puzzle-piece-assignee done">✅ 已完成</span>';
-                else if (pp2.state === 'claimed-by-me') assigneeLabel = '<span class="puzzle-piece-assignee mine">🙋 我认领</span>';
-                else if (pp2.state === 'claimed') {
-                    var gColor = pp2.color ? pp2.color.glow : '#8a94a6';
-                    assigneeLabel = '<span class="puzzle-piece-assignee" style="color:' + gColor + ';">🔒 ' + esc(pp2.assigneeName || pp2.assignee) + '</span>';
+            // Sort: current user first
+            var currentUser = getCurrentUser();
+            var myKey = currentUser.uid;
+            var sortedOrder = teamOrder.filter(function(k){ return k === myKey; })
+                .concat(teamOrder.filter(function(k){ return k !== myKey; }));
+
+            for (var oi = 0; oi < sortedOrder.length; oi++) {
+                var m = teamMap[sortedOrder[oi]];
+                var mc = getMemberColor(space, m.uid || m.role);
+                var memFrags = m.fragments;
+                var fragDone = memFrags.filter(function(f){ return f.done; }).length;
+                var memPct = memFrags.length > 0 ? Math.round((fragDone / memFrags.length) * 100) : 0;
+                var isMe = (m.uid === myKey);
+
+                html += '<div class="tm-member-row" onclick="toggleTmMember(this)">' +
+                    '<div class="tm-member-avatar" style="border-color:' + mc.glow + ';box-shadow:0 0 6px ' + mc.glow + '40;">' + (m.emoji || '🧑') + '</div>' +
+                    '<div class="tm-member-info">' +
+                        '<div class="tm-member-name" style="color:' + mc.glow + ';">' + esc(m.role) + (isMe ? '（我）' : '') + '</div>' +
+                        '<div class="tm-member-stats">' + memFrags.length + '碎片 · 完成' + fragDone + '</div>' +
+                    '</div>' +
+                    '<span class="tm-member-pct" style="color:' + (memPct === 100 ? '#4ec9b0' : mc.glow) + ';">' + memPct + '%</span>' +
+                '</div>';
+
+                // Member detail (hidden by default)
+                html += '<div class="tm-member-detail">';
+
+                for (var ffi = 0; ffi < memFrags.length; ffi++) {
+                    var mf = memFrags[ffi];
+                    var fragColor = mc;
+                    var prog = getFragmentProgress(mf.fragRef);
+
+                    html += '<div class="tm-frag-item" style="border-color:' + fragColor.glow + ';">';
+                    html += '<div class="tm-frag-name">' + esc(mf.name) + ' <span style="font-size:0.6rem;color:#8a94a6;">← ' + esc(mf.creationName) + '</span></div>';
+
+                    // Tasks with three-layer color
+                    if (mf.rounds && mf.rounds.length > 0) {
+                        html += '<div class="tm-frag-tasks">';
+                        for (var ri = 0; ri < mf.rounds.length; ri++) {
+                            var round = mf.rounds[ri];
+                            html += '<div style="font-size:0.58rem;color:#8a94a6;margin-top:3px;">第' + round.roundNum + '轮</div>';
+                            for (var tk = 0; tk < round.tasks.length; tk++) {
+                                var task = round.tasks[tk];
+                                var completerColor = task.completedByUid ? getMemberColor(space, task.completedByUid) : null;
+                                // Layer 1: assignee border (member color), Layer 2: completer check, Layer 3: task creator
+                                var checkBg = task.done ? (completerColor ? completerColor.glow : '#4ec9b0') : 'transparent';
+                                var checkBorder = task.done ? (completerColor ? completerColor.glow : '#4ec9b0') : 'rgba(130,150,255,0.3)';
+                                var checkText = task.done ? '✓' : '';
+                                var taskColor = task.done ? (completerColor ? completerColor.dark : '#2d8a78') : '#5a6480';
+                                var creatorNote = '';
+                                // Check if task was assigned by someone else (different color)
+                                if (task.createdByUid && task.createdByUid !== m.uid) {
+                                    var creatorColor = getMemberColor(space, task.createdByUid);
+                                    creatorNote = ' <span style="color:' + creatorColor.glow + ';font-size:0.55rem;">←' + (task.createdBy || '') + '</span>';
+                                }
+
+                                html += '<div class="tm-task-item" style="background:' + fragColor.glow + '08;">' +
+                                    '<div class="tm-task-check" style="background:' + checkBg + ';border-color:' + checkBorder + ';color:#fff;">' + checkText + '</div>' +
+                                    '<span style="color:' + taskColor + ';">' + esc(task.name) + '</span>' +
+                                    creatorNote +
+                                '</div>';
+                            }
+                        }
+                        html += '</div>';
+                    } else {
+                        html += '<div style="font-size:0.6rem;color:#8a94a6;padding:2px 0;">无任务记录</div>';
+                    }
+
+                    html += '</div>';
                 }
-                else assigneeLabel = '<span class="puzzle-piece-assignee">未认领</span>';
-                var tlBadge = pp2.timelineCount > 0
-                    ? '<span style="position:absolute;top:4px;right:6px;font-size:0.6rem;background:rgba(100,200,100,0.2);color:#4caf50;border-radius:8px;padding:1px 5px;">' + pp2.timelineCount + '条</span>'
-                    : '';
-                var glowStyle = '';
-                if (pp2.color && pp2.state !== 'unclaimed') {
-                    glowStyle = ' style="box-shadow:0 0 8px ' + pp2.color.glow + '30;border-color:' + pp2.color.dark + '50;"';
-                }
-                html += '<div class="puzzle-piece ' + pp2.state + '"' + glowStyle + ' onclick="openPersonalCard(' + pp2.cIdx + ',' + pp2.fIdx + ')">' +
-                    tlBadge +
-                    '<span class="puzzle-piece-name">' + esc(pp2.name) + '</span>' +
-                    assigneeLabel +
-                    '<span class="puzzle-piece-source">来自「' + esc(pp2.creationName) + '」</span>' +
-                    '</div>';
+
+                html += '</div>'; // close tm-member-detail
             }
-            html += '</div>';
-            html += '</div>';
         }
-        grid.innerHTML = html;
+
+        if (activeCreations.length === 0 && teamOrder.length === 0) {
+            html = '<div style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:24px 0;">还没有碎片。去创造盒子中拆分碎片后，团队地图会在这里展示。</div>';
+        }
+
+        container.innerHTML = html;
+    }
+
+    function toggleTmMember(row) {
+        var detail = row.nextElementSibling;
+        if (detail && detail.classList.contains('tm-member-detail')) {
+            detail.classList.toggle('open');
+        }
     }
 
     function openPuzzleMap() {
@@ -3338,7 +3543,7 @@
                     </div>
                     <div id="creationTypeBtns" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
                     <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
-                        <button class="add-btn" style="font-size:0.7rem;padding:4px 10px;" onclick="openManageTypesModal()">🏷️ 物库</button>
+                        <button class="add-btn" style="font-size:0.7rem;padding:4px 10px;" onclick="openManageTypesModal()">🏷️ 类目库</button>
                     </div>
                 </div>
             </div>
@@ -3449,27 +3654,69 @@
         var _spaces = loadData();
         var space = _spaces.find(function(s){ return s.id === currentSpaceId; });
 
-        // 竣工态：显示星辰
+        // 竣工态：显示星球
         if (c.completed) {
-            var starSvg = '<svg class="star-svg" width="60" height="60" viewBox="0 0 24 24">' +
-                '<defs><radialGradient id="starGrad' + idx + '">' +
-                '<stop offset="0%" stop-color="#fff8dc"/>' +
-                '<stop offset="50%" stop-color="#ffd700"/>' +
-                '<stop offset="100%" stop-color="#ff9a56"/>' +
-                '</radialGradient></defs>' +
-                '<circle cx="12" cy="12" r="8" fill="url(#starGrad' + idx + ')" opacity="0.3"/>' +
-                '<path d="M12 2l2.4 7.4H22l-6.2 4.5L18.2 22 12 17.3 5.8 22l2.4-8.1L2 9.4h7.6z" ' +
-                'fill="url(#starGrad' + idx + ')" stroke="#ffd700" stroke-width="0.5"/></svg>';
-            var starDesc = c.vision || c.description || '';
-            return '<div class="creation-card" style="border-color:rgba(255,215,0,0.15);">' +
+            var planetId = c.planetId || 'P-????';
+            var planetSvg = '<svg class="planet-svg" width="80" height="80" viewBox="0 0 100 100">' +
+                '<defs>' +
+                '<radialGradient id="planetGrad' + idx + '" cx="35%" cy="35%">' +
+                '<stop offset="0%" stop-color="#e3f2ff"/>' +
+                '<stop offset="30%" stop-color="#7ec8ff"/>' +
+                '<stop offset="70%" stop-color="#5b6eff"/>' +
+                '<stop offset="100%" stop-color="#2d3a8c"/>' +
+                '</radialGradient>' +
+                '<radialGradient id="planetGlow' + idx + '">' +
+                '<stop offset="0%" stop-color="#7ec8ff" stop-opacity="0.4"/>' +
+                '<stop offset="100%" stop-color="#7ec8ff" stop-opacity="0"/>' +
+                '</radialGradient>' +
+                '</defs>' +
+                '<circle cx="50" cy="50" r="42" fill="url(#planetGlow' + idx + ')"/>' +
+                '<circle cx="50" cy="50" r="28" fill="url(#planetGrad' + idx + ')" stroke="#7ec8ff" stroke-width="0.5"/>' +
+                '<ellipse cx="50" cy="50" rx="40" ry="8" fill="none" stroke="#8299ff" stroke-width="1.5" opacity="0.4" transform="rotate(-20 50 50)"/>' +
+                '<ellipse cx="50" cy="50" rx="36" ry="6" fill="none" stroke="#8299ff" stroke-width="1" opacity="0.2" transform="rotate(-20 50 50)"/>' +
+                '<circle cx="42" cy="44" r="3" fill="#fff" opacity="0.3"/>' +
+                '<circle cx="55" cy="55" r="2" fill="#fff" opacity="0.2"/>' +
+                '</svg>';
+            var planetDesc = c.vision || c.description || '';
+            // Show member completions
+            var memberCompHtml = '';
+            if (c.planetMembers) {
+                var user = getCurrentUser();
+                for (var pUid in c.planetMembers) {
+                    var pColor = getMemberColor(space, pUid);
+                    var pName = '';
+                    // Find name from team or fragments
+                    for (var mi = 0; mi < (space.team || []).length; mi++) {
+                        if (space.team[mi].uid === pUid) { pName = space.team[mi].role; break; }
+                    }
+                    if (!pName) {
+                        for (var ci2 = 0; ci2 < (space.creations || []).length; ci2++) {
+                            var cFrags = (space.creations[ci2].fragments || []);
+                            for (var fi2 = 0; fi2 < cFrags.length; fi2++) {
+                                if (cFrags[fi2].assignee === pUid) { pName = cFrags[fi2].assigneeName || pUid; break; }
+                            }
+                            if (pName) break;
+                        }
+                    }
+                    var isMe = (pUid === user.uid);
+                    memberCompHtml += '<div style="display:flex;align-items:center;gap:6px;padding:2px 0;">' +
+                        '<div style="width:8px;height:8px;border-radius:50%;background:' + pColor.glow + ';"></div>' +
+                        '<span style="font-size:0.65rem;color:' + pColor.glow + ';">' + esc(pName) + (isMe ? '（我）' : '') + '</span>' +
+                        '<span style="font-size:0.65rem;color:#4ec9b0;margin-left:auto;">' + c.planetMembers[pUid] + '%</span>' +
+                    '</div>';
+                }
+            }
+            return '<div class="creation-card" style="border-color:rgba(126,200,255,0.15);">' +
                 '<div class="creation-name">' +
-                    '<span class="creation-type ' + cls + '" style="background:rgba(255,215,0,0.08);color:#ffd700;">' + (t.icon || '⭐') + ' ' + (t.label || c.type) + '</span>' +
-                    '<span style="color:#ffd700;">' + esc(c.name) + '</span>' +
-                    '<span style="font-size:0.6rem;background:rgba(255,215,0,0.12);color:#ffd700;padding:1px 6px;border-radius:4px;margin-left:4px;">已竣工</span>' +
+                    '<span class="creation-type ' + cls + '" style="background:rgba(126,200,255,0.08);color:#7ec8ff;">' + (t.icon || '⭐') + ' ' + (t.label || c.type) + '</span>' +
+                    '<span style="color:#7ec8ff;">' + esc(c.name) + '</span>' +
+                    '<span style="font-size:0.6rem;background:rgba(126,200,255,0.12);color:#7ec8ff;padding:1px 6px;border-radius:4px;margin-left:4px;">已竣工</span>' +
                 '</div>' +
-                '<div class="star-achievement">' + starSvg +
-                    '<div class="star-name">' + esc(c.name) + '</div>' +
-                    (starDesc ? '<div class="star-desc">' + esc(starDesc) + '</div>' : '') +
+                '<div class="planet-achievement">' + planetSvg +
+                    '<div class="planet-name">' + esc(c.name) + '</div>' +
+                    '<div class="planet-id">' + planetId + '</div>' +
+                    (planetDesc ? '<div style="font-size:0.7rem;color:#8a94a6;margin-top:4px;">' + esc(planetDesc) + '</div>' : '') +
+                    (memberCompHtml ? '<div style="margin-top:8px;padding:6px 10px;background:rgba(130,150,255,0.04);border-radius:8px;">' + memberCompHtml + '</div>' : '') +
                 '</div>' +
                 '<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">' +
                     '<button class="add-btn" style="font-size:0.7rem;padding:4px 8px;" onclick="editCreation(' + idx + ')">编辑</button>' +
@@ -3683,6 +3930,7 @@
                     <button class="add-btn" style="font-size:0.7rem;padding:4px 8px;" onclick="editCreation(${idx})">编辑</button>
                     <button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;" onclick="openBlueprintEditModal(${idx})">📋 蓝图</button>
                     ${frags.length > 0 ? '<button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;" onclick="openSplitModal(' + idx + ')">管理碎片</button>' : ''}
+                    ${frags.length > 0 ? '<button class="my-completion-btn" onclick="openMyCompletion(' + idx + ')">📊 我的完成度</button>' : ''}
                     <button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;background:rgba(255,215,0,0.08);color:#ffd700;border-color:rgba(255,215,0,0.15);" onclick="completeCreation(${idx})">⭐ 竣工</button>
                     <button class="law-del" onclick="removeCreation(${idx})">删除</button>
                 </div>
@@ -4151,6 +4399,84 @@
         document.getElementById('fragmentPanelModal').classList.remove('active');
     }
 
+    // ===== 个人完成度 =====
+    function openMyCompletion(cIdx) {
+        var spaces = loadData();
+        var space = spaces.find(function(s){ return s.id === currentSpaceId; });
+        if (!space || !space.creations || !space.creations[cIdx]) return;
+        var c = space.creations[cIdx];
+        var user = getCurrentUser();
+        var myUid = user.uid;
+
+        document.getElementById('myCompTitle').textContent = '📊 我的完成度 — ' + c.name;
+        document.getElementById('myCompInfo').innerHTML = '查看你在「' + esc(c.name) + '」各任务阶段的碎片完成度。一次竣工 = 一颗星球。';
+
+        var frags = c.fragments || [];
+        var myFrags = frags.filter(function(f){ return f.assignee === myUid; });
+
+        var html = '';
+
+        if (myFrags.length === 0) {
+            html = '<div style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:20px 0;">你还没有认领碎片。去认领碎片后，完成度会在这里展示。</div>';
+        } else {
+            // Overall completion = arithmetic average of all my fragments
+            var totalPct = 0;
+            for (var i = 0; i < myFrags.length; i++) {
+                var prog = getFragmentProgress(myFrags[i]);
+                totalPct += prog.pct;
+            }
+            var avgPct = Math.round(totalPct / myFrags.length);
+
+            html += '<div style="text-align:center;margin-bottom:14px;padding:12px;background:rgba(130,150,255,0.05);border-radius:10px;">' +
+                '<div style="font-size:1.4rem;font-weight:700;color:#8299ff;">' + avgPct + '%</div>' +
+                '<div style="font-size:0.65rem;color:#8a94a6;margin-top:2px;">综合完成度（算术平均）</div>' +
+            '</div>';
+
+            // Per-fragment (per stage) breakdown
+            html += '<div style="font-size:0.72rem;color:#8299ff;margin-bottom:6px;font-weight:500;">📋 各碎片完成度</div>';
+            for (var j = 0; j < myFrags.length; j++) {
+                var f = myFrags[j];
+                var fp = getFragmentProgress(f);
+                var fColor = getFragmentAssigneeColor(space, f);
+                var barColor = f.done ? '#4ec9b0' : (fColor ? fColor.glow : '#8299ff');
+                var stageLabel = '';
+                if (f.rounds && f.rounds.length > 0) {
+                    stageLabel = '第' + f.rounds[f.rounds.length - 1].roundNum + '轮';
+                }
+                html += '<div class="my-comp-stage">' +
+                    '<div class="my-comp-stage-num">' + (j + 1) + '</div>' +
+                    '<div style="flex:1;">' +
+                        '<div style="font-size:0.72rem;color:#4a5578;">' + esc(f.name) + (stageLabel ? ' <span style="font-size:0.6rem;color:#8a94a6;">' + stageLabel + '</span>' : '') + '</div>' +
+                        '<div class="my-comp-bar">' +
+                            '<div class="my-comp-bar-fill" style="width:' + fp.pct + '%;background:' + barColor + ';"></div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<span style="font-size:0.72rem;font-weight:600;color:' + barColor + ';min-width:36px;text-align:right;">' + fp.pct + '%</span>' +
+                '</div>';
+            }
+
+            // Planet info
+            if (c.completed) {
+                html += '<div style="margin-top:14px;padding:10px;background:rgba(255,215,0,0.05);border-radius:10px;text-align:center;">' +
+                    '<div style="font-size:0.7rem;color:#ffd700;">🌟 已竣工</div>' +
+                    '<div style="font-size:0.6rem;color:#8a94a6;margin-top:4px;">星球编号：' + (c.planetId || '—') + '</div>' +
+                    '<div style="font-size:0.65rem;color:#4ec9b0;margin-top:2px;">个人完成度：' + avgPct + '%</div>' +
+                '</div>';
+            } else {
+                html += '<div style="margin-top:14px;padding:10px;background:rgba(255,215,0,0.03);border-radius:10px;text-align:center;">' +
+                    '<div style="font-size:0.65rem;color:#8a94a6;">竣工后获得星球，碎片完成度算术平均为个人完成度</div>' +
+                '</div>';
+            }
+        }
+
+        document.getElementById('myCompBody').innerHTML = html;
+        document.getElementById('myCompletionModal').classList.add('active');
+    }
+
+    function closeMyCompletion() {
+        document.getElementById('myCompletionModal').classList.remove('active');
+    }
+
     // ===== 竣工 =====
     function completeCreation(idx) {
         var spaces = loadData();
@@ -4160,18 +4486,42 @@
         var fragInfo = '';
         if (c.fragments && c.fragments.length > 0) {
             var done = c.fragments.filter(function(f){return f.done;}).length;
-            fragInfo = '\n\n当前碎片完成度：' + done + '/' + c.fragments.length;
+            fragInfo = '<br>当前碎片完成度：' + done + '/' + c.fragments.length;
             if (done < c.fragments.length) {
-                fragInfo += '<br>注意：部分碎片未完成，竣工后成果将记录当前完成度。';
+                fragInfo += '<br>注意：部分碎片未完成，竣工后仍获得一颗星球，完成度按算术平均记录。';
             }
         }
-        var confirmMsg = '确认「' + c.name + '」竣工？<br>竣工后碎片将合为星辰，成果将作为独立个体存在。' + fragInfo;
+        var confirmMsg = '确认「' + c.name + '」竣工？<br>竣工后获得一颗星球，代表此项目。不论碎片多少，每个项目 = 一颗星球。碎片完成度算术平均为个人完成度。' + fragInfo;
         customConfirm(confirmMsg, '竣工确认', function() {
             c.completed = true;
             c.completedAt = new Date().toISOString();
+            // Generate planet ID
+            var now = new Date();
+            var ts = now.getFullYear().toString().slice(-2) + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2);
+            var rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+            c.planetId = 'P-' + ts + '-' + rand;
+            // Calculate each member's completion
+            if (c.fragments && c.fragments.length > 0) {
+                var memberStats = {};
+                for (var fi = 0; fi < c.fragments.length; fi++) {
+                    var f = c.fragments[fi];
+                    if (f.assignee) {
+                        if (!memberStats[f.assignee]) memberStats[f.assignee] = { total: 0, pctSum: 0 };
+                        memberStats[f.assignee].total++;
+                        var prog = getFragmentProgress(f);
+                        memberStats[f.assignee].pctSum += prog.pct;
+                    }
+                }
+                c.planetMembers = {};
+                for (var uid in memberStats) {
+                    var ms = memberStats[uid];
+                    c.planetMembers[uid] = Math.round(ms.pctSum / ms.total);
+                }
+            }
             saveData(spaces);
             if (window.SFX) SFX.master();
             openSpaceDetail(currentSpaceId);
+            customAlert('🌟「' + c.name + '」已竣工！<br>星球编号：' + c.planetId + '<br>不论项目大小，这都是你的一颗星球。', '竣工成功');
         });
     }
 
@@ -4181,6 +4531,8 @@
         if (!space || !space.creations[idx]) return;
         space.creations[idx].completed = false;
         delete space.creations[idx].completedAt;
+        delete space.creations[idx].planetId;
+        delete space.creations[idx].planetMembers;
         saveData(spaces);
         openSpaceDetail(currentSpaceId);
     }
