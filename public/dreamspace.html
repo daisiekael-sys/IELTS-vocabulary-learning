@@ -25,6 +25,18 @@
             min-height: 100vh;
         }
 
+        /* 全局滚动条 — 融入背景 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(130,150,255,0.12);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(130,150,255,0.2); }
+        ::-webkit-scrollbar-corner { background: transparent; }
+        /* Firefox */
+        * { scrollbar-width: thin; scrollbar-color: rgba(130,150,255,0.12) transparent; }
+
         /* 顶部导航 */
         .top-bar {
             position: sticky; top: 0;
@@ -187,6 +199,7 @@
         .sub-chevron.open { transform: rotate(180deg); }
         .sub-body {
             display: none; padding: 0 16px 14px;
+            position: relative;
         }
         .sub-body.open { display: block; }
 
@@ -227,7 +240,7 @@
         }
         .add-btn:hover { background: rgba(255,215,0,0.2); }
 
-        /* 创造物卡片 */
+        /* 创造盒子卡片 */
         .creation-card {
             background: rgba(130,150,255,0.05);
             border: 1px solid rgba(130,150,255,0.1);
@@ -341,16 +354,32 @@
         .member-resp { color: #5a6480; font-size: 0.7rem; }
 
         /* 图景/蓝图 */
+        .blueprint-bar {
+            background: rgba(130,150,255,0.05);
+            border: 1px solid rgba(130,150,255,0.1);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+        }
+        .blueprint-bar-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .blueprint-edit-btn {
+            background: none; border: none; cursor: pointer; font-size: 0.85rem;
+            opacity: 0.4; transition: opacity 0.2s; padding: 2px 4px;
+        }
+        .blueprint-edit-btn:hover { opacity: 1; }
         .blueprint-text {
             color: #c7d1ff; font-size: 0.85rem; line-height: 1.7;
-            padding: 12px 0;
+            padding: 6px 0;
         }
         .blueprint-text:empty::after {
-            content: '描绘达成后的世界会是什么样子…';
+            content: '描绘这个世界是什么样…';
             color: #3d4a6a; font-style: italic;
         }
 
-        /* 创造物蓝图 */
+        /* 创造盒子蓝图 */
         .creation-blueprint {
             margin-top: 8px; padding-top: 8px;
             border-top: 1px dashed rgba(130,150,255,0.1);
@@ -428,6 +457,62 @@
         .modal-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .modal-cost {
             color: #5a6480; font-size: 0.75rem; text-align: center; margin-top: 8px;
+        }
+
+        /* ===== 碎片版面按钮 + 拼图布局 ===== */
+        .puzzle-mini-btn {
+            background: none; border: none; cursor: pointer; padding: 2px;
+            display: flex; align-items: center; opacity: 0.6; transition: opacity 0.2s;
+        }
+        .puzzle-mini-btn:hover { opacity: 1; }
+        .collab-toggle-btn {
+            background: rgba(130,150,255,0.08); border: 1px solid rgba(130,150,255,0.15);
+            border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 0.75rem;
+            transition: all 0.2s; opacity: 0.6;
+        }
+        .collab-toggle-btn:hover { opacity: 1; }
+        .collab-toggle-btn.active {
+            background: rgba(78,201,176,0.12); border-color: rgba(78,201,176,0.3);
+            opacity: 1;
+        }
+        .puzzle-layout-grid {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            padding: 20px 16px;
+        }
+        .puzzle-layout-row {
+            display: flex; gap: 8px; justify-content: center;
+        }
+        .puzzle-piece-cell {
+            width: 64px; height: 64px; position: relative; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .puzzle-piece-cell.claimed {
+            filter: drop-shadow(0 0 6px var(--piece-glow, rgba(130,150,255,0.4)));
+        }
+        .puzzle-piece-cell.unclaimed .puzzle-svg-fill {
+            fill: rgba(130,150,255,0.04); stroke: rgba(130,150,255,0.15);
+            stroke-dasharray: 4 3;
+        }
+        .puzzle-piece-cell.claimed .puzzle-svg-fill {
+            fill: rgba(130,150,255,0.12); stroke: var(--piece-glow, rgba(130,150,255,0.5));
+            stroke-dasharray: none;
+        }
+        .puzzle-piece-cell.selected .puzzle-svg-fill {
+            fill: rgba(78,201,176,0.15); stroke: rgba(78,201,176,0.5);
+            stroke-dasharray: none;
+        }
+        .puzzle-piece-label {
+            position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+            font-size: 0.6rem; color: #8a94a6; white-space: nowrap;
+            max-width: 80px; overflow: hidden; text-overflow: ellipsis;
+        }
+        .puzzle-piece-cell.claimed .puzzle-piece-label {
+            color: var(--piece-glow-text, #c7d1ff);
+        }
+
+        /* 任务发布编辑行 */
+        .task-editor-row {
+            display: flex; align-items: center; gap: 4px; margin-bottom: 6px;
         }
 
         /* 空状态 */
@@ -578,13 +663,44 @@
             font-size: 0.62rem; color: #5a6480; margin-top: 2px;
         }
         .timeline-input {
-            width: 100%; background: rgba(130,150,255,0.05);
+            flex: 1; background: rgba(130,150,255,0.05);
             border: 1px solid rgba(130,150,255,0.1); border-radius: 6px;
             padding: 6px 10px; color: #c7d1ff; font-size: 0.75rem;
             outline: none; margin-top: 8px;
         }
         .timeline-input:focus { border-color: rgba(255,215,0,0.3); }
         .timeline-input::placeholder { color: #3d4a6a; }
+        .timeline-input-row { display: flex; gap: 6px; align-items: center; }
+        .timeline-img-btn {
+            cursor: pointer; font-size: 0.95rem; padding: 6px 8px;
+            background: rgba(130,150,255,0.05); border: 1px solid rgba(130,150,255,0.1);
+            border-radius: 6px; margin-top: 8px; transition: all 0.2s;
+        }
+        .timeline-img-btn:hover { border-color: rgba(130,150,255,0.3); }
+
+        /* 任务勾选 */
+        .task-check-item {
+            display: flex; align-items: center; gap: 8px; padding: 8px 0;
+            border-bottom: 1px solid rgba(78,201,176,0.06);
+        }
+        .task-checkbox {
+            cursor: pointer; flex-shrink: 0; transition: transform 0.15s;
+        }
+        .task-checkbox:hover { transform: scale(1.15); }
+        .task-checkbox.done svg rect {
+            fill: rgba(78,201,176,0.3); stroke: #4ec9b0;
+        }
+        .task-check-label {
+            font-size: 0.8rem; color: #c7d1ff; cursor: pointer; flex: 1;
+        }
+
+        /* 撤回按钮 */
+        .revoke-btn {
+            background: none; border: none; cursor: pointer; color: #5a6480;
+            font-size: 0.75rem; padding: 0 4px; margin-left: 6px;
+            opacity: 0.4; transition: opacity 0.2s;
+        }
+        .revoke-btn:hover { opacity: 1; color: #ff9a56; }
 
         /* ===== 拼图碎片入口图标 ===== */
         .puzzle-entry-btn {
@@ -634,7 +750,7 @@
             stroke-dasharray: 3,2;
         }
 
-        /* ===== 创造物编辑/新建 modal ===== */
+        /* ===== 创造盒子编辑/新建 modal ===== */
         .creation-modal-section {
             margin-bottom: 16px;
             padding: 12px 14px;
@@ -881,8 +997,9 @@
             display: flex; align-items: flex-start; justify-content: center;
             padding: 5vh 16px; overflow-y: auto;
             opacity: 0; transition: opacity 0.25s;
+            pointer-events: none;
         }
-        .personal-card-overlay.show { opacity: 1; }
+        .personal-card-overlay.show { opacity: 1; pointer-events: auto; }
         .personal-card {
             background: linear-gradient(135deg, rgba(26,35,69,0.98), rgba(16,22,48,0.98));
             border: 1px solid var(--card-accent, rgba(130,150,255,0.2));
@@ -1210,10 +1327,10 @@
     </div>
 </div>
 
-<!-- 创造物新建/编辑弹窗 -->
+<!-- 创造盒子新建/编辑弹窗 -->
 <div class="modal-overlay" id="creationModal">
     <div class="modal" style="max-width:460px;max-height:85vh;overflow-y:auto;">
-        <h4 id="creationModalTitle">🎯 新建创造物</h4>
+        <h4 id="creationModalTitle">🎯 新建创造盒子</h4>
 
         <!-- ① 基本信息 -->
         <div class="creation-modal-section">
@@ -1221,10 +1338,10 @@
                 <span class="creation-modal-step">①</span> 基本信息
             </div>
             <div class="form-group" style="margin-bottom:8px;">
-                <input class="form-input" id="cmName" placeholder="创造物名称" style="font-size:0.85rem;">
+                <input class="form-input" id="cmName" placeholder="名称（选填，想清楚了再起名也行）" style="font-size:0.85rem;">
             </div>
             <div class="form-group">
-                <textarea class="form-input" id="cmDesc" placeholder="一句话说清这个创造物是干什么的…" style="min-height:50px;font-size:0.82rem;"></textarea>
+                <textarea class="form-input" id="cmDesc" placeholder="一句话说清这个创造盒子是干什么的…" style="min-height:50px;font-size:0.82rem;"></textarea>
             </div>
             <div id="cmTypeFields"></div>
         </div>
@@ -1233,7 +1350,7 @@
         <div class="creation-modal-section">
             <div class="creation-modal-section-title">
                 <span class="creation-modal-step">②</span> 关键要素
-                <span style="font-size:0.65rem;color:#5a6480;margin-left:4px;">（后续可一键导入碎片）</span>
+                <span style="font-size:0.65rem;color:#5a6480;margin-left:4px;">（东西本身的核心设定，对齐颗粒度）</span>
             </div>
             <div id="cmElementsList" style="min-height:36px;margin-bottom:6px;"></div>
             <div class="add-row">
@@ -1253,9 +1370,26 @@
         <!-- ④ 达成图景 -->
         <div class="creation-modal-section">
             <div class="creation-modal-section-title">
-                <span class="creation-modal-step">④</span> 完成后是什么样
+                <span class="creation-modal-step">④</span> 达成图景
+                <span style="font-size:0.65rem;color:#5a6480;margin-left:4px;">（完成后是什么样）</span>
             </div>
-            <textarea class="form-input" id="cmVision" placeholder="完成后这个创造物会达到什么效果？给人什么感受？" style="min-height:60px;font-size:0.82rem;"></textarea>
+            <textarea class="form-input" id="cmVision" placeholder="完成后这个创造盒子会达到什么效果？给人什么感受？" style="min-height:60px;font-size:0.82rem;"></textarea>
+        </div>
+
+        <!-- ⑤ 工作拆分 -->
+        <div class="creation-modal-section">
+            <div class="creation-modal-section-title">
+                <span class="creation-modal-step">⑤</span> 工作拆分
+                <span style="font-size:0.65rem;color:#5a6480;margin-left:4px;">（大致需要哪些工作，自动生成碎片）</span>
+            </div>
+            <div id="cmWorkSplitList" style="min-height:36px;margin-bottom:6px;"></div>
+            <div class="add-row">
+                <input class="add-input" id="cmWorkSplitInput" placeholder="如：插画设计 / 内容撰写 / 灵感提供…" style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();addCmWorkSplit();}">
+                <button class="add-btn" onclick="addCmWorkSplit()">添加</button>
+            </div>
+            <div style="font-size:0.62rem;color:#5a6480;margin-top:4px;line-height:1.5;">
+                每项工作会生成一块碎片。不论自己做还是找人合作，都更清晰有条理。
+            </div>
         </div>
 
         <div class="modal-btns">
@@ -1277,7 +1411,7 @@
         </div>
         <div id="fragmentPanelContent"></div>
         <div id="fragmentPanelEmpty" style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:20px 0;">
-            还没有碎片。在创造物中拆分碎片后，认领情况会展示在这里。
+            还没有碎片。在创造盒子中拆分碎片后，认领情况会展示在这里。
         </div>
         <div class="modal-btns">
             <button class="modal-btn cancel" onclick="closeFragmentPanel()">关闭</button>
@@ -1304,14 +1438,14 @@
     </div>
 </div>
 
-<!-- 创造物蓝图弹窗 -->
+<!-- 创造盒子蓝图弹窗 -->
 <div class="modal-overlay" id="blueprintEditModal">
     <div class="modal" style="max-width:440px;max-height:85vh;overflow-y:auto;">
         <h4>📋 编辑蓝图</h4>
         <div id="bpEditCreationInfo" style="font-size:0.78rem;color:#8a94a6;margin-bottom:10px;padding:8px 10px;background:rgba(130,150,255,0.05);border-radius:8px;"></div>
         <div class="form-group">
             <label class="form-label">蓝图文字</label>
-            <textarea class="form-input" id="bpEditText" placeholder="描述这个创造物的蓝图、设计思路、参考链接…" style="min-height:100px;font-size:0.82rem;"></textarea>
+            <textarea class="form-input" id="bpEditText" placeholder="描述这个创造盒子的蓝图、设计思路、参考链接…" style="min-height:100px;font-size:0.82rem;"></textarea>
         </div>
         <div class="form-group">
             <label class="form-label">图片URL（选填）</label>
@@ -1319,7 +1453,7 @@
         </div>
         <div id="bpImgPreview" style="margin-bottom:10px;"></div>
         <div style="font-size:0.68rem;color:#5a6480;margin-bottom:10px;">
-            可去AI绘图等平台生成图片，将图片链接粘贴到上方输入框。文字部分默认从创造物信息自动填充，可自由编辑。
+            可去AI绘图等平台生成图片，将图片链接粘贴到上方输入框。文字部分默认从创造盒子信息自动填充，可自由编辑。
         </div>
         <div class="modal-btns">
             <button class="modal-btn cancel" onclick="closeBlueprintEditModal()">取消</button>
@@ -1360,11 +1494,11 @@
     <div class="modal" style="max-width:480px;max-height:85vh;overflow-y:auto;">
         <h4 style="display:flex;align-items:center;gap:6px;">🧩 团队地图</h4>
         <div style="font-size:0.72rem;color:#8a94a6;margin-bottom:10px;">
-            所有创造物的碎片总览。虚框=未认领，实心=已认领（认领者颜色辉光），✓=已完成。液体填充=当前轮完成度。点击碎片查看个人卡片。
+            所有创造盒子的碎片总览。虚框=未认领，实心=已认领（认领者颜色辉光），✓=已完成。液体填充=当前轮完成度。点击碎片查看个人卡片。
         </div>
         <div id="puzzleMapGrid"></div>
         <div id="puzzleMapEmpty" style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:16px 0;">
-            还没有碎片。去创造物中拆分碎片后，拼图会出现在这里。
+            还没有碎片。去创造盒子中拆分碎片后，拼图会出现在这里。
         </div>
         <div class="modal-btns">
             <button class="modal-btn cancel" onclick="closePuzzleMap()">关闭</button>
@@ -1379,9 +1513,15 @@
         <div id="fragmentTimelineInfo" style="font-size:0.75rem;color:#8a94a6;margin-bottom:10px;padding:8px 10px;background:rgba(130,150,255,0.05);border-radius:8px;"></div>
         <div id="fragmentTimelineList"></div>
         <div id="fragmentTimelineEmpty" style="color:#3d4a6a;font-size:0.72rem;text-align:center;padding:12px 0;">
-            还没有工作记录。勾选任务或添加留痕，所有工作可追溯。
+            还没有任务或记录。发布任务后勾选完成，或直接在下方记录工作。
         </div>
-        <input class="timeline-input" id="timelineInput" placeholder="记录完成的工作，回车提交留痕…" onkeydown="if(event.key==='Enter')addTimelineEntry()">
+        <div class="timeline-input-row">
+            <input class="timeline-input" id="timelineInput" placeholder="记录工作…" onkeydown="if(event.key==='Enter')addTimelineEntry()">
+            <label class="timeline-img-btn" title="添加图片">
+                📷
+                <input type="file" id="timelineImgInput" accept="image/*" style="display:none;" onchange="var f=this.files[0];if(f){var lbl=this.previousSibling;lbl.textContent=f.name.substring(0,8);}">
+            </label>
+        </div>
         <div class="modal-btns" style="margin-top:12px;">
             <button class="modal-btn cancel" onclick="closeFragmentTimeline()">返回</button>
         </div>
@@ -1391,6 +1531,34 @@
 <!-- 个人小卡片弹窗（手写信风格） -->
 <div class="personal-card-overlay" id="personalCardOverlay" onclick="if(event.target===this)closePersonalCard()">
     <div class="personal-card" id="personalCardContent"></div>
+</div>
+
+<!-- 任务发布弹窗 -->
+<div class="modal-overlay" id="taskPublishModal">
+    <div class="modal" style="max-width:460px;max-height:85vh;overflow-y:auto;">
+        <h4 id="taskPublishTitle">📝 发布任务</h4>
+        <div id="taskPublishInfo" style="font-size:0.75rem;color:#8a94a6;margin-bottom:10px;padding:8px 10px;background:rgba(130,150,255,0.05);border-radius:8px;"></div>
+        <div id="taskPublishBody" style="margin-bottom:10px;"></div>
+        <div class="modal-btns">
+            <button class="modal-btn cancel" onclick="closeTaskPublish()">取消</button>
+            <button class="modal-btn confirm" onclick="confirmPublishTasks()">发布</button>
+        </div>
+    </div>
+</div>
+
+<!-- 碎片版面弹窗（拼图布局） -->
+<div class="modal-overlay" id="puzzleLayoutModal">
+    <div class="modal" style="max-width:480px;max-height:85vh;overflow-y:auto;">
+        <h4 id="puzzleLayoutTitle">🧩 碎片版面</h4>
+        <div id="puzzleLayoutInfo" style="font-size:0.75rem;color:#8a94a6;margin-bottom:10px;padding:8px 10px;background:rgba(130,150,255,0.05);border-radius:8px;line-height:1.5;"></div>
+        <div class="puzzle-layout-grid" id="puzzleLayoutGrid"></div>
+        <div id="puzzleClaimBar" style="display:none;text-align:center;margin-top:20px;padding-bottom:10px;">
+            <button class="modal-btn confirm" id="puzzleClaimBtn" onclick="confirmClaim()" style="padding:8px 28px;">确认认领</button>
+        </div>
+        <div class="modal-btns">
+            <button class="modal-btn cancel" onclick="closePuzzleLayout()">关闭</button>
+        </div>
+    </div>
 </div>
 
 <!-- 悬浮刷新按钮 -->
@@ -1614,7 +1782,12 @@
             html += '<button class="personal-card-btn primary" onclick="claimFragment(' + cIdx + ',' + fIdx + ');closePersonalCard();">认领这块碎片</button>';
         } else if (isMine && !f.done) {
             html += '<button class="personal-card-btn" onclick="closePersonalCard();openFragmentTimeline(' + cIdx + ',' + fIdx + ');">查看完整时间线</button>';
-            html += '<button class="personal-card-btn primary" onclick="closePersonalCard();publishTaskRound(' + cIdx + ',' + fIdx + ');">发布任务</button>';
+            var hasRounds = (f.rounds && f.rounds.length > 0);
+            if (hasRounds) {
+                html += '<button class="personal-card-btn primary" onclick="closePersonalCard();openFragmentTimeline(' + cIdx + ',' + fIdx + ');">开始任务</button>';
+            } else {
+                html += '<button class="personal-card-btn primary" onclick="closePersonalCard();publishTaskRound(' + cIdx + ',' + fIdx + ');">发布任务</button>';
+            }
         } else {
             html += '<button class="personal-card-btn" onclick="closePersonalCard();openFragmentTimeline(' + cIdx + ',' + fIdx + ');">查看完整时间线</button>';
         }
@@ -1723,7 +1896,7 @@
         } catch(e) { console.error('[dreamspace] refundSFlowers error:', e); }
     }
 
-    // ===== 创造物类型库 =====
+    // ===== 创造盒子类型库 =====
     const DEFAULT_CREATION_TYPES = {
         novel:      { label: '小说', icon: '📖', fields: ['genre:题材', 'synopsis:简介', 'characters:角色'] },
         invention:  { label: '发明', icon: '🔧', fields: ['function:功能', 'structure:结构', 'color:花色', 'cost:成本', 'price:定价'] },
@@ -1956,6 +2129,14 @@
         space.creations[cIdx].fragments[fIdx].assigneeName = user.name;
         space.creations[cIdx].fragments[fIdx].assigneeColor = color.name;
         space.creations[cIdx].fragments[fIdx].done = false;
+        // Auto-add to team if not already there
+        if (!space.team) space.team = [];
+        var alreadyInTeam = space.team.find(function(m) { return m.uid === user.uid; });
+        if (!alreadyInTeam) {
+            // Derive role from the fragment name they claimed
+            var fragName = space.creations[cIdx].fragments[fIdx].name;
+            space.team.push({ uid: user.uid, role: fragName, responsibility: '', emoji: '🧑' });
+        }
         saveData(spaces);
         openSpaceDetail(currentSpaceId);
     }
@@ -1986,6 +2167,203 @@
         openSpaceDetail(currentSpaceId);
     }
 
+    // ===== 碎片版面（拼图布局） =====
+    var puzzleLayoutIdx = -1;
+    var puzzleSelectedSet = {}; // { fIdx: true }
+
+    function getPuzzleMiniSvg(count) {
+        // Mini puzzle icon showing count dots
+        var dots = '';
+        for (var i = 0; i < Math.min(count, 6); i++) {
+            var cx = 6 + (i % 3) * 6;
+            var cy = 6 + Math.floor(i / 3) * 6;
+            dots += '<circle cx="' + cx + '" cy="' + cy + '" r="2" fill="#8299ff" opacity="0.6"/>';
+        }
+        return '<svg width="16" height="16" viewBox="0 0 24 24">' + dots + '</svg>';
+    }
+
+    function getPuzzleRows(count) {
+        // Layout rules: 1→[1], 2→[2], 3→[3], 4→[2,2], 5→[2,3], 6→[3,3]
+        switch(count) {
+            case 1: return [[0]];
+            case 2: return [[0,1]];
+            case 3: return [[0,1,2]];
+            case 4: return [[0,1],[2,3]];
+            case 5: return [[0,1],[2,3,4]];
+            case 6: return [[0,1,2],[3,4,5]];
+            default:
+                // 7+: 3 per row
+                var rows = [];
+                for (var i = 0; i < count; i += 3) {
+                    var row = [];
+                    for (var j = i; j < Math.min(i + 3, count); j++) row.push(j);
+                    rows.push(row);
+                }
+                return rows;
+        }
+    }
+
+    function openPuzzleLayout(idx) {
+        puzzleLayoutIdx = idx;
+        puzzleSelectedSet = {};
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[idx]) return;
+        var c = space.creations[idx];
+        var frags = c.fragments || [];
+        if (frags.length === 0) {
+            customAlert('这个创造盒子还没有碎片。在编辑中添加工作拆分即可生成碎片。');
+            return;
+        }
+        var allTypes = getCreationTypes();
+        var t = allTypes[c.type] || { label: c.type, icon: '⭐' };
+        document.getElementById('puzzleLayoutTitle').textContent = '🧩 ' + c.name;
+        var user = getCurrentUser();
+        var infoText = c.collabMode
+            ? '🌐 团队协作模式 — 点击碎片选择认领，选完后点「确认认领」'
+            : '👤 个人模式 — 所有碎片默认归你。点击右上角🌐切换为团队协作';
+        document.getElementById('puzzleLayoutInfo').textContent = infoText;
+
+        var rows = getPuzzleRows(frags.length);
+        var html = '';
+        for (var ri = 0; ri < rows.length; ri++) {
+            html += '<div class="puzzle-layout-row">';
+            for (var ci = 0; ci < rows[ri].length; ci++) {
+                var fi = rows[ri][ci];
+                var f = frags[fi];
+                var claimed = (f.assignee && f.assignee !== user.uid) || (f.assignee === user.uid && !c.collabMode);
+                var mine = (f.assignee === user.uid);
+                var isOther = (f.assignee && f.assignee !== user.uid);
+                var color = isOther ? getMemberColor(space, f.assignee) : { glow: 'rgba(130,150,255,0.5)', name: 'sky', text: '#c7d1ff' };
+                var cls = 'unclaimed';
+                if (mine && !c.collabMode) cls = 'claimed';
+                else if (isOther) cls = 'claimed';
+                else if (mine && c.collabMode) cls = 'claimed';
+                var selected = puzzleSelectedSet[fi] ? ' selected' : '';
+                var onclick = c.collabMode
+                    ? 'onclick="togglePuzzleSelect(' + fi + ')"'
+                    : 'onclick="openPersonalCard(' + idx + ',' + fi + ')"';
+                var label = f.assigneeName || f.name;
+                var assigneeTag = isOther ? '<div style="font-size:0.55rem;color:' + color.glow + ';margin-top:2px;">' + esc(f.assigneeName) + '</div>' : '';
+                html += '<div class="puzzle-piece-cell ' + cls + selected + '" style="--piece-glow:' + color.glow + '50;--piece-glow-text:' + color.text + ';" ' + onclick + ' title="' + esc(f.name) + '">' +
+                    '<svg width="64" height="64" viewBox="0 0 64 64">' +
+                        '<path class="puzzle-svg-fill" d="M14 10h14a4 4 0 008 0h14v14a4 4 0 000 8v14H36a4 4 0 00-8 0H14V36a4 4 0 000-8V10z" stroke-width="2" stroke-linejoin="round"/>' +
+                        (f.done ? '<path d="M26 32l4 4 8-8" stroke="' + color.glow + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' : '') +
+                    '</svg>' +
+                    '<div class="puzzle-piece-label">' + esc(f.name) + '</div>' +
+                    assigneeTag +
+                '</div>';
+            }
+            html += '</div>';
+        }
+        document.getElementById('puzzleLayoutGrid').innerHTML = html;
+
+        // Show claim bar only in collab mode
+        document.getElementById('puzzleClaimBar').style.display = c.collabMode ? 'block' : 'none';
+        document.getElementById('puzzleLayoutModal').classList.add('active');
+    }
+
+    function closePuzzleLayout() {
+        document.getElementById('puzzleLayoutModal').classList.remove('active');
+        puzzleLayoutIdx = -1;
+        puzzleSelectedSet = {};
+    }
+
+    function togglePuzzleSelect(fi) {
+        if (puzzleLayoutIdx < 0) return;
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[puzzleLayoutIdx]) return;
+        var c = space.creations[puzzleLayoutIdx];
+        var f = c.fragments[fi];
+        var user = getCurrentUser();
+        // Can only select unclaimed or own fragments
+        if (f.assignee && f.assignee !== user.uid) {
+            customAlert('「' + f.name + '」已被' + (f.assigneeName || '他人') + '认领');
+            return;
+        }
+        if (puzzleSelectedSet[fi]) {
+            delete puzzleSelectedSet[fi];
+        } else {
+            puzzleSelectedSet[fi] = true;
+        }
+        // Re-render
+        openPuzzleLayout(puzzleLayoutIdx);
+    }
+
+    function confirmClaim() {
+        if (puzzleLayoutIdx < 0) return;
+        var selected = Object.keys(puzzleSelectedSet);
+        if (selected.length === 0) {
+            customAlert('请先点击选择要认领的碎片');
+            return;
+        }
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[puzzleLayoutIdx]) return;
+        var c = space.creations[puzzleLayoutIdx];
+        var user = getCurrentUser();
+        var color = getMemberColor(space, user.uid);
+        var claimedNames = [];
+        for (var i = 0; i < selected.length; i++) {
+            var fi = parseInt(selected[i]);
+            var f = c.fragments[fi];
+            f.assignee = user.uid;
+            f.assigneeName = user.name;
+            f.assigneeColor = color.name;
+            f.done = false;
+            f.isDefault = false;
+            claimedNames.push(f.name);
+        }
+        // Auto-add to team
+        if (!space.team) space.team = [];
+        var alreadyInTeam = space.team.find(function(m) { return m.uid === user.uid; });
+        if (!alreadyInTeam) {
+            space.team.push({ uid: user.uid, role: claimedNames[0], responsibility: '', emoji: '🧑' });
+        }
+        saveData(spaces);
+        puzzleSelectedSet = {};
+        if (window.SFX) SFX.correct();
+        closePuzzleLayout();
+        openSpaceDetail(currentSpaceId);
+        customAlert('已认领：' + claimedNames.join('、'), '✅ 认领成功');
+    }
+
+    function toggleCollab(idx) {
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[idx]) return;
+        var c = space.creations[idx];
+        if (c.collabMode) {
+            // Switching back to solo — confirm
+            customConfirm('切回个人模式后，所有碎片将重新归你。确定？', '切换模式', function() {
+                var user = getCurrentUser();
+                var color = getMemberColor(space, user.uid);
+                for (var i = 0; i < (c.fragments || []).length; i++) {
+                    c.fragments[i].assignee = user.uid;
+                    c.fragments[i].assigneeName = user.name;
+                    c.fragments[i].assigneeColor = color.name;
+                    c.fragments[i].isDefault = true;
+                }
+                c.collabMode = false;
+                saveData(spaces);
+                openSpaceDetail(currentSpaceId);
+            });
+        } else {
+            // Switch to collab — release all fragments for claiming
+            c.collabMode = true;
+            for (var i = 0; i < (c.fragments || []).length; i++) {
+                c.fragments[i].assignee = null;
+                c.fragments[i].assigneeName = null;
+                c.fragments[i].assigneeColor = null;
+                c.fragments[i].isDefault = false;
+            }
+            saveData(spaces);
+            openSpaceDetail(currentSpaceId);
+            customAlert('已切换为团队协作模式！点击碎片版面按钮选择认领。', '🌐 团队协作');
+        }
+    }
+
     // ===== 任务轮次系统 =====
     /**
      * Fragment rounds data structure:
@@ -1996,27 +2374,84 @@
      * (or when there are no rounds, manual complete still works)
      */
 
+    // ===== 任务发布弹窗 =====
+    var taskPublishRef = null;
+
     function publishTaskRound(cIdx, fIdx) {
+        // Open task editor modal instead of auto-generating
+        taskPublishRef = { cIdx: cIdx, fIdx: fIdx };
         var spaces = loadData();
         var space = spaces.find(s => s.id === currentSpaceId);
         if (!space || !space.creations[cIdx] || !space.creations[cIdx].fragments) return;
         var frag = space.creations[cIdx].fragments[fIdx];
+        var existingRounds = frag.rounds || [];
+        var roundNum = existingRounds.length + 1;
+
+        document.getElementById('taskPublishTitle').textContent = '📝 第 ' + roundNum + ' 轮任务 — ' + frag.name;
+        document.getElementById('taskPublishInfo').textContent = '来自「' + space.creations[cIdx].name + '」';
+
+        // Build task editor rows (start with 1 empty task)
+        var html = '';
+        html += '<div id="taskEditorRows">';
+        html += '<div class="task-editor-row">' +
+            '<input class="form-input task-title-input" placeholder="任务标题（如：完成第一章初稿）" style="flex:1;font-size:0.82rem;">' +
+            '<button class="law-del" onclick="this.parentElement.remove()" style="margin-left:4px;">✕</button>' +
+            '</div>';
+        html += '</div>';
+        html += '<div style="margin-top:6px;">';
+        html += '<button class="add-btn" style="font-size:0.72rem;padding:3px 10px;border-style:dashed;" onclick="addTaskEditorRow()">+ 添加任务</button>';
+        html += '</div>';
+        document.getElementById('taskPublishBody').innerHTML = html;
+
+        document.getElementById('taskPublishModal').classList.add('active');
+    }
+
+    function addTaskEditorRow() {
+        var container = document.getElementById('taskEditorRows');
+        var div = document.createElement('div');
+        div.className = 'task-editor-row';
+        div.innerHTML = '<input class="form-input task-title-input" placeholder="任务标题" style="flex:1;font-size:0.82rem;">' +
+            '<button class="law-del" onclick="this.parentElement.remove()" style="margin-left:4px;">✕</button>';
+        container.appendChild(div);
+    }
+
+    function closeTaskPublish() {
+        document.getElementById('taskPublishModal').classList.remove('active');
+        taskPublishRef = null;
+    }
+
+    function confirmPublishTasks() {
+        if (!taskPublishRef) return;
+        var inputs = document.querySelectorAll('.task-title-input');
+        var tasks = [];
+        for (var i = 0; i < inputs.length; i++) {
+            var val = inputs[i].value.trim();
+            if (val) tasks.push({ name: val, done: false });
+        }
+        if (tasks.length === 0) {
+            customAlert('请至少输入一个任务标题');
+            return;
+        }
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[taskPublishRef.cIdx] || !space.creations[taskPublishRef.cIdx].fragments) return;
+        var frag = space.creations[taskPublishRef.cIdx].fragments[taskPublishRef.fIdx];
         if (!frag.rounds) frag.rounds = [];
         var roundId = 'r' + Date.now().toString(36);
-        var roundNum = frag.rounds.length + 1;
-        // Default: 3 sub-tasks for this round (user can edit before confirming)
         frag.rounds.push({
             roundId: roundId,
-            roundNum: roundNum,
+            roundNum: frag.rounds.length + 1,
             publishedAt: new Date().toISOString(),
-            tasks: [
-                { name: '任务1', done: false },
-                { name: '任务2', done: false },
-                { name: '任务3', done: false }
-            ]
+            tasks: tasks
         });
         saveData(spaces);
+        closeTaskPublish();
+        if (window.SFX) SFX.correct();
         openSpaceDetail(currentSpaceId);
+        // Open timeline to show new tasks
+        setTimeout(function() {
+            openFragmentTimeline(taskPublishRef.cIdx, taskPublishRef.fIdx);
+        }, 100);
     }
 
     function toggleRoundTask(cIdx, fIdx, roundIdx, taskIdx) {
@@ -2047,9 +2482,14 @@
             frag.done = false;
         }
         saveData(spaces);
-        openSpaceDetail(currentSpaceId);
+        // If timeline modal is open, re-render it; otherwise re-render space detail
+        var timelineModal = document.getElementById('fragmentTimelineModal');
+        if (timelineModal && timelineModal.classList.contains('active') && currentFragmentRef) {
+            renderFragmentTimeline();
+        } else {
+            openSpaceDetail(currentSpaceId);
+        }
     }
-
     function editRoundTaskName(cIdx, fIdx, roundIdx, taskIdx, newName) {
         var spaces = loadData();
         var space = spaces.find(s => s.id === currentSpaceId);
@@ -2130,7 +2570,7 @@
         return html;
     }
 
-    // ===== 创造物蓝图 =====
+    // ===== 创造盒子蓝图 =====
     let blueprintEditIdx = -1;
 
     function getAutoBlueprintText(c, t) {
@@ -2482,72 +2922,110 @@
         infoEl.innerHTML = '来自「' + esc(c.name) + '」' +
             (f.done ? ' · <span style="color:' + infoColor + ';">已完成</span>' : f.assignee === getCurrentUser().uid ? ' · <span style="color:' + infoColor + ';">我认领</span>' : (f.assignee ? ' · <span style="color:' + infoColor + ';">' + esc(f.assigneeName || f.assignee) + ' 认领</span>' : ' · 未认领'));
 
-        // Build unified timeline: merge manual entries + round task completions
-        var entries = [];
+        // Build unified timeline: pending tasks (with checkbox) + completed entries (sorted by time)
+        var pendingTasks = [];  // Tasks not yet done (show checkbox)
+        var completedEntries = []; // Completed tasks + manual entries (show as history)
 
-        // Manual timeline entries
-        var tl = f.timeline || [];
-        for (var i = 0; i < tl.length; i++) {
-            entries.push({
-                ts: tl[i].createdAt || '',
-                type: 'manual',
-                text: tl[i].text,
-                author: tl[i].author || '',
-                authorUid: tl[i].authorUid || ''
-            });
-        }
-
-        // Round task completions
+        // Pending round tasks (with checkboxes, grouped by round)
         if (f.rounds) {
             for (var ri = 0; ri < f.rounds.length; ri++) {
                 var round = f.rounds[ri];
                 for (var ti = 0; ti < round.tasks.length; ti++) {
                     var task = round.tasks[ti];
-                    if (task.done && task.completedAt) {
+                    if (!task.done) {
+                        pendingTasks.push({
+                            roundIdx: ri, taskIdx: ti,
+                            name: task.name,
+                            roundNum: round.roundNum
+                        });
+                    } else if (task.completedAt) {
                         var completerColor = getTaskCompleterColor(space, task.completedByUid);
-                        entries.push({
+                        completedEntries.push({
                             ts: task.completedAt,
                             type: 'task',
-                            text: '完成「' + task.name + '」（第' + round.roundNum + '轮）',
+                            text: task.name,
+                            roundIdx: ri, taskIdx: ti,
+                            roundNum: round.roundNum,
                             author: task.completedBy || '',
                             authorUid: task.completedByUid || '',
-                            completerColor: completerColor
+                            completerColor: completerColor,
+                            canRevoke: true
                         });
                     }
                 }
             }
         }
 
-        // Sort by timestamp descending (most recent first)
-        entries.sort(function(a, b) {
+        // Manual timeline entries (personal work records, no checkbox)
+        var tl = f.timeline || [];
+        for (var i = 0; i < tl.length; i++) {
+            completedEntries.push({
+                ts: tl[i].createdAt || '',
+                type: 'manual',
+                text: tl[i].text,
+                img: tl[i].img || '',
+                author: tl[i].author || '',
+                authorUid: tl[i].authorUid || ''
+            });
+        }
+
+        // Sort completed entries by timestamp descending
+        completedEntries.sort(function(a, b) {
             if (!a.ts) return 1;
             if (!b.ts) return -1;
             return b.ts.localeCompare(a.ts);
         });
 
-        if (entries.length === 0) {
+        if (pendingTasks.length === 0 && completedEntries.length === 0) {
             listEl.innerHTML = '';
             emptyEl.style.display = 'block';
             return;
         }
         emptyEl.style.display = 'none';
         var html = '';
-        for (var k = 0; k < entries.length; k++) {
-            var e = entries[k];
-            var dt = e.ts ? new Date(e.ts).toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
-            var dotStyle = '';
-            var prefix = '';
-            if (e.type === 'task') {
-                var cColor = e.completerColor ? e.completerColor.glow : '#4ec9b0';
-                dotStyle = ' style="background:' + cColor + ';"';
-                prefix = '<span style="color:' + cColor + ';">✓</span> ';
+
+        // Pending tasks section (with checkboxes)
+        if (pendingTasks.length > 0) {
+            html += '<div style="margin-bottom:16px;">';
+            html += '<div style="font-size:0.72rem;color:#4ec9b0;margin-bottom:8px;font-weight:500;">📋 待完成任务</div>';
+            for (var pt = 0; pt < pendingTasks.length; pt++) {
+                var t = pendingTasks[pt];
+                html += '<div class="task-check-item">' +
+                    '<div class="task-checkbox" onclick="toggleRoundTask(' + currentFragmentRef.cIdx + ',' + currentFragmentRef.fIdx + ',' + t.roundIdx + ',' + t.taskIdx + ')">' +
+                    '<svg width="18" height="18" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="rgba(78,201,176,0.4)" stroke-width="2"/></svg>' +
+                    '</div>' +
+                    '<span class="task-check-label" onclick="toggleRoundTask(' + currentFragmentRef.cIdx + ',' + currentFragmentRef.fIdx + ',' + t.roundIdx + ',' + t.taskIdx + ')">' + esc(t.name) + '</span>' +
+                    '<span style="font-size:0.6rem;color:#5a6480;margin-left:auto;">第' + t.roundNum + '轮</span>' +
+                '</div>';
             }
-            html += '<div class="timeline-entry">' +
-                '<div class="timeline-dot"' + dotStyle + '></div>' +
-                '<div class="timeline-content">' +
-                '<div class="timeline-text">' + prefix + esc(e.text) + '</div>' +
-                '<div class="timeline-meta">' + dt + (e.author ? ' · ' + esc(e.author) : '') + '</div>' +
-                '</div></div>';
+            html += '</div>';
+        }
+
+        // Completed entries + manual records (history, no checkbox)
+        if (completedEntries.length > 0) {
+            html += '<div style="font-size:0.72rem;color:#8a94a6;margin-bottom:8px;">🕘 工作记录</div>';
+            for (var k = 0; k < completedEntries.length; k++) {
+                var e = completedEntries[k];
+                var dt = e.ts ? new Date(e.ts).toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+                var dotStyle = '';
+                var prefix = '';
+                var revokeBtn = '';
+                if (e.type === 'task') {
+                    var cColor = e.completerColor ? e.completerColor.glow : '#4ec9b0';
+                    dotStyle = ' style="background:' + cColor + ';"';
+                    prefix = '<span style="color:' + cColor + ';">✓</span> ';
+                    if (e.canRevoke) {
+                        revokeBtn = '<button class="revoke-btn" onclick="revokeTask(' + currentFragmentRef.cIdx + ',' + currentFragmentRef.fIdx + ',' + e.roundIdx + ',' + e.taskIdx + ')" title="撤回">↩</button>';
+                    }
+                }
+                html += '<div class="timeline-entry">' +
+                    '<div class="timeline-dot"' + dotStyle + '></div>' +
+                    '<div class="timeline-content">' +
+                    '<div class="timeline-text">' + prefix + esc(e.text) + revokeBtn + '</div>' +
+                    (e.img ? '<img src="' + esc(e.img) + '" style="max-width:100%;border-radius:6px;margin-top:4px;border:1px solid rgba(130,150,255,0.1);">' : '') +
+                    '<div class="timeline-meta">' + dt + (e.author ? ' · ' + esc(e.author) : '') + '</div>' +
+                    '</div></div>';
+            }
         }
         listEl.innerHTML = html;
     }
@@ -2560,7 +3038,8 @@
     }
     function closeFragmentTimeline() {
         document.getElementById('fragmentTimelineModal').classList.remove('active');
-        openPuzzleMap();
+        currentFragmentRef = null;
+        openSpaceDetail(currentSpaceId);
     }
 
     function addTimelineEntry() {
@@ -2568,6 +3047,26 @@
         var input = document.getElementById('timelineInput');
         var text = input.value.trim();
         if (!text) return;
+        var imgInput = document.getElementById('timelineImgInput');
+        var img = '';
+        if (imgInput && imgInput.files && imgInput.files[0]) {
+            var file = imgInput.files[0];
+            if (file.size > 500000) {
+                customAlert('图片太大（超过500KB），请压缩后再上传');
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                saveTimelineEntry(text, e.target.result);
+            };
+            reader.readAsDataURL(file);
+            return;
+        }
+        saveTimelineEntry(text, '');
+    }
+
+    function saveTimelineEntry(text, img) {
+        if (!currentFragmentRef) return;
         var spaces = loadData();
         var space = spaces.find(function(s){ return s.id === currentSpaceId; });
         if (!space || !space.creations) return;
@@ -2576,10 +3075,32 @@
         var f = c.fragments[currentFragmentRef.fIdx];
         if (!f) return;
         if (!f.timeline) f.timeline = [];
-        f.timeline.push({ text: text, createdAt: new Date().toISOString(), author: getCurrentUser().name, authorUid: getCurrentUser().uid });
+        var user = getCurrentUser();
+        f.timeline.push({ text: text, img: img, createdAt: new Date().toISOString(), author: user.name, authorUid: user.uid });
         saveData(spaces);
-        input.value = '';
+        var input = document.getElementById('timelineInput');
+        if (input) input.value = '';
+        var imgInput = document.getElementById('timelineImgInput');
+        if (imgInput) imgInput.value = '';
         renderFragmentTimeline();
+    }
+
+    function revokeTask(cIdx, fIdx, roundIdx, taskIdx) {
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[cIdx] || !space.creations[cIdx].fragments) return;
+        var frag = space.creations[cIdx].fragments[fIdx];
+        if (!frag.rounds || !frag.rounds[roundIdx]) return;
+        var task = frag.rounds[roundIdx].tasks[taskIdx];
+        task.done = false;
+        task.completedAt = null;
+        task.completedBy = null;
+        task.completedByUid = null;
+        // Un-complete the fragment if it was marked done
+        frag.done = false;
+        saveData(spaces);
+        renderFragmentTimeline();
+        customAlert('已撤回「' + task.name + '」，可以重新完成。', '↩ 已撤回');
     }
 
     // ===== 渲染空间列表 =====
@@ -2757,28 +3278,34 @@
                 <span class="detail-title">${esc(space.name)}</span>
                 <span class="space-type-badge ${typeClass}">${typeLabel}</span>
                 <button onclick="openPuzzleMap()" title="团队地图" style="background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.15);color:#8299ff;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:0.75rem;white-space:nowrap;">🧩 地图</button>
+                <button onclick="deleteSpace('${space.id}')" title="删除空间并退还花朵" style="background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.15);color:#ff6b6b;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:0.75rem;white-space:nowrap;margin-left:auto;">🗑 删除</button>
             </div>
 
-            <!-- 蓝图 -->
-            ${space.blueprint ? `
-            <div class="sub-section">
-                <div class="sub-header" onclick="toggleSub(this)">
+            <!-- 蓝图（不可折叠，始终展开） -->
+            <div class="blueprint-bar">
+                <div class="blueprint-bar-header">
                     <span class="sub-title">🗺️ 蓝图</span>
-                    <svg class="sub-chevron" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#5a6480" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+                    <button class="blueprint-edit-btn" onclick="toggleBlueprintEdit(true)" title="编辑蓝图">✏️</button>
                 </div>
-                <div class="sub-body open">
-                    <div style="font-size:0.82rem;color:#8a94a6;line-height:1.7;padding:4px 0;">${esc(space.blueprint)}</div>
+                <div id="blueprintView" style="display:${(space.blueprint || space.vision) ? 'block' : 'none'};">
+                    <div class="blueprint-text" id="blueprintText">${esc(space.blueprint || space.vision || '')}</div>
+                </div>
+                <div id="blueprintEdit" style="display:${(space.blueprint || space.vision) ? 'none' : 'block'};">
+                    <textarea class="form-input" id="blueprintInput" placeholder="描绘这个世界是什么样…" style="min-height:80px;">${esc(space.blueprint || space.vision || '')}</textarea>
+                    <div style="margin-top:6px;display:flex;gap:6px;">
+                        <button class="add-btn" onclick="saveBlueprint()">保存</button>
+                        <button class="modal-btn cancel" style="font-size:0.75rem;padding:4px 10px;" onclick="toggleBlueprintEdit(false)">取消</button>
+                    </div>
                 </div>
             </div>
-            ` : ''}
 
-            <!-- 世界法则 -->
+            <!-- 世界法则（默认展开，铅笔切换新增输入框） -->
             <div class="sub-section">
                 <div class="sub-header" onclick="toggleSub(this)">
                     <span class="sub-title">📜 世界法则</span>
                     <svg class="sub-chevron" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#5a6480" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
                 </div>
-                <div class="sub-body" id="lawsBody">
+                <div class="sub-body open">
                     <div class="law-list" id="lawList">
                         ${(space.laws || []).map((l, i) => `
                             <div class="law-item">
@@ -2787,18 +3314,22 @@
                                 <button class="law-del" onclick="removeLaw(${i})">✕</button>
                             </div>
                         `).join('')}
+                        ${(space.laws || []).length === 0 ? '<div style="color:#3d4a6a;font-size:0.72rem;padding:4px 0;">还没有法则。点击 ✏️ 添加。</div>' : ''}
                     </div>
-                    <div class="add-row">
-                        <input class="add-input" id="lawInput" placeholder="新增一条法则…" onkeydown="if(event.key==='Enter')addLaw()">
-                        <button class="add-btn" onclick="addLaw()">添加</button>
+                    <div class="law-add-row" id="lawAddRow" style="display:none;">
+                        <div class="add-row">
+                            <input class="add-input" id="lawInput" placeholder="新增一条法则…" onkeydown="if(event.key==='Enter')addLaw()">
+                            <button class="add-btn" onclick="addLaw()">添加</button>
+                        </div>
                     </div>
+                    <button class="blueprint-edit-btn" onclick="var r=document.getElementById('lawAddRow');r.style.display=r.style.display==='none'?'block':'none';" title="编辑法则" style="position:absolute;top:8px;right:10px;">✏️</button>
                 </div>
             </div>
 
-            <!-- 创造物 -->
+            <!-- 创造盒子 -->
             <div class="sub-section">
                 <div class="sub-header" onclick="toggleSub(this)">
-                    <span class="sub-title">🎯 创造物</span>
+                    <span class="sub-title">🎁 创造盒子</span>
                     <svg class="sub-chevron" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#5a6480" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
                 </div>
                 <div class="sub-body" id="creationsBody">
@@ -2807,13 +3338,12 @@
                     </div>
                     <div id="creationTypeBtns" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
                     <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
-                        <button class="add-btn" style="font-size:0.7rem;padding:4px 10px;border-style:dashed;" onclick="openCreateTypeModal()">+ 自定义标签</button>
-                        <button class="add-btn" style="font-size:0.7rem;padding:4px 10px;" onclick="openManageTypesModal()">🏷️ 管理标签</button>
+                        <button class="add-btn" style="font-size:0.7rem;padding:4px 10px;" onclick="openManageTypesModal()">🏷️ 物库</button>
                     </div>
                 </div>
             </div>
 
-            <!-- 团队（含碎片入口） -->
+            <!-- 团队（默认折叠，自己置顶） -->
             <div class="sub-section">
                 <div class="sub-header" onclick="toggleSub(this)">
                     <span class="sub-title">👥 团队</span>
@@ -2833,45 +3363,67 @@
                 </div>
                 <div class="sub-body" id="teamBody">
                     <div id="teamList">
-                        ${(space.team || []).map((m, i) => `
-                            <div class="team-member">
-                                <div class="member-avatar">${m.emoji || '🧑'}</div>
-                                <div class="member-info">
-                                    <div class="member-role">${esc(m.role)}</div>
-                                    <div class="member-resp">${esc(m.responsibility)}</div>
-                                </div>
-                                <button class="law-del" onclick="removeTeamMember(${i})">✕</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="add-row" style="flex-wrap:wrap;">
-                        <input class="add-input" id="memberRole" placeholder="角色（如：设计师）" style="flex:1;min-width:100px;">
-                        <input class="add-input" id="memberResp" placeholder="职责" style="flex:1;min-width:100px;">
-                    </div>
-                    <div class="add-row" style="margin-top:6px;">
-                        <input class="add-input" id="memberEmoji" placeholder="emoji" style="width:60px;">
-                        <button class="add-btn" onclick="addTeamMember()">加入</button>
+                        ${(function() {
+                            var _teamMap = {};
+                            var _teamOrder = [];
+                            for (var ti = 0; ti < (space.team || []).length; ti++) {
+                                var tm = space.team[ti];
+                                var key = tm.uid || tm.role;
+                                if (!_teamMap[key]) {
+                                    _teamMap[key] = { uid: tm.uid, role: tm.role, responsibility: tm.responsibility || '', emoji: tm.emoji || '🧑', fragments: [] };
+                                    _teamOrder.push(key);
+                                }
+                            }
+                            for (var ci = 0; ci < (space.creations || []).length; ci++) {
+                                var frags = space.creations[ci].fragments || [];
+                                for (var fi = 0; fi < frags.length; fi++) {
+                                    var f = frags[fi];
+                                    if (f.assignee) {
+                                        var key = f.assignee;
+                                        if (!_teamMap[key]) {
+                                            _teamMap[key] = { uid: f.assignee, role: f.assigneeName || f.assignee, responsibility: '', emoji: '🧑', fragments: [] };
+                                            _teamOrder.push(key);
+                                        }
+                                        _teamMap[key].fragments.push({ name: f.name, done: f.done, cIdx: ci, fIdx: fi });
+                                    }
+                                }
+                            }
+                            if (_teamOrder.length === 0) {
+                                return '<div style="color:#3d4a6a;font-size:0.72rem;text-align:center;padding:12px 0;">还没有伙伴加入。在创造盒子中认领碎片即可自动加入团队。</div>';
+                            }
+                            // Sort: current user first, then others
+                            var currentUser = getCurrentUser();
+                            var myKey = currentUser.uid;
+                            var sortedOrder = _teamOrder.filter(function(k) { return k === myKey; }).concat(_teamOrder.filter(function(k) { return k !== myKey; }));
+                            var html = '';
+                            for (var oi = 0; oi < sortedOrder.length; oi++) {
+                                var m = _teamMap[sortedOrder[oi]];
+                                var mc = MEMBER_COLORS[oi % MEMBER_COLORS.length];
+                                var fragList = m.fragments.map(function(f) {
+                                    return '<span style="font-size:0.62rem;background:' + (f.done ? mc.dark : mc.glow + '20') + ';color:' + (f.done ? mc.dark : mc.glow) + ';padding:1px 5px;border-radius:3px;margin:1px;">' + (f.done ? '✓ ' : '') + esc(f.name) + '</span>';
+                                }).join('');
+                                var isMe = (m.uid === myKey);
+                                // After first item (me), add expand button for others
+                                if (oi === 1) {
+                                    html += '<div onclick="var el=this.nextElementSibling;el.style.display=el.style.display===\'none\'?\'block\':\'none\';" style="font-size:0.68rem;color:#5a6480;cursor:pointer;padding:4px 0;text-align:center;">▸ 展开其他伙伴</div>';
+                                    html += '<div id="otherMembers" style="display:none;">';
+                                }
+                                html += '<div class="team-member">' +
+                                    '<div class="member-avatar" style="border-color:' + mc.glow + ';box-shadow:0 0 8px ' + mc.glow + '40;">' + (m.emoji || '🧑') + '</div>' +
+                                    '<div class="member-info">' +
+                                        '<div class="member-role" style="color:' + mc.glow + ';">' + esc(m.role) + (isMe ? ' （我）' : '') + '</div>' +
+                                        (m.responsibility ? '<div class="member-resp">' + esc(m.responsibility) + '</div>' : '') +
+                                        (fragList ? '<div style="margin-top:3px;display:flex;flex-wrap:wrap;gap:2px;">' + fragList + '</div>' : '') +
+                                    '</div>' +
+                                '</div>';
+                            }
+                            if (sortedOrder.length > 1) html += '</div>'; // close otherMembers
+                            return html;
+                        })()}
                     </div>
                 </div>
             </div>
 
-            <!-- 图景/蓝图 -->
-            <div class="sub-section">
-                <div class="sub-header" onclick="toggleSub(this)">
-                    <span class="sub-title">🌅 达成图景</span>
-                    <svg class="sub-chevron" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#5a6480" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
-                </div>
-                <div class="sub-body" id="blueprintBody">
-                    <div id="blueprintView" style="display:${(space.blueprint || space.vision) ? 'block' : 'none'};">
-                        <div class="blueprint-text" id="blueprintText">${esc(space.blueprint || space.vision || '')}</div>
-                        <button class="add-btn" style="margin-top:6px;" onclick="toggleBlueprintEdit(true)">编辑</button>
-                    </div>
-                    <div id="blueprintEdit" style="display:${(space.blueprint || space.vision) ? 'none' : 'block'};">
-                        <textarea class="form-input" id="blueprintInput" placeholder="描绘达成后的世界会是什么样子…" style="min-height:100px;">${esc(space.blueprint || space.vision || '')}</textarea>
-                        <button class="add-btn" style="margin-top:6px;" onclick="saveBlueprint()">保存</button>
-                    </div>
-                </div>
-            </div>
         `;
         renderCreationTypeBtns();
     }
@@ -3116,6 +3668,10 @@
                 <div class="creation-name">
                     <span class="creation-type ${cls}" style="background:rgba(130,150,255,0.1);color:#8299ff;">${t.icon || '⭐'} ${t.label || c.type}</span>
                     ${esc(c.name)}
+                    <div style="margin-left:auto;display:flex;gap:4px;align-items:center;">
+                        ${frags.length > 0 ? `<button class="puzzle-mini-btn" onclick="openPuzzleLayout(${idx})" title="碎片版面">${getPuzzleMiniSvg(frags.length)}</button>` : ''}
+                        <button class="collab-toggle-btn ${c.collabMode ? 'active' : ''}" onclick="toggleCollab(${idx})" title="${c.collabMode ? '当前：团队协作' : '当前：个人'}">${c.collabMode ? '🌐' : '👤'}</button>
+                    </div>
                 </div>
                 <div class="creation-desc">${esc(c.description || '')}</div>
                 ${detailHtml}
@@ -3139,6 +3695,46 @@
         document.getElementById('spaceDetailView').classList.remove('active');
         document.getElementById('spaceListView').style.display = 'block';
         renderSpaceList();
+    }
+
+    function deleteSpace(id) {
+        var spaces = loadData();
+        var space = spaces.find(function(s) { return s.id === id; });
+        if (!space) return;
+        var creationCount = (space.creations || []).length;
+
+        // Refund policy: full refund within 24h, no refund after
+        var createdAt = space.createdAt ? new Date(space.createdAt).getTime() : 0;
+        var ageMs = Date.now() - createdAt;
+        var within24h = ageMs < 24 * 60 * 60 * 1000;
+        var refundAmount = within24h ? 3 : 0;
+
+        var msg = '删除「' + space.name + '」';
+        if (creationCount > 0) {
+            msg += '（内含 ' + creationCount + ' 个创造盒子，将一并删除）';
+        }
+        if (within24h) {
+            msg += '\n\n创建未满24小时，将退还 3 朵太阳花。';
+        } else {
+            msg += '\n\n创建已超过24小时，不退还太阳花。';
+        }
+        msg += '\n确定删除？';
+
+        customConfirm(msg, '🗑 删除空间', function() {
+            var idx = spaces.findIndex(function(s) { return s.id === id; });
+            if (idx < 0) return;
+            spaces.splice(idx, 1);
+            saveData(spaces);
+            if (refundAmount > 0) refundSFlowers(refundAmount);
+            if (window.SFX) SFX.correct();
+            backToList();
+            if (refundAmount > 0) {
+                var bal = getSFlowers();
+                customAlert('已删除「' + space.name + '」，退还 ' + refundAmount + ' 朵太阳花。当前余额：' + bal, '✅ 退还成功');
+            } else {
+                customAlert('已删除「' + space.name + '」。', '🗑 已删除');
+            }
+        });
     }
 
     function toggleSub(header) {
@@ -3172,15 +3768,17 @@
         openSpaceDetail(currentSpaceId);
     }
 
-    // ===== 创造物操作 =====
+    // ===== 创造盒子操作 =====
     var cmEditingIdx = null;
     var cmType = null;
     var cmElements = [];
+    var cmWorkSplits = [];
 
     function addCreation(type) {
         cmEditingIdx = null;
         cmType = type;
         cmElements = [];
+        cmWorkSplits = [];
         openCreationModal(false, type);
     }
 
@@ -3192,6 +3790,8 @@
         const c = space.creations[idx];
         cmType = c.type;
         cmElements = (c.elements || []).slice();
+        // Load work splits from existing fragments (name only, preserve order)
+        cmWorkSplits = ((c.fragments || []).map(function(f) { return f.name; }));
         openCreationModal(true, c.type, c);
     }
 
@@ -3199,7 +3799,7 @@
         var allTypes = getCreationTypes();
         var t = allTypes[type] || { label: type, icon: '⭐', fields: [] };
         document.getElementById('creationModalTitle').textContent =
-            (isEdit ? '✏️ 编辑' : (t.icon || '⭐') + ' 新建') + '创造物';
+            (isEdit ? '✏️ 编辑' : (t.icon || '⭐') + ' 新建') + '创造盒子';
 
         // ① 基本信息
         document.getElementById('cmName').value = (existing && existing.name) ? existing.name : '';
@@ -3227,6 +3827,9 @@
 
         // ④ 达成图景
         document.getElementById('cmVision').value = (existing && existing.vision) ? existing.vision : '';
+
+        // ⑤ 工作拆分
+        renderCmWorkSplits();
 
         document.getElementById('cmConfirmBtn').textContent = isEdit ? '保存' : '创建';
         document.getElementById('creationModal').classList.add('active');
@@ -3266,6 +3869,34 @@
         container.innerHTML = html;
     }
 
+    function addCmWorkSplit() {
+        var input = document.getElementById('cmWorkSplitInput');
+        var val = input.value.trim();
+        if (!val) return;
+        cmWorkSplits.push(val);
+        input.value = '';
+        renderCmWorkSplits();
+    }
+
+    function removeCmWorkSplit(idx) {
+        cmWorkSplits.splice(idx, 1);
+        renderCmWorkSplits();
+    }
+
+    function renderCmWorkSplits() {
+        var container = document.getElementById('cmWorkSplitList');
+        if (cmWorkSplits.length === 0) {
+            container.innerHTML = '<span style="color:#3d4a6a;font-size:0.72rem;">还没有添加工作项。跳过也行，后续可随时在创造盒子中拆分。</span>';
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < cmWorkSplits.length; i++) {
+            html += '<span class="element-tag" style="background:rgba(78,201,176,0.08);border-color:rgba(78,201,176,0.15);color:#4ec9b0;">' + esc(cmWorkSplits[i]) +
+                ' <span class="remove-tag" onclick="removeCmWorkSplit(' + i + ')">✕</span></span>';
+        }
+        container.innerHTML = html;
+    }
+
     function renderCmElementContents(existing) {
         var section = document.getElementById('cmElementContentsSection');
         var container = document.getElementById('cmElementContents');
@@ -3292,7 +3923,7 @@
 
     function confirmCreationModal() {
         var name = document.getElementById('cmName').value.trim();
-        if (!name) { document.getElementById('cmName').focus(); return; }
+        if (!name) name = '未命名';
         var desc = document.getElementById('cmDesc').value.trim();
 
         // Collect type fields
@@ -3316,6 +3947,33 @@
 
         var vision = document.getElementById('cmVision').value.trim();
 
+        // Build fragments from work splits, preserving existing fragment state
+        var newFragments = [];
+        for (var wi = 0; wi < cmWorkSplits.length; wi++) {
+            var wName = cmWorkSplits[wi].trim();
+            if (!wName) continue;
+            // Try to find existing fragment with same name
+            var existingFrag = null;
+            if (cmEditingIdx !== null) {
+                var spaces0 = loadData();
+                var sp0 = spaces0.find(function(s) { return s.id === currentSpaceId; });
+                if (sp0 && sp0.creations[cmEditingIdx] && sp0.creations[cmEditingIdx].fragments) {
+                    existingFrag = sp0.creations[cmEditingIdx].fragments.find(function(f) { return f.name === wName; });
+                }
+            }
+            if (existingFrag) {
+                if (!existingFrag.rounds) existingFrag.rounds = [];
+                newFragments.push(existingFrag);
+            } else {
+                // Default: fragment belongs to creator (solo mode)
+                var user = getCurrentUser();
+                newFragments.push({
+                    name: wName, assignee: user.uid, assigneeName: user.name,
+                    done: false, rounds: [], isDefault: true
+                });
+            }
+        }
+
         var spaces = loadData();
         var space = spaces.find(s => s.id === currentSpaceId);
         if (!space) return;
@@ -3330,12 +3988,16 @@
             c.elements = cmElements.slice();
             c.elementContents = elementContents;
             c.vision = vision;
+            // Only replace fragments if there are new ones, otherwise keep old
+            if (newFragments.length > 0) c.fragments = newFragments;
+            if (c.collabMode === undefined) c.collabMode = false;
         } else {
             // New
             space.creations.push({
                 name: name, type: cmType, description: desc, details: details,
                 elements: cmElements.slice(), elementContents: elementContents,
-                vision: vision, fragments: [], completed: false
+                vision: vision, fragments: newFragments, completed: false,
+                collabMode: false
             });
         }
         saveData(spaces);
@@ -3352,7 +4014,7 @@
         var c = space.creations[idx];
         var elements = c.elements || [];
         if (elements.length === 0) {
-            customAlert('请先在创造物中添加关键要素');
+            customAlert('请先在创造盒子中添加关键要素');
             return;
         }
         // Pre-fill split modal with element names
@@ -3559,8 +4221,11 @@
 
     // ===== 图景 =====
     function toggleBlueprintEdit(showEdit) {
-        document.getElementById('blueprintView').style.display = showEdit ? 'none' : 'block';
-        document.getElementById('blueprintEdit').style.display = showEdit ? 'block' : 'none';
+        var view = document.getElementById('blueprintView');
+        var edit = document.getElementById('blueprintEdit');
+        if (!view || !edit) return;
+        view.style.display = showEdit ? 'none' : 'block';
+        edit.style.display = showEdit ? 'block' : 'none';
         if (showEdit) {
             var text = document.getElementById('blueprintText').textContent;
             document.getElementById('blueprintInput').value = text;
