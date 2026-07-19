@@ -13,6 +13,7 @@ firebase-debug.*.log
 .agents/
 .claude/
 .trae/
+.dumate/
 .vscode/
 .idea/
 skills-lock.json
@@ -20,6 +21,13 @@ skills-lock.json
 # === 生成的文件 ===
 generated-images/
 start-server.ps1
+public/temp_*.html
+public/verify*.ps1
+check-firestore.js
+
+# Windows 保留名误生成的占位文件
+nul
+**/nul
 
 # === 敏感配置 ===
 # Firebase 配置已抽离到 firebase-config.js，GitHub 上不提交

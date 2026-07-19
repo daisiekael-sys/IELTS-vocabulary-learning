@@ -16,7 +16,7 @@
     <script src="firebase-config.js?v=3"></script>
     <script src="auth.js?v=3"></script>
     <script src="sfx.js?v=1"></script>
-    <script src="sidebar.js?v=1"></script>
+    <script src="sidebar.js?v=2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", Arial, sans-serif; }
         body {
@@ -127,6 +127,25 @@
             margin-left: 18px;
         }
         .tree-children.open { display: block; }
+        .tree-show-all-toggle {
+            font-size: 0.68rem; color: #5a6480; cursor: pointer;
+            padding: 4px 12px 4px 26px; text-align: left;
+            transition: color 0.15s;
+        }
+        .tree-show-all-toggle:hover { color: #8299ff; }
+
+        .tree-home .tree-row { font-weight: 600; font-size: 0.85rem; }
+        .tree-home .tree-icon { font-size: 1rem; }
+        .tree-divider {
+            height: 1px; margin: 6px 12px;
+            background: linear-gradient(90deg, transparent, rgba(130,150,255,0.12), transparent);
+        }
+        .tree-tag {
+            flex-shrink: 0; font-size: 0.55rem;
+            padding: 1px 5px; border-radius: 3px;
+            background: rgba(130,150,255,0.08);
+            color: #5a6480; white-space: nowrap;
+        }
 
         .tree-empty {
             padding: 20px 16px;
@@ -146,20 +165,6 @@
         .hamburger-btn:hover { background: rgba(130,150,255,0.15); }
         .hamburger-btn svg { color: #8a94a6; }
         .hamburger-btn:hover svg { color: #c7d1ff; }
-
-        /* 页面内 pin 按钮（右上角固定） */
-        .page-pin-btn {
-            position: fixed; top: 60px; right: 16px;
-            width: 32px; height: 32px;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(10,16,40,0.8); backdrop-filter: blur(8px);
-            border: 1px solid rgba(130,150,255,0.12);
-            border-radius: 8px; cursor: pointer;
-            z-index: 90; transition: all 0.2s;
-            color: #5a6480;
-        }
-        .page-pin-btn:hover { color: #c7d1ff; border-color: rgba(130,150,255,0.2); }
-        .page-pin-btn.pinned { color: #ffd700; border-color: rgba(255,215,0,0.2); background: rgba(255,215,0,0.06); }
 
         /* 顶部导航 */
         .top-bar {
@@ -321,11 +326,130 @@
             transition: transform 0.3s; color: #5a6480;
         }
         .sub-chevron.open { transform: rotate(180deg); }
+        .type-lib-btn {
+            position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+            background: rgba(130,150,255,0.08); border: 1px solid rgba(130,150,255,0.15);
+            border-radius: 6px; padding: 3px 10px; cursor: pointer; font-size: 0.72rem;
+            transition: all 0.2s; opacity: 0.85; color: #8299ff;
+            display: flex; align-items: center; gap: 3px; white-space: nowrap;
+        }
+        .type-lib-btn:hover { opacity: 1; background: rgba(130,150,255,0.15); }
         .sub-body {
             display: none; padding: 0 16px 14px;
             position: relative;
         }
         .sub-body.open { display: block; }
+
+        /* 创造盒子标签栏 */
+        .creation-tab-bar {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(130,150,255,0.2) transparent;
+            border-bottom: 1px solid rgba(130,150,255,0.08);
+            padding: 0;
+            margin-bottom: 0;
+        }
+        .creation-tab-bar::-webkit-scrollbar { height: 3px; }
+        .creation-tab-bar::-webkit-scrollbar-track { background: transparent; }
+        .creation-tab-bar::-webkit-scrollbar-thumb { background: rgba(130,150,255,0.15); border-radius: 2px; }
+        .creation-tab {
+            flex-shrink: 0;
+            display: flex; align-items: center; gap: 5px;
+            padding: 8px 14px;
+            font-size: 0.78rem;
+            color: #5a6480;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            user-select: none;
+            position: relative;
+        }
+        .creation-tab:hover { color: #8a94a6; background: rgba(130,150,255,0.03); }
+        .creation-tab.active {
+            color: #c7d1ff;
+            border-bottom-color: #ffd700;
+        }
+        .creation-tab.dragging { opacity: 0.4; }
+        .creation-tab.drag-over { border-left: 2px solid #ffd700; }
+        .creation-tab-type-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            flex-shrink: 0;
+        }
+        /* Tab rename tooltip card */
+        .tab-rename-card {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a2345;
+            border: 1px solid rgba(130,150,255,0.15);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: none;
+            z-index: 300;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            width: 220px;
+            text-align: center;
+        }
+        .tab-rename-card.active { display: block; }
+        .tab-rename-card::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background: #1a2345;
+            border-left: 1px solid rgba(130,150,255,0.15);
+            border-top: 1px solid rgba(130,150,255,0.15);
+            transform: translateX(-50%) rotate(45deg);
+        }
+        .tab-rename-card input {
+            width: 100%;
+            background: rgba(130,150,255,0.06);
+            border: 1px solid rgba(130,150,255,0.15);
+            border-radius: 6px;
+            padding: 6px 8px;
+            color: #c7d1ff;
+            font-size: 0.78rem;
+            outline: none;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+        }
+        .tab-rename-card input:focus { border-color: rgba(255,215,0,0.3); }
+        .tab-rename-card .rename-btns {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+        .tab-rename-card .rename-btns button {
+            font-size: 0.72rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all .15s;
+        }
+        .tab-rename-card .rename-btns .save-btn {
+            background: rgba(78,201,176,0.12);
+            color: #4ec9b0;
+            border-color: rgba(78,201,176,0.25);
+        }
+        .tab-rename-card .rename-btns .save-btn:hover { background: rgba(78,201,176,0.2); }
+        .tab-rename-card .rename-btns .cancel-btn {
+            background: rgba(255,107,107,0.08);
+            color: #ff6b6b;
+            border-color: rgba(255,107,107,0.15);
+        }
+        .tab-rename-card .rename-btns .cancel-btn:hover { background: rgba(255,107,107,0.15); }
+        .creation-tab-content {
+            padding: 14px 0;
+        }
 
         /* 世界法则编辑 */
         .law-list { margin-bottom: 8px; }
@@ -374,7 +498,32 @@
         }
         .creation-name {
             color: #c7d1ff; font-size: 0.88rem; font-weight: 500; margin-bottom: 4px;
+            display: flex; align-items: center; gap: 4px;
         }
+        .creation-name-text {
+            cursor: text; border-radius: 3px; padding: 1px 3px;
+            transition: background 0.15s; min-width: 20px;
+        }
+        .creation-name-text:hover { background: rgba(130,150,255,0.08); }
+        .creation-name-text:focus { outline: 1px solid rgba(130,150,255,0.3); background: rgba(130,150,255,0.06); }
+        .creation-name-edit-input {
+            font-size: 0.88rem; font-weight: 500; color: #c7d1ff;
+            background: rgba(130,150,255,0.08); border: 1px solid rgba(130,150,255,0.3);
+            border-radius: 4px; padding: 1px 4px; outline: none;
+            max-width: 200px;
+        }
+        .creation-name-edit-btns {
+            display: inline-flex; gap: 3px; margin-left: 4px; vertical-align: middle;
+        }
+        .creation-name-edit-btns button {
+            font-size: 0.68rem; padding: 1px 5px; border-radius: 4px;
+            cursor: pointer; border: 1px solid transparent; background: transparent;
+            transition: all .15s;
+        }
+        .creation-name-edit-btns .save-btn { color: #4ec9b0; border-color: rgba(78,201,176,0.2); }
+        .creation-name-edit-btns .save-btn:hover { background: rgba(78,201,176,0.12); }
+        .creation-name-edit-btns .cancel-btn { color: #ff6b6b; border-color: rgba(255,107,107,0.2); }
+        .creation-name-edit-btns .cancel-btn:hover { background: rgba(255,107,107,0.12); }
         .creation-type {
             display: inline-block; font-size: 0.65rem; padding: 1px 6px;
             border-radius: 6px; margin-right: 4px;
@@ -446,13 +595,13 @@
         }
         .fragment-summary span b { color: #c7d1ff; }
 
-        /* ===== 碎片横向卡片 ===== */
+        /* ===== 碎片横向卡片（全宽） ===== */
         .frag-h-layout {
-            display: flex; flex-wrap: wrap; gap: 10px;
+            display: flex; flex-direction: column; gap: 10px;
             margin-top: 6px;
         }
         .frag-h-card {
-            flex: 1 1 200px; min-width: 180px; max-width: 360px;
+            width: 100%;
             background: rgba(130,150,255,0.04);
             border: 1px solid rgba(130,150,255,0.1);
             border-radius: 10px;
@@ -463,7 +612,7 @@
         .frag-h-card.done { border-color: rgba(78,201,176,0.15); }
         .frag-h-header {
             display: flex; align-items: center; gap: 6px;
-            padding: 8px 10px;
+            padding: 8px 12px;
             cursor: pointer;
             border-bottom: 1px solid rgba(130,150,255,0.06);
         }
@@ -471,66 +620,102 @@
             width: 10px; height: 10px; border-radius: 50%;
             border: 1.5px solid #5a6480; flex-shrink: 0;
         }
-        .frag-h-name { font-size: 0.75rem; color: #c7d1ff; flex: 1; }
-        .frag-h-assignee { font-size: 0.62rem; color: #5a6480; }
+        .frag-h-name { font-size: 0.82rem; color: #c7d1ff; flex: 1; }
+        .frag-h-assignee { font-size: 0.75rem; color: #5a6480; }
         .frag-h-body {
-            padding: 6px 10px;
+            padding: 8px 12px;
             display: none;
         }
         .frag-h-card.expanded .frag-h-body { display: block; }
         .frag-h-actions {
-            display: flex; gap: 4px; flex-wrap: wrap;
-            padding: 4px 0 6px;
+            display: flex; gap: 6px; flex-wrap: wrap;
+            padding: 4px 0 8px;
         }
         .frag-h-rounds {
             margin-top: 4px;
         }
         .frag-h-task-row {
-            display: flex; align-items: center; gap: 6px;
-            padding: 3px 6px;
-            border-radius: 4px;
-            margin-bottom: 2px;
-            font-size: 0.68rem;
+            display: flex; align-items: center; gap: 8px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            margin-bottom: 3px;
+            font-size: 0.8rem;
             cursor: pointer;
             transition: background 0.15s;
         }
         .frag-h-task-row:hover { background: rgba(130,150,255,0.08); }
         .frag-h-task-check {
-            width: 14px; height: 14px;
-            border-radius: 3px;
+            width: 16px; height: 16px;
+            border-radius: 4px;
             border: 1.5px solid;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             flex-shrink: 0;
         }
         .frag-h-subtask-input {
             width: 100%;
-            padding: 3px 6px;
-            border-radius: 4px;
+            padding: 5px 8px;
+            border-radius: 6px;
             background: rgba(130,150,255,0.06);
             border: 1px solid rgba(130,150,255,0.15);
             color: #c7d1ff;
-            font-size: 0.65rem;
+            font-size: 0.78rem;
             outline: none;
-            margin-top: 3px;
+            margin-top: 4px;
         }
         .frag-h-subtask-input:focus { border-color: rgba(130,150,255,0.3); }
         .frag-h-subtask-list {
-            padding-left: 20px;
-            margin-top: 2px;
+            padding-left: 24px;
+            margin-top: 3px;
         }
         .frag-h-subtask-item {
-            display: flex; align-items: center; gap: 4px;
-            font-size: 0.6rem;
-            padding: 2px 4px;
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.75rem;
+            padding: 3px 6px;
         }
         .frag-h-others-toggle {
-            font-size: 0.65rem; color: #5a6480; cursor: pointer;
-            padding: 6px 0 2px; text-align: center;
+            font-size: 0.78rem; color: #5a6480; cursor: pointer;
+            padding: 8px 0 4px; text-align: center;
             border-top: 1px dashed rgba(130,150,255,0.08);
             margin-top: 6px;
         }
         .frag-h-others-toggle:hover { color: #8299ff; }
+        /* 工作记录区域 */
+        .frag-h-records {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed rgba(130,150,255,0.08);
+        }
+        .frag-h-record-item {
+            display: flex; gap: 8px;
+            padding: 4px 8px;
+            margin-bottom: 4px;
+        }
+        .frag-h-record-input-row {
+            display: flex; gap: 6px;
+            margin-top: 8px;
+            align-items: center;
+        }
+        .frag-h-record-input {
+            flex: 1;
+            padding: 5px 10px;
+            border-radius: 6px;
+            background: rgba(130,150,255,0.06);
+            border: 1px solid rgba(130,150,255,0.15);
+            color: #c7d1ff;
+            font-size: 0.78rem;
+            outline: none;
+        }
+        .frag-h-record-input:focus { border-color: rgba(130,150,255,0.3); }
+        .frag-h-record-img-btn {
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 5px 8px;
+            border-radius: 6px;
+            background: rgba(130,150,255,0.06);
+            border: 1px solid rgba(130,150,255,0.15);
+            color: #8a94a6;
+        }
 
         /* ===== 碎片总览弹窗 ===== */
         .puzzle-overview-members {
@@ -635,9 +820,24 @@
             margin-top: 8px; padding-top: 8px;
             border-top: 1px dashed rgba(130,150,255,0.1);
         }
-        .creation-blueprint-img {
-            width: 100%; border-radius: 8px; margin-top: 6px;
+        .creation-cover-img {
+            width: 100%; max-height: 220px; object-fit: cover;
+            border-radius: 12px; margin-bottom: 8px;
             border: 1px solid rgba(130,150,255,0.1);
+            cursor: zoom-in; transition: opacity .2s;
+        }
+        .creation-cover-img:hover { opacity: 0.85; }
+        /* Lightbox */
+        .lightbox-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.92);
+            display: none; align-items: center; justify-content: center;
+            z-index: 9999; cursor: zoom-out;
+        }
+        .lightbox-overlay.active { display: flex; }
+        .lightbox-overlay img {
+            max-width: 92vw; max-height: 92vh;
+            border-radius: 8px;
         }
         .creation-blueprint-text {
             color: #c7d1ff; font-size: 0.78rem; line-height: 1.6;
@@ -678,6 +878,40 @@
         .form-input:focus { border-color: rgba(255,215,0,0.35); }
         .form-input::placeholder { color: #3d4a6a; }
         textarea.form-input { resize: vertical; min-height: 80px; }
+
+        /* 碎片输入行 */
+        .frag-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 3px 0;
+        }
+        .frag-bullet {
+            color: #8299ff;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .frag-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed rgba(130, 150, 255, 0.25);
+            color: #c7d1ff;
+            font-size: 0.82rem;
+            padding: 4px 0;
+            outline: none;
+        }
+        .frag-input:focus { border-bottom-color: rgba(130, 150, 255, 0.7); }
+        .frag-input::placeholder { color: rgba(130, 150, 255, 0.3); }
+        .frag-del {
+            cursor: pointer;
+            opacity: 0.25;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            transition: opacity 0.15s;
+        }
+        .frag-del:hover { opacity: 0.7; }
         .type-select {
             display: flex; gap: 8px; flex-wrap: wrap;
         }
@@ -712,33 +946,48 @@
 
         /* ===== 碎片版面按钮 + 拼图布局 ===== */
         .puzzle-mini-btn {
-            background: none; border: none; cursor: pointer; padding: 2px;
-            display: flex; align-items: center; opacity: 0.6; transition: opacity 0.2s;
+            background: rgba(130,150,255,0.1); border: 1px solid rgba(130,150,255,0.2);
+            border-radius: 6px; cursor: pointer; padding: 3px 6px;
+            display: flex; align-items: center; gap: 3px;
+            opacity: 0.85; transition: all 0.2s;
         }
-        .puzzle-mini-btn:hover { opacity: 1; }
+        .puzzle-mini-btn:hover { opacity: 1; background: rgba(130,150,255,0.15); }
+        .puzzle-mini-btn .puzzle-count {
+            font-size: 0.6rem; color: #8299ff; font-weight: 600;
+        }
         .collab-toggle-btn {
-            background: rgba(130,150,255,0.08); border: 1px solid rgba(130,150,255,0.15);
-            border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 0.75rem;
-            transition: all 0.2s; opacity: 0.6;
+            border-radius: 6px; padding: 3px 7px; cursor: pointer; font-size: 0.8rem;
+            transition: all 0.2s; border: 1px solid;
         }
-        .collab-toggle-btn:hover { opacity: 1; }
-        .collab-toggle-btn.active {
+        .collab-toggle-btn.personal {
+            background: rgba(126,200,255,0.15); border-color: rgba(126,200,255,0.35);
+            color: #7ec8ff; opacity: 1;
+        }
+        .collab-toggle-btn.personal:hover { background: rgba(126,200,255,0.25); }
+        .collab-toggle-btn.team {
             background: rgba(78,201,176,0.12); border-color: rgba(78,201,176,0.3);
-            opacity: 1;
+            opacity: 0.95;
         }
+        .collab-toggle-btn.team:hover { background: rgba(78,201,176,0.2); opacity: 1; }
         .puzzle-layout-grid {
             display: flex; flex-direction: column; align-items: center; gap: 8px;
-            padding: 20px 16px;
+            padding: 20px 16px 56px;
         }
         .puzzle-layout-row {
-            display: flex; gap: 8px; justify-content: center;
+            display: flex; gap: 10px; justify-content: center;
         }
         .puzzle-piece-cell {
-            width: 64px; height: 64px; position: relative; cursor: pointer;
+            width: 80px; height: 80px; position: relative; cursor: pointer;
             transition: all 0.2s;
         }
-        .puzzle-piece-cell.claimed {
-            filter: drop-shadow(0 0 6px var(--piece-glow, rgba(130,150,255,0.4)));
+        /* Glow wraps the SVG puzzle piece lines, not the outer cell */
+        .puzzle-piece-cell.claimed .puzzle-svg-fill {
+            filter: drop-shadow(0 0 4px var(--piece-glow, rgba(130,150,255,0.4))) drop-shadow(0 0 8px var(--piece-glow, rgba(130,150,255,0.3)));
+            animation: claimedGlow 2.5s ease-in-out infinite;
+        }
+        @keyframes claimedGlow {
+            0%, 100% { filter: drop-shadow(0 0 3px var(--piece-glow, rgba(130,150,255,0.3))) drop-shadow(0 0 6px var(--piece-glow, rgba(130,150,255,0.2))); }
+            50% { filter: drop-shadow(0 0 5px var(--piece-glow, rgba(130,150,255,0.5))) drop-shadow(0 0 12px var(--piece-glow, rgba(130,150,255,0.35))); }
         }
         .puzzle-piece-cell.unclaimed .puzzle-svg-fill {
             fill: rgba(130,150,255,0.04); stroke: rgba(130,150,255,0.15);
@@ -751,14 +1000,79 @@
         .puzzle-piece-cell.selected .puzzle-svg-fill {
             fill: rgba(78,201,176,0.15); stroke: rgba(78,201,176,0.5);
             stroke-dasharray: none;
+            filter: drop-shadow(0 0 4px rgba(78,201,176,0.4));
         }
         .puzzle-piece-label {
-            position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
-            font-size: 0.6rem; color: #8a94a6; white-space: nowrap;
-            max-width: 80px; overflow: hidden; text-overflow: ellipsis;
+            position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+            font-size: 0.7rem; color: #8a94a6; white-space: nowrap;
+            max-width: 100px; overflow: hidden; text-overflow: ellipsis;
+            text-align: center; line-height: 1.2;
         }
         .puzzle-piece-cell.claimed .puzzle-piece-label {
             color: var(--piece-glow-text, #c7d1ff);
+        }
+        .puzzle-piece-assignee {
+            position: absolute; bottom: -38px; left: 50%; transform: translateX(-50%);
+            font-size: 0.64rem; white-space: nowrap;
+            max-width: 100px; overflow: hidden; text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        /* ===== 宇宙液体填充 (Cosmic Liquid Fill inside puzzle piece SVG) ===== */
+        /* When cosmic liquid is present, outline fill becomes transparent */
+        .puzzle-piece-cell.has-cosmic .puzzle-svg-fill {
+            fill: transparent !important;
+        }
+        /* Liquid surface wave animation */
+        .cosmic-wave {
+            animation: cosmicWave 3s ease-in-out infinite;
+        }
+        @keyframes cosmicWave {
+            0%, 100% { transform: translateY(0) scaleX(1); }
+            50% { transform: translateY(-1px) scaleX(0.96); }
+        }
+        /* Star sparkles inside liquid */
+        .cosmic-star {
+            animation: cosmicStarTwinkle 2s ease-in-out infinite;
+        }
+        @keyframes cosmicStarTwinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.3); }
+        }
+        /* Liquid surface highlight ellipse */
+        .cosmic-highlight {
+            animation: cosmicPulse 3s ease-in-out infinite;
+        }
+        @keyframes cosmicPulse {
+            0%, 100% { opacity: 0.15; }
+            50% { opacity: 0.35; }
+        }
+
+        /* 颜色选择器 */
+        .color-swatch {
+            width: 44px; height: 44px; border-radius: 50%;
+            cursor: pointer; position: relative;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .color-swatch:hover { transform: scale(1.1); }
+        .color-swatch.selected {
+            border-color: #fff;
+            box-shadow: 0 0 12px rgba(255,255,255,0.3);
+        }
+        .color-swatch.selected::after {
+            content: '✓'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); color: #fff;
+            font-size: 1rem; font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        .member-legend-item {
+            display: flex; align-items: center; gap: 4px;
+            font-size: 0.75rem; color: #8a94a6;
+        }
+        .member-legend-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            flex-shrink: 0;
         }
 
         /* 任务发布编辑行 */
@@ -911,7 +1225,7 @@
             font-size: 0.78rem; color: #c7d1ff; line-height: 1.5;
         }
         .timeline-meta {
-            font-size: 0.62rem; color: #5a6480; margin-top: 2px;
+            font-size: 0.7rem; color: #5a6480; margin-top: 2px;
         }
         .timeline-input {
             flex: 1; background: rgba(130,150,255,0.05);
@@ -1080,7 +1394,7 @@
         .frag-liquid-text {
             position: relative;
             z-index: 2;
-            font-size: 0.55rem;
+            font-size: 0.68rem;
             color: #e6edf7;
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
@@ -1431,7 +1745,7 @@
             color: var(--completer-color, #4ec9b0);
         }
 
-        /* ===== 竣工星辰 ===== */
+        /* ===== 竣工星球 ===== */
         .star-achievement {
             display: flex; flex-direction: column; align-items: center;
             padding: 20px 10px; margin: 8px 0;
@@ -1593,6 +1907,11 @@
         .planet-svg {
             display: block;
             margin: 0 auto;
+            animation: planetFloat 4s ease-in-out infinite;
+        }
+        @keyframes planetFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
         }
         .planet-achievement {
             text-align: center;
@@ -1631,11 +1950,6 @@
     <div class="sidebar-body" id="sidebarBody"></div>
 </div>
 
-<!-- 页面 pin 按钮 -->
-<div class="page-pin-btn" id="pagePinBtn" onclick="toggleCurrentPagePin()" title="固定到侧边栏" style="display:none;">
-    <svg width="16" height="16" viewBox="0 0 24 24"><path d="M9 4h6l-1 7 3 3v2h-4v4l-1 1-1-1v-4H7v-2l3-3-1-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-</div>
-
 <!-- 顶部导航 -->
 <div class="top-bar">
     <div style="display:flex;align-items:center;gap:8px;">
@@ -1650,6 +1964,9 @@
     <span class="top-title">🏵️ 创造空间</span>
     <div style="display:flex;align-items:center;gap:12px;">
         <span class="top-s-info">🏵️ <span id="sFlowerBalance">0</span></span>
+        <div style="cursor:pointer;color:#8a94a6;display:flex;align-items:center;" onclick="location.href='profile.html'" title="个人主页">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4-6.2-4.5-6.2 4.5 2.4-7.4L2 9.4h7.6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/></svg>
+        </div>
         <div style="position:relative;cursor:pointer;" onclick="openTaskBoard()">
             <svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-4M9 7V5a3 3 0 016 0v2M9 7h6" stroke="#8a94a6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M9 13l2 2 4-4" stroke="#4ec9b0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
             <span id="taskBoardBadge" style="position:absolute;top:-4px;right:-4px;background:#ff6b6b;color:#fff;font-size:0.55rem;width:14px;height:14px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:600;"></span>
@@ -1659,7 +1976,6 @@
 
 <!-- 空间列表 -->
 <div class="space-list" id="spaceListView">
-    <div class="section-label">我的空间</div>
     <div id="spaceListContainer"></div>
 
     <div class="create-card" id="createCard" onclick="tryCreateSpace()">
@@ -1672,7 +1988,7 @@
         </div>
         <div class="create-icon">✦</div>
         <div class="create-text">创造新空间</div>
-        <div class="create-cost">消耗 3 朵 🏵️S级小红花 · 当前拥有 <span id="createSCount">0</span> 朵</div>
+        <div class="create-cost" id="createCostText">消耗 3 朵 🏵️S级小红花 · 当前拥有 <span id="createSCount">0</span> 朵</div>
     </div>
 </div>
 
@@ -1688,6 +2004,10 @@
             <input class="form-input" id="newSpaceName" placeholder="给你的世界起个名字" maxlength="30">
         </div>
         <div class="form-group">
+            <label class="form-label">空间图标（选填，输入 emoji）</label>
+            <input class="form-input" id="newSpaceIcon" placeholder="🌌" maxlength="4" style="font-size:1.3rem;text-align:center;width:60px;">
+        </div>
+        <div class="form-group">
             <label class="form-label">空间类型</label>
             <div class="type-select">
                 <div class="type-option selected" data-type="theme" onclick="selectSpaceType('theme')">🌌 主题式</div>
@@ -1699,10 +2019,10 @@
             <textarea class="form-input" id="newSpaceLaws" placeholder="这个世界的基本规则是什么？&#10;例：这里的时间流速是外界的3倍&#10;例：每个人只能携带3件物品"></textarea>
         </div>
         <div class="form-group">
-            <label class="form-label">蓝图（选填）</label>
-            <textarea class="form-input" id="newSpaceBlueprint" placeholder="大致描述一下这里是一个什么样的世界" style="min-height:60px;"></textarea>
+            <label class="form-label" id="blueprintLabel">主题（选填）</label>
+            <textarea class="form-input" id="newSpaceBlueprint" placeholder="描绘这个世界是什么样…" style="min-height:60px;"></textarea>
         </div>
-        <div class="modal-cost">✦ 花朵已扣除，填写信息后创造你的世界</div>
+        <div class="modal-cost" id="modalCostText">✦ 花朵已扣除，填写信息后创造你的世界</div>
         <div class="modal-btns">
             <button class="modal-btn cancel" onclick="closeCreateModal()">取消（退还）</button>
             <button class="modal-btn confirm" id="createConfirmBtn" onclick="confirmCreate()">创造</button>
@@ -1711,7 +2031,7 @@
 </div>
 
 <!-- 自定义标签弹窗 -->
-<div class="modal-overlay" id="createTypeModal">
+<div class="modal-overlay" id="createTypeModal" style="z-index:210;">
     <div class="modal" style="max-width:400px;">
         <h4>🏷️ 自定义标签</h4>
         <div class="form-group">
@@ -1735,11 +2055,14 @@
 
 <!-- 管理标签弹窗 -->
 <div class="modal-overlay" id="manageTypesModal">
-    <div class="modal" style="max-width:400px;max-height:80vh;overflow-y:auto;">
-        <h4>🏷️ 管理标签</h4>
+    <div class="modal" style="max-width:440px;max-height:85vh;overflow-y:auto;">
+        <h4>🏷️ 类目库</h4>
+        <div style="font-size:0.7rem;color:#8a94a6;margin-bottom:10px;padding:6px 10px;background:rgba(130,153,255,0.05);border-radius:8px;line-height:1.5;">
+            点击类目可创建新的创造物 · 下方可编辑/删除自定义类目
+        </div>
         <div id="manageTypesList" style="margin-bottom:12px;"></div>
         <div id="deletedDefaultsSection" style="margin-top:10px;display:none;">
-            <div style="font-size:0.7rem;color:#5a6480;margin-bottom:6px;">已删除的默认标签（可恢复）：</div>
+            <div style="font-size:0.7rem;color:#5a6480;margin-bottom:6px;">已隐藏的默认类目（可恢复）：</div>
             <div id="deletedDefaultsList"></div>
         </div>
         <div class="modal-btns">
@@ -1843,14 +2166,14 @@
 <!-- 碎片拆分弹窗 -->
 <div class="modal-overlay" id="splitModal">
     <div class="modal" style="max-width:420px;max-height:80vh;overflow-y:auto;">
-        <h4>🧩 拆分碎片</h4>
+        <h4 id="splitModalTitle">🧩 拆分碎片</h4>
         <div id="splitCreationInfo" style="font-size:0.78rem;color:#8a94a6;margin-bottom:10px;padding:8px 10px;background:rgba(130,150,255,0.05);border-radius:8px;"></div>
         <div class="form-group">
-            <label class="form-label">碎片列表（每行一个碎片名称）</label>
-            <textarea class="form-input" id="splitFragments" placeholder="如：&#10;世界观设定&#10;角色设计&#10;章节大纲&#10;插图绘制" style="min-height:120px;font-size:0.82rem;"></textarea>
+            <label class="form-label" id="splitListLabel">碎片列表</label>
+            <div id="splitFragments" style="min-height:60px;padding:8px 10px;background:rgba(130,150,255,0.05);border:1px solid rgba(130,150,255,0.15);border-radius:8px;"></div>
         </div>
-        <div style="font-size:0.68rem;color:#5a6480;margin-bottom:10px;">
-            每行一个碎片。创建后可逐个认领，未认领的碎片可在团队地图中查看。
+        <div style="font-size:0.68rem;color:#5a6480;margin-bottom:10px;" id="splitHint">
+            回车添加下一个碎片，创建后可逐个认领。
         </div>
         <div class="modal-btns">
             <button class="modal-btn cancel" onclick="closeSplitModal()">取消</button>
@@ -1859,28 +2182,69 @@
     </div>
 </div>
 
-<!-- 创造盒子蓝图弹窗 -->
+<!-- 创造盒子设计图弹窗 -->
 <div class="modal-overlay" id="blueprintEditModal">
     <div class="modal" style="max-width:440px;max-height:85vh;overflow-y:auto;">
-        <h4>📋 编辑蓝图</h4>
+        <h4>📋 编辑设计图</h4>
         <div id="bpEditCreationInfo" style="font-size:0.78rem;color:#8a94a6;margin-bottom:10px;padding:8px 10px;background:rgba(130,150,255,0.05);border-radius:8px;"></div>
         <div class="form-group">
-            <label class="form-label">蓝图文字</label>
-            <textarea class="form-input" id="bpEditText" placeholder="描述这个创造盒子的蓝图、设计思路、参考链接…" style="min-height:100px;font-size:0.82rem;"></textarea>
+            <label class="form-label">设计文字</label>
+            <textarea class="form-input" id="bpEditText" placeholder="描述这个创造盒子的设计思路、参考链接…" style="min-height:100px;font-size:0.82rem;"></textarea>
         </div>
         <div class="form-group">
-            <label class="form-label">图片URL（选填）</label>
-            <input class="form-input" id="bpEditImg" placeholder="粘贴图片链接，可去外部平台生成后插入" style="font-size:0.8rem;" oninput="updateBpImgPreview()">
+            <label class="form-label">图片（选填）</label>
+            <div style="display:flex;gap:6px;align-items:center;">
+                <input class="form-input" id="bpEditImg" placeholder="粘贴图片链接…" style="font-size:0.8rem;flex:1;" oninput="updateBpImgPreview()">
+                <label style="flex-shrink:0;cursor:pointer;padding:8px 10px;border-radius:8px;background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.15);font-size:0.75rem;color:#8299ff;transition:all .2s;white-space:nowrap;" onmouseover="this.style.background='rgba(130,150,255,0.15)'" onmouseout="this.style.background='rgba(130,150,255,0.08)'">
+                    📁 上传
+                    <input type="file" accept="image/*" style="display:none;" onchange="handleBpImgUpload(this)">
+                </label>
+            </div>
         </div>
         <div id="bpImgPreview" style="margin-bottom:10px;"></div>
         <div style="font-size:0.68rem;color:#5a6480;margin-bottom:10px;">
-            可去AI绘图等平台生成图片，将图片链接粘贴到上方输入框。文字部分默认从创造盒子信息自动填充，可自由编辑。
+            可直接上传本地图片，或粘贴图片链接。文字部分默认从创造盒子信息自动填充，可自由编辑。
         </div>
         <div class="modal-btns">
             <button class="modal-btn cancel" onclick="closeBlueprintEditModal()">取消</button>
-            <button class="modal-btn confirm" onclick="saveCreationBlueprint()">保存蓝图</button>
+            <button class="modal-btn confirm" onclick="saveCreationBlueprint()">保存设计图</button>
         </div>
     </div>
+</div>
+
+<!-- 添加图片引导弹窗 -->
+<div class="modal-overlay" id="imageGuideModal">
+    <div class="modal" style="max-width:420px;max-height:85vh;overflow-y:auto;">
+        <h4>🖼️ 添加图片</h4>
+        <div id="imageGuideContent" style="font-size:0.78rem;color:#8a94a6;line-height:1.7;padding:10px 12px;background:rgba(130,150,255,0.05);border-radius:8px;margin-bottom:12px;"></div>
+        <!-- Direct upload section -->
+        <div style="margin-bottom:12px;">
+            <label class="form-label" style="color:#8299ff;">直接上传图片</label>
+            <div style="position:relative;border:2px dashed rgba(130,150,255,0.2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;" id="imgGuideDropZone" onclick="document.getElementById('imgGuideFileInput').click()" ondragover="event.preventDefault();this.style.borderColor='rgba(130,150,255,0.5)'" ondragleave="this.style.borderColor='rgba(130,150,255,0.2)'" ondrop="handleImgGuideDrop(event)">
+                <div id="imgGuideUploadHint" style="font-size:0.78rem;color:#8a94a6;">
+                    <span style="font-size:1.4rem;display:block;margin-bottom:6px;">📤</span>
+                    点击选择图片，或拖拽到此处
+                </div>
+                <div id="imgGuidePreview" style="display:none;">
+                    <img id="imgGuidePreviewImg" style="max-width:100%;border-radius:8px;border:1px solid rgba(130,150,255,0.1);" />
+                    <div style="font-size:0.65rem;color:#4ec9b0;margin-top:4px;">✓ 已选择，点击保存设计图</div>
+                </div>
+                <input type="file" id="imgGuideFileInput" accept="image/*" style="display:none;" onchange="handleImgGuideUpload(this)">
+            </div>
+        </div>
+        <div style="font-size:0.68rem;color:#5a6480;margin-bottom:10px;padding:6px 10px;background:rgba(130,150,255,0.03);border-radius:6px;">
+            也可使用 AI 绘图工具生成图片后粘贴链接，或直接上传本地图片。
+        </div>
+        <div class="modal-btns">
+            <button class="modal-btn cancel" onclick="closeImageGuideModal()">取消</button>
+            <button class="modal-btn confirm" id="imgGuideSaveBtn" onclick="saveImgGuideUpload()" style="opacity:0.5;pointer-events:none;">保存图片</button>
+        </div>
+    </div>
+</div>
+
+<!-- 图片灯箱（全屏查看） -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" />
 </div>
 
 <!-- 团队协作看板弹窗 -->
@@ -1964,14 +2328,41 @@
 <!-- 碎片版面弹窗（拼图布局） -->
 <div class="modal-overlay" id="puzzleLayoutModal">
     <div class="modal" style="max-width:480px;max-height:85vh;overflow-y:auto;">
-        <h4 id="puzzleLayoutTitle">🧩 碎片版面</h4>
+        <div id="puzzleLayoutTitleWrap" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <h4 id="puzzleLayoutTitle" style="margin:0;cursor:text;" ondblclick="startPuzzleTitleEdit()" title="双击改名">🧩 碎片版面</h4>
+            <button class="frag-btn" style="font-size:0.6rem;padding:2px 6px;color:#8299ff;border-color:rgba(130,150,255,0.15);" onclick="startPuzzleTitleEdit()">✏️</button>
+        </div>
+        <div id="puzzleTitleEditRow" style="display:none;gap:6px;align-items:center;margin-bottom:10px;">
+            <input type="text" id="puzzleTitleInput" maxlength="30" placeholder="起个名字…" style="background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.3);border-radius:6px;padding:5px 8px;color:#c7d1ff;font-size:0.88rem;outline:none;flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmPuzzleTitleEdit();}else if(event.key==='Escape'){cancelPuzzleTitleEdit();}" />
+            <button class="frag-btn" style="font-size:0.62rem;padding:3px 8px;color:#4ec9b0;border-color:rgba(78,201,176,0.2);" onclick="confirmPuzzleTitleEdit()">✓ 保存</button>
+            <button class="frag-btn" style="font-size:0.62rem;padding:3px 8px;color:#ff6b6b;border-color:rgba(255,107,107,0.2);" onclick="cancelPuzzleTitleEdit()">✕</button>
+        </div>
         <div id="puzzleLayoutInfo" style="font-size:0.75rem;color:#8a94a6;margin-bottom:10px;padding:8px 10px;background:rgba(130,150,255,0.05);border-radius:8px;line-height:1.5;"></div>
+        <div id="puzzleMemberLegend" style="margin-bottom:12px;"></div>
         <div class="puzzle-layout-grid" id="puzzleLayoutGrid"></div>
         <div id="puzzleClaimBar" style="display:none;text-align:center;margin-top:20px;padding-bottom:10px;">
             <button class="modal-btn confirm" id="puzzleClaimBtn" onclick="confirmClaim()" style="padding:8px 28px;">确认认领</button>
         </div>
+        <div id="puzzleManageBar" style="text-align:center;margin-top:6px;margin-bottom:6px;">
+            <button class="frag-btn" id="puzzleManageBtn" style="font-size:0.7rem;padding:4px 12px;" onclick="var pi=puzzleLayoutIdx;closePuzzleLayout();if(pi>=0)openSplitModal(pi);">🧩 管理碎片</button>
+        </div>
         <div class="modal-btns">
             <button class="modal-btn cancel" onclick="closePuzzleLayout()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 颜色选择弹窗 -->
+<div class="modal-overlay" id="colorPickerModal">
+    <div class="modal" style="max-width:380px;">
+        <h4>🎨 选择你的颜色</h4>
+        <div style="font-size:0.8rem;color:#8a94a6;margin-bottom:14px;line-height:1.6;">
+            加入团队时选择一个代表色。你的碎片、任务对勾和反馈都会用这个颜色标记。
+        </div>
+        <div id="colorPickerGrid" style="display:flex;flex-wrap:wrap;gap:16px 14px;justify-content:center;margin-bottom:24px;padding-bottom:8px;"></div>
+        <div class="modal-btns">
+            <button class="modal-btn cancel" onclick="closeColorPicker()">取消</button>
+            <button class="modal-btn confirm" id="colorPickerConfirm" onclick="confirmColorChoice()">确认</button>
         </div>
     </div>
 </div>
@@ -1988,17 +2379,6 @@
     </div>
 </div>
 
-<!-- 碎片总览弹窗 -->
-<div class="modal-overlay" id="puzzleOverviewModal">
-    <div class="modal" style="max-width:460px;max-height:85vh;overflow-y:auto;">
-        <h4 id="puzzleOverviewTitle">🧩 碎片总览</h4>
-        <div id="puzzleOverviewBody"></div>
-        <div class="modal-btns">
-            <button class="modal-btn cancel" onclick="closePuzzleOverview()">关闭</button>
-        </div>
-    </div>
-</div>
-
 <!-- 悬浮刷新按钮 -->
 <button class="float-refresh" onclick="location.reload()" title="刷新">
     <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5" stroke="#ffd700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
@@ -2008,10 +2388,12 @@
     const STORAGE_KEY = 'ielts_learning_system';
     let currentSpaceId = null;
     let newSpaceType = 'theme';
+    let _targetFragIdx = -1; // When set, this fragment card auto-expands in space detail
+    let _targetCreationIdx = -1; // Which creation the target fragment belongs to
 
     // ===== 用户身份 =====
     function getCurrentUser() {
-        if (window.auth && window.auth.currentUser) {
+        if (window.firebaseInitialized && window.auth && window.auth.currentUser) {
             var user = window.auth.currentUser;
             var email = user.email || '';
             var name = email ? email.split('@')[0] : 'me';
@@ -2022,24 +2404,35 @@
 
     // ===== 成员颜色三层独立体系 =====
     var MEMBER_COLORS = [
-        { name: 'amber',    glow: '#ffd700', dark: '#b8860b' },
-        { name: 'teal',     glow: '#4ec9b0', dark: '#2d8a78' },
-        { name: 'coral',    glow: '#ff7e6b', dark: '#c44a3a' },
-        { name: 'lavender', glow: '#c9a0ff', dark: '#7d5cc4' },
-        { name: 'sky',      glow: '#7ec8ff', dark: '#3a8bc4' },
-        { name: 'lime',     glow: '#a8e063', dark: '#5a8a2e' },
-        { name: 'rose',     glow: '#ff9ec4', dark: '#c4597d' },
-        { name: 'sand',     glow: '#e8c87a', dark: '#a08840' }
+        { name: 'amber',    glow: '#ffd700', dark: '#b8860b', text: '#fff3c4', label: '琥珀金' },
+        { name: 'teal',     glow: '#4ec9b0', dark: '#2d8a78', text: '#c4f0e8', label: '青碧' },
+        { name: 'coral',    glow: '#ff7e6b', dark: '#c44a3a', text: '#ffd4cc', label: '珊瑚红' },
+        { name: 'lavender', glow: '#c9a0ff', dark: '#7d5cc4', text: '#e8d4ff', label: '薰衣紫' },
+        { name: 'sky',      glow: '#7ec8ff', dark: '#3a8bc4', text: '#d4ecff', label: '天蓝' },
+        { name: 'lime',     glow: '#a8e063', dark: '#5a8a2e', text: '#e0f0c4', label: '青柠绿' },
+        { name: 'rose',     glow: '#ff9ec4', dark: '#c4597d', text: '#ffd4e4', label: '玫瑰粉' },
+        { name: 'sand',     glow: '#e8c87a', dark: '#a08840', text: '#f4e4c4', label: '沙金' }
     ];
 
-    // 获取成员颜色（按团队加入顺序分配）
+    // Default avatar SVG — bright cyan-blue person icon, visible on dark backgrounds
+    var DEFAULT_AVATAR_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" style="vertical-align:middle;">' +
+        '<circle cx="12" cy="8" r="4" fill="#7ec8ff"/>' +
+        '<path d="M4 22c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="#7ec8ff" stroke-width="2.5" stroke-linecap="round"/>' +
+        '<circle cx="12" cy="8" r="4" fill="none" stroke="#a8d8ff" stroke-width="0.8"/>' +
+        '</svg>';
+    // For places that expect a string emoji (team.emoji field), use this bright symbol
+    var DEFAULT_AVATAR_EMOJI = '🌟';
+
+    // 获取成员颜色（优先读取用户选择的颜色，fallback到按加入顺序分配）
     function getMemberColor(space, uid) {
         if (!space || !space.team || space.team.length === 0) return MEMBER_COLORS[0];
-        // 在 team 中查找该 uid 的索引
+        // 在 team 中查找该 uid
         var teamIdx = -1;
+        var member = null;
         for (var i = 0; i < space.team.length; i++) {
             if (space.team[i].uid === uid) {
                 teamIdx = i;
+                member = space.team[i];
                 break;
             }
         }
@@ -2050,6 +2443,13 @@
                 hash = ((hash << 5) - hash + uid.charCodeAt(c)) | 0;
             }
             teamIdx = Math.abs(hash) % MEMBER_COLORS.length;
+            return MEMBER_COLORS[teamIdx % MEMBER_COLORS.length];
+        }
+        // 优先使用用户选择的颜色
+        if (member && member.colorChoice !== undefined && member.colorChoice !== null) {
+            for (var j = 0; j < MEMBER_COLORS.length; j++) {
+                if (MEMBER_COLORS[j].name === member.colorChoice) return MEMBER_COLORS[j];
+            }
         }
         return MEMBER_COLORS[teamIdx % MEMBER_COLORS.length];
     }
@@ -2059,6 +2459,8 @@
         if (!frag || !frag.assignee) return null;
         return getMemberColor(space, frag.assignee);
     }
+    // Expose to sidebar.js
+    window.getMemberColor = getMemberColor;
 
     // 获取任务完成者颜色
     function getTaskCompleterColor(space, completedByUid) {
@@ -2219,7 +2621,7 @@
         if (!f.assignee) {
             html += '<button class="personal-card-btn primary" onclick="claimFragment(' + cIdx + ',' + fIdx + ');closePersonalCard();">认领这块碎片</button>';
         } else if (isMine && !f.done) {
-            html += '<button class="personal-card-btn" onclick="closePersonalCard();openFragmentTimeline(' + cIdx + ',' + fIdx + ');">查看完整时间线</button>';
+            html += '<button class="personal-card-btn" onclick="closePersonalCard();openFragmentTimeline(' + cIdx + ',' + fIdx + ');">查看详情</button>';
             var hasRounds = (f.rounds && f.rounds.length > 0);
             if (hasRounds) {
                 html += '<button class="personal-card-btn primary" onclick="closePersonalCard();openFragmentTimeline(' + cIdx + ',' + fIdx + ');">开始任务</button>';
@@ -2227,7 +2629,7 @@
                 html += '<button class="personal-card-btn primary" onclick="closePersonalCard();publishTaskRound(' + cIdx + ',' + fIdx + ');">发布任务</button>';
             }
         } else {
-            html += '<button class="personal-card-btn" onclick="closePersonalCard();openFragmentTimeline(' + cIdx + ',' + fIdx + ');">查看完整时间线</button>';
+            html += '<button class="personal-card-btn" onclick="closePersonalCard();openFragmentTimeline(' + cIdx + ',' + fIdx + ');">查看详情</button>';
         }
         html += '</div>';
 
@@ -2245,40 +2647,67 @@
     }
 
     // ===== 自定义弹窗（替代 alert/confirm）=====
-    function customAlert(msg, title) {
+    // opts: { solution: { text, action } } — 报错即方案：附带最短路径解决方案按钮
+    function customAlert(msg, title, opts) {
         var overlay = document.createElement('div');
         overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;';
+        var solBtn = '';
+        if (opts && opts.solution) {
+            var act = opts.solution.action || '';
+            solBtn = '<button id="caSolution" style="padding:6px 18px;border-radius:8px;background:rgba(78,201,176,0.15);border:1px solid rgba(78,201,176,0.3);color:#4ec9b0;font-size:0.8rem;cursor:pointer;transition:all .2s;margin-right:8px;">' + opts.solution.text + '</button>';
+        }
         overlay.innerHTML = '<div style="background:rgba(26,35,69,0.95);border:1px solid rgba(130,150,255,0.25);border-radius:14px;padding:24px 28px;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:scale(0.92);transition:transform .2s;">' +
             (title ? '<div style="font-size:0.9rem;color:#c7d1ff;font-weight:600;margin-bottom:10px;">' + title + '</div>' : '') +
             '<div style="font-size:0.82rem;color:#8a94a6;line-height:1.6;margin-bottom:18px;">' + msg + '</div>' +
+            '<div style="display:flex;gap:8px;justify-content:center;align-items:center;">' +
+            solBtn +
             '<button style="padding:6px 24px;border-radius:8px;background:rgba(130,150,255,0.15);border:1px solid rgba(130,150,255,0.3);color:#c7d1ff;font-size:0.8rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.background=\'rgba(130,150,255,0.25)\'" onmouseout="this.style.background=\'rgba(130,150,255,0.15)\'">好的</button>' +
-            '</div>';
+            '</div></div>';
         document.body.appendChild(overlay);
         requestAnimationFrame(function() { overlay.style.opacity = '1'; overlay.querySelector('div').style.transform = 'scale(1)'; });
-        var btn = overlay.querySelector('button');
-        btn.onclick = function() {
+        var btns = overlay.querySelectorAll('button');
+        var closeBtn = btns[btns.length - 1]; // "好的" is last
+        closeBtn.onclick = function() {
             overlay.style.opacity = '0';
             setTimeout(function() { overlay.remove(); }, 200);
         };
-        btn.focus();
+        if (opts && opts.solution) {
+            var solEl = overlay.querySelector('#caSolution');
+            solEl.onclick = function() {
+                overlay.style.opacity = '0';
+                setTimeout(function() { overlay.remove(); }, 200);
+                if (typeof opts.solution.action === 'function') opts.solution.action();
+            };
+        }
+        closeBtn.focus();
     }
 
-    function customConfirm(msg, title, onConfirm, onCancel) {
+    function customConfirm(msg, title, onConfirm, onCancel, opts) {
+        // opts.doubleConfirm: { msg, title } — if set, clicking confirm shows a second dialog
+        // Button design: cancel = dark/prominent (safe exit), confirm = light/subdued (consequence is heavier)
         var overlay = document.createElement('div');
         overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;';
         overlay.innerHTML = '<div style="background:rgba(26,35,69,0.95);border:1px solid rgba(130,150,255,0.25);border-radius:14px;padding:24px 28px;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:scale(0.92);transition:transform .2s;">' +
             (title ? '<div style="font-size:0.9rem;color:#c7d1ff;font-weight:600;margin-bottom:10px;">' + title + '</div>' : '') +
             '<div style="font-size:0.82rem;color:#8a94a6;line-height:1.6;margin-bottom:18px;">' + msg + '</div>' +
             '<div style="display:flex;gap:10px;justify-content:center;">' +
-            '<button id="ccCancel" style="padding:6px 18px;border-radius:8px;background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.15);color:#5a6480;font-size:0.8rem;cursor:pointer;transition:all .2s;">取消</button>' +
-            '<button id="ccOk" style="padding:6px 18px;border-radius:8px;background:rgba(130,150,255,0.15);border:1px solid rgba(130,150,255,0.3);color:#c7d1ff;font-size:0.8rem;cursor:pointer;transition:all .2s;">确认</button>' +
+            '<button id="ccCancel" style="padding:6px 18px;border-radius:8px;background:rgba(130,150,255,0.2);border:1px solid rgba(130,150,255,0.35);color:#c7d1ff;font-size:0.8rem;cursor:pointer;transition:all .2s;font-weight:500;">取消</button>' +
+            '<button id="ccOk" style="padding:6px 18px;border-radius:8px;background:rgba(130,150,255,0.06);border:1px solid rgba(130,150,255,0.12);color:#5a6480;font-size:0.8rem;cursor:pointer;transition:all .2s;">确认</button>' +
             '</div></div>';
         document.body.appendChild(overlay);
         requestAnimationFrame(function() { overlay.style.opacity = '1'; overlay.querySelector('div').style.transform = 'scale(1)'; });
         function close() { overlay.style.opacity = '0'; setTimeout(function() { overlay.remove(); }, 200); }
         overlay.querySelector('#ccCancel').onclick = function() { close(); if (onCancel) onCancel(); };
-        overlay.querySelector('#ccOk').onclick = function() { close(); if (onConfirm) onConfirm(); };
-        overlay.querySelector('#ccOk').focus();
+        overlay.querySelector('#ccOk').onclick = function() {
+            if (opts && opts.doubleConfirm) {
+                close();
+                customConfirm(opts.doubleConfirm.msg, opts.doubleConfirm.title || '再次确认', onConfirm, onCancel);
+            } else {
+                close();
+                if (onConfirm) onConfirm();
+            }
+        };
+        overlay.querySelector('#ccCancel').focus();
     }
 
     // ===== 数据 =====
@@ -2299,6 +2728,36 @@
                 syncDataWithCloud();
             }
         } catch(e) { console.error('[dreamspace] saveData error:', e); }
+    }
+
+    // ===== lifeBlueprint 读写（直接操作 localStorage 完整对象，不经过 loadData/saveData）=====
+    function loadLifeBlueprint() {
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return null;
+            var data = JSON.parse(raw);
+            if (!data.lifeBlueprint) {
+                data.lifeBlueprint = { vision: '', laws: [], stars: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            }
+            return data.lifeBlueprint;
+        } catch(e) {
+            console.error('[dreamspace] loadLifeBlueprint error:', e);
+            return null;
+        }
+    }
+
+    function saveLifeBlueprint(bp) {
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            var data = JSON.parse(raw);
+            data.lifeBlueprint = bp;
+            data.lifeBlueprint.updatedAt = new Date().toISOString();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch(e) {
+            console.error('[dreamspace] saveLifeBlueprint error:', e);
+        }
     }
 
     function getSFlowers() {
@@ -2440,7 +2899,6 @@
         var key = 'custom_' + Date.now();
         addCustomCreationType(key, label, icon, fields);
         closeCreateTypeModal();
-        renderCreationTypeBtns();
         if (window.SFX) SFX.correct();
     }
 
@@ -2458,13 +2916,20 @@
         for (var k in types) {
             var t = types[k];
             var isDefault = !!DEFAULT_CREATION_TYPES[k];
-            html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
-                '<span style="font-size:0.85rem;">' + (t.icon || '⭐') + ' ' + esc(t.label || k) +
-                (isDefault ? ' <span style="font-size:0.6rem;color:#5a6480;">默认</span>' : ' <span style="font-size:0.6rem;color:#8299ff;">自定义</span>') +
+            html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;margin-bottom:4px;background:rgba(130,150,255,0.06);border-radius:8px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background=\'rgba(130,150,255,0.12)\'" onmouseout="this.style.background=\'rgba(130,150,255,0.06)\'" onclick="createCreationFromTypeLib(\'' + k + '\')">' +
+                '<span style="font-size:0.88rem;">' + (t.icon || '⭐') + ' ' + esc(t.label || k) +
+                (isDefault ? ' <span style="font-size:0.58rem;color:#5a6480;margin-left:4px;">默认</span>' : ' <span style="font-size:0.58rem;color:#8299ff;margin-left:4px;">自定义</span>') +
                 '</span>' +
-                '<button class="law-del" style="font-size:0.65rem;padding:2px 8px;" onclick="confirmRemoveType(\'' + k + '\')">删除</button>' +
+                '<div style="display:flex;gap:4px;align-items:center;">' +
+                '<span style="font-size:0.6rem;color:#8299ff;">+ 新建</span>' +
+                '<button class="law-del" style="font-size:0.6rem;padding:2px 6px;" onclick="event.stopPropagation();confirmRemoveType(\'' + k + '\')" title="删除/隐藏">✕</button>' +
+                '</div>' +
                 '</div>';
         }
+        // Add custom type button
+        html += '<div style="margin-top:8px;">' +
+            '<button class="add-btn" style="width:100%;font-size:0.78rem;" onclick="openCreateTypeModal()">+ 添加自定义类目</button>' +
+            '</div>';
         listEl.innerHTML = html;
 
         var deleted = getDeletedDefaultTypes();
@@ -2476,7 +2941,7 @@
                 var dk = deleted[i];
                 var dt = DEFAULT_CREATION_TYPES[dk];
                 if (!dt) continue;
-                delHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;">' +
+                delHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;">' +
                     '<span style="font-size:0.8rem;color:#5a6480;">' + (dt.icon || '⭐') + ' ' + esc(dt.label) + '</span>' +
                     '<button class="add-btn" style="font-size:0.65rem;padding:2px 8px;" onclick="restoreType(\'' + dk + '\')">恢复</button>' +
                     '</div>';
@@ -2487,28 +2952,109 @@
             delSection.style.display = 'none';
         }
     }
+    function createCreationFromTypeLib(type) {
+        closeManageTypesModal();
+        addCreation(type);
+    }
     function confirmRemoveType(key) {
         var types = getCreationTypes();
         var t = types[key];
         if (!t) return;
         var isDefault = !!DEFAULT_CREATION_TYPES[key];
         var msg = isDefault
-            ? '确定删除默认标签「' + (t.label || key) + '」吗？<br>删除后可随时从"已删除的默认标签"中恢复。'
-            : '确定删除自定义标签「' + (t.label || key) + '」吗？<br>此操作不可恢复。';
+            ? '确定隐藏默认类目「' + (t.label || key) + '」吗？<br>隐藏后可随时从下方"已隐藏的默认类目"中恢复。'
+            : '确定删除自定义类目「' + (t.label || key) + '」吗？<br>此操作不可恢复。';
         customConfirm(msg, '删除标签', function() {
             removeCreationType(key);
             renderManageTypesList();
-            renderCreationTypeBtns();
         });
     }
     function restoreType(key) {
         restoreCreationType(key);
         renderManageTypesList();
-        renderCreationTypeBtns();
     }
 
     // ===== 宇宙碎片系统 =====
     let splitCreationIdx = -1;
+    let fragmentRowSeq = 0;
+
+    // 创建一行碎片输入：• <input>
+    function addFragmentRow(container, value) {
+        var rowId = 'fragRow_' + (++fragmentRowSeq);
+        var row = document.createElement('div');
+        row.className = 'frag-input-row';
+        row.id = rowId;
+        row.innerHTML =
+            '<span class="frag-bullet">•</span>' +
+            '<input class="frag-input" type="text" placeholder="碎片名称…" ' +
+            'onkeydown="handleFragmentKeydown(event, \'' + rowId + '\')">' +
+            '<span class="frag-del" onclick="removeFragmentRow(\'' + rowId + '\')">✕</span>';
+        container.appendChild(row);
+        if (value) row.querySelector('.frag-input').value = value;
+        return row;
+    }
+
+    function handleFragmentKeydown(e, rowId) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            var input = e.target;
+            // 当前行为空 → 不新增，聚焦留在此行
+            if (!input.value.trim()) return;
+            var container = document.getElementById('splitFragments');
+            var newRow = addFragmentRow(container, '');
+            newRow.querySelector('.frag-input').focus();
+        } else if (e.key === 'Backspace' && e.target.value === '') {
+            // 空行按退格 → 删掉这行，回到上一行末尾
+            e.preventDefault();
+            var container = document.getElementById('splitFragments');
+            var rows = container.querySelectorAll('.frag-input-row');
+            if (rows.length <= 1) return; // 至少保留一行
+            var row = document.getElementById(rowId);
+            var prev = row.previousElementSibling;
+            row.remove();
+            if (prev) {
+                var prevInput = prev.querySelector('.frag-input');
+                prevInput.focus();
+                var len = prevInput.value.length;
+                prevInput.setSelectionRange(len, len);
+            }
+        }
+    }
+
+    function removeFragmentRow(rowId) {
+        var container = document.getElementById('splitFragments');
+        var rows = container.querySelectorAll('.frag-input-row');
+        if (rows.length <= 1) {
+            // 只剩一行，清空内容而非删除
+            rows[0].querySelector('.frag-input').value = '';
+            return;
+        }
+        document.getElementById(rowId).remove();
+    }
+
+    function renderSplitFragmentRows(names) {
+        var container = document.getElementById('splitFragments');
+        container.innerHTML = '';
+        if (names.length === 0) {
+            addFragmentRow(container, '');
+        } else {
+            names.forEach(function(n) { addFragmentRow(container, n); });
+        }
+        // 聚焦第一行
+        var first = container.querySelector('.frag-input');
+        if (first) first.focus();
+    }
+
+    function collectFragmentNames() {
+        var container = document.getElementById('splitFragments');
+        var inputs = container.querySelectorAll('.frag-input');
+        var names = [];
+        for (var i = 0; i < inputs.length; i++) {
+            var v = inputs[i].value.trim();
+            if (v) names.push(v);
+        }
+        return names;
+    }
 
     function openSplitModal(idx) {
         splitCreationIdx = idx;
@@ -2520,9 +3066,23 @@
         const t = allTypes[c.type] || { label: c.type, icon: '⭐' };
         document.getElementById('splitCreationInfo').textContent =
             (t.icon || '⭐') + ' ' + c.name + (c.description ? ' — ' + c.description : '');
-        // Pre-fill existing fragments if any
-        const existing = (c.fragments || []).map(f => f.name).join('\n');
-        document.getElementById('splitFragments').value = existing;
+        // 个人模式下改为"工作组件"语境
+        var isPersonal = !c.collabMode;
+        document.getElementById('splitModalTitle').textContent = isPersonal ? '🧩 工作组件拆解' : '🧩 拆分碎片';
+        document.getElementById('splitListLabel').textContent = isPersonal ? '工作组件列表' : '碎片列表';
+        document.getElementById('splitHint').textContent = isPersonal
+            ? '回车添加下一个工作组件，每个组件独立追踪完成度。'
+            : '回车添加下一个碎片，创建后可逐个认领。';
+        // Pre-fill existing fragments
+        var fragNames = (c.fragments || []).map(f => f.name);
+        renderSplitFragmentRows(fragNames);
+        // 个人模式下更新输入框 placeholder
+        if (isPersonal) {
+            var fragInputs = document.querySelectorAll('#splitFragments .frag-input');
+            for (var pi = 0; pi < fragInputs.length; pi++) {
+                fragInputs[pi].placeholder = '工作组件名称…';
+            }
+        }
         document.getElementById('splitModal').classList.add('active');
     }
     function closeSplitModal() {
@@ -2531,13 +3091,18 @@
     }
     function confirmSplit() {
         if (splitCreationIdx < 0) return;
-        var raw = document.getElementById('splitFragments').value.trim();
-        if (!raw) { customAlert('请至少输入一个碎片名称'); return; }
-        var lines = raw.split('\n');
+        var names = collectFragmentNames();
+        if (names.length === 0) {
+            // 个人模式下改为"工作组件"语境
+            var sp0 = loadData().find(s => s.id === currentSpaceId);
+            var c0 = sp0 && sp0.creations[splitCreationIdx];
+            var isPersonal0 = c0 ? !c0.collabMode : false;
+            customAlert(isPersonal0 ? '请至少输入一个工作组件名称' : '请至少输入一个碎片名称');
+            return;
+        }
         var newFrags = [];
-        for (var i = 0; i < lines.length; i++) {
-            var name = lines[i].trim();
-            if (!name) continue;
+        for (var i = 0; i < names.length; i++) {
+            var name = names[i];
             // Try to preserve existing fragment state
             var existing = null;
             var spaces0 = loadData();
@@ -2563,7 +3128,118 @@
         openSpaceDetail(currentSpaceId);
     }
 
+    // ===== 颜色选择器 =====
+    var _colorPickerCallback = null;
+    var _selectedColorIdx = 0;
+
+    function openColorPicker(callback) {
+        _colorPickerCallback = callback;
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        var user = getCurrentUser();
+        
+        // Find used colors by other team members
+        var usedColors = {};
+        if (space && space.team) {
+            for (var i = 0; i < space.team.length; i++) {
+                if (space.team[i].uid !== user.uid && space.team[i].colorChoice) {
+                    usedColors[space.team[i].colorChoice] = true;
+                }
+            }
+        }
+        
+        // Find current user's color if they already have one
+        var currentChoice = null;
+        if (space && space.team) {
+            for (var j = 0; j < space.team.length; j++) {
+                if (space.team[j].uid === user.uid && space.team[j].colorChoice) {
+                    currentChoice = space.team[j].colorChoice;
+                    break;
+                }
+            }
+        }
+        
+        var html = '';
+        for (var k = 0; k < MEMBER_COLORS.length; k++) {
+            var mc = MEMBER_COLORS[k];
+            var isUsed = usedColors[mc.name];
+            var isSelected = (currentChoice === mc.name) || (!currentChoice && k === 0 && !isUsed);
+            if (isSelected) _selectedColorIdx = k;
+            var opacity = isUsed ? '0.3' : '1';
+            var pointerEvents = isUsed ? 'none' : 'pointer';
+            var selectedClass = isSelected ? ' selected' : '';
+            var usedLabel = isUsed ? '<span style="position:absolute;top:-4px;right:-4px;font-size:0.6rem;background:#ff6b6b;color:#fff;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;">·</span>' : '';
+            html += '<div class="color-swatch' + selectedClass + '" style="background:' + mc.glow + ';opacity:' + opacity + ';pointer-events:' + pointerEvents + ';" data-idx="' + k + '" data-name="' + mc.name + '" onclick="selectColor(' + k + ')" title="' + mc.label + '">' + usedLabel + '<span style="position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:0.68rem;color:#8a94a6;white-space:nowrap;">' + mc.label + '</span></div>';
+        }
+        document.getElementById('colorPickerGrid').innerHTML = html;
+        document.getElementById('colorPickerModal').classList.add('active');
+    }
+
+    function selectColor(idx) {
+        _selectedColorIdx = idx;
+        var swatches = document.querySelectorAll('.color-swatch');
+        for (var i = 0; i < swatches.length; i++) {
+            swatches[i].classList.remove('selected');
+        }
+        var target = document.querySelector('.color-swatch[data-idx="' + idx + '"]');
+        if (target) target.classList.add('selected');
+    }
+
+    function closeColorPicker() {
+        document.getElementById('colorPickerModal').classList.remove('active');
+        _colorPickerCallback = null;
+    }
+
+    function confirmColorChoice() {
+        var chosenColor = MEMBER_COLORS[_selectedColorIdx];
+        // Save the color choice to the user's team member entry
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (space) {
+            if (!space.team) space.team = [];
+            var user = getCurrentUser();
+            var member = space.team.find(function(m) { return m.uid === user.uid; });
+            if (member) {
+                member.colorChoice = chosenColor.name;
+            } else {
+                space.team.push({ uid: user.uid, role: '', responsibility: '', emoji: DEFAULT_AVATAR_EMOJI, colorChoice: chosenColor.name });
+            }
+            saveData(spaces);
+        }
+        closeColorPicker();
+        if (_colorPickerCallback) {
+            var cb = _colorPickerCallback;
+            _colorPickerCallback = null;
+            cb(chosenColor);
+        }
+    }
+
+    // Check if user needs to pick a color (not yet in team or no colorChoice)
+    function needsColorPick(space, user) {
+        if (!space || !space.team) return true;
+        var member = space.team.find(function(m) { return m.uid === user.uid; });
+        if (!member) return true;
+        if (!member.colorChoice) return true;
+        return false;
+    }
+
     function claimFragment(cIdx, fIdx) {
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[cIdx] || !space.creations[cIdx].fragments) return;
+        var user = getCurrentUser();
+        
+        // If user hasn't picked a color yet, show color picker first
+        if (needsColorPick(space, user)) {
+            openColorPicker(function(chosenColor) {
+                doClaimFragment(cIdx, fIdx);
+            });
+            return;
+        }
+        doClaimFragment(cIdx, fIdx);
+    }
+    
+    function doClaimFragment(cIdx, fIdx) {
         var spaces = loadData();
         var space = spaces.find(s => s.id === currentSpaceId);
         if (!space || !space.creations[cIdx] || !space.creations[cIdx].fragments) return;
@@ -2577,9 +3253,8 @@
         if (!space.team) space.team = [];
         var alreadyInTeam = space.team.find(function(m) { return m.uid === user.uid; });
         if (!alreadyInTeam) {
-            // Derive role from the fragment name they claimed
             var fragName = space.creations[cIdx].fragments[fIdx].name;
-            space.team.push({ uid: user.uid, role: fragName, responsibility: '', emoji: '🧑' });
+            space.team.push({ uid: user.uid, role: fragName, responsibility: '', emoji: DEFAULT_AVATAR_EMOJI, colorChoice: color.name });
         }
         saveData(spaces);
         openSpaceDetail(currentSpaceId);
@@ -2616,14 +3291,8 @@
     var puzzleSelectedSet = {}; // { fIdx: true }
 
     function getPuzzleMiniSvg(count) {
-        // Mini puzzle icon showing count dots
-        var dots = '';
-        for (var i = 0; i < Math.min(count, 6); i++) {
-            var cx = 6 + (i % 3) * 6;
-            var cy = 6 + Math.floor(i / 3) * 6;
-            dots += '<circle cx="' + cx + '" cy="' + cy + '" r="2" fill="#8299ff" opacity="0.6"/>';
-        }
-        return '<svg width="16" height="16" viewBox="0 0 24 24">' + dots + '</svg>';
+        // Puzzle piece icon — clearly recognizable shape
+        return '<svg width="14" height="14" viewBox="0 0 24 24"><path d="M10 3h4v3a2 2 0 104 0V3h3v4h-3a2 2 0 100 4h3v6h-3a2 2 0 10-4 0v3H10v-3a2 2 0 10-4 0v3H3v-6h3a2 2 0 100-4H3V3h3a2 2 0 104 0V3z" fill="none" stroke="#8299ff" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="puzzle-count">' + count + '</span>';
     }
 
     function getPuzzleRows(count) {
@@ -2648,15 +3317,18 @@
     }
 
     function openPuzzleLayout(idx) {
+        var isReopen = (puzzleLayoutIdx === idx && Object.keys(puzzleSelectedSet).length > 0);
         puzzleLayoutIdx = idx;
-        puzzleSelectedSet = {};
+        if (!isReopen) puzzleSelectedSet = {};
         var spaces = loadData();
         var space = spaces.find(s => s.id === currentSpaceId);
         if (!space || !space.creations[idx]) return;
         var c = space.creations[idx];
         var frags = c.fragments || [];
         if (frags.length === 0) {
-            customAlert('这个创造盒子还没有碎片。在编辑中添加工作拆分即可生成碎片。');
+            customAlert(c.collabMode
+                ? '这个创造盒子还没有碎片。在编辑中添加工作拆分即可生成碎片。'
+                : '这个创造盒子还没有工作组件。在编辑中添加工作拆分即可生成组件。');
             return;
         }
         var allTypes = getCreationTypes();
@@ -2665,8 +3337,50 @@
         var user = getCurrentUser();
         var infoText = c.collabMode
             ? '🌐 团队协作模式 — 点击碎片选择认领，选完后点「确认认领」'
-            : '👤 个人模式 — 所有碎片默认归你。点击右上角🌐切换为团队协作';
+            : '👤 个人模式 — 将项目拆解为工作组件，每个组件独立追踪完成度。点击🌐切换为团队协作';
         document.getElementById('puzzleLayoutInfo').textContent = infoText;
+
+        // Build team member circle (from overview) + stats
+        var claimedCount = frags.filter(function(f){ return f.assignee; }).length;
+        var doneCount = frags.filter(function(f){ return f.done; }).length;
+        var teamMap = {};
+        var teamOrder = [];
+        for (var ti = 0; ti < (space.team || []).length; ti++) {
+            var tm = space.team[ti];
+            var key = tm.uid || tm.role;
+            if (!teamMap[key]) { teamMap[key] = { uid: tm.uid, role: tm.role, emoji: tm.emoji || DEFAULT_AVATAR_EMOJI, fragCount: 0 }; teamOrder.push(key); }
+        }
+        for (var fi2 = 0; fi2 < frags.length; fi2++) {
+            var f2 = frags[fi2];
+            if (f2.assignee) {
+                var key2 = f2.assignee;
+                if (!teamMap[key2]) { teamMap[key2] = { uid: f2.assignee, role: f2.assigneeName || f2.assignee, emoji: DEFAULT_AVATAR_EMOJI, fragCount: 0 }; teamOrder.push(key2); }
+                teamMap[key2].fragCount++;
+            }
+        }
+        var legendHtml = '';
+        if (teamOrder.length > 0) {
+            legendHtml = '<div class="puzzle-overview-members">';
+            var curUser = getCurrentUser();
+            var sortedTeam = teamOrder.filter(function(k){ return k === curUser.uid; })
+                .concat(teamOrder.filter(function(k){ return k !== curUser.uid; }));
+            for (var oi = 0; oi < sortedTeam.length; oi++) {
+                var m = teamMap[sortedTeam[oi]];
+                var mc = getMemberColor(space, m.uid || m.role);
+                var isMe = (m.uid === curUser.uid);
+                legendHtml += '<div class="pom-member">' +
+                    '<div class="pom-avatar" style="border-color:' + mc.glow + ';box-shadow:0 0 8px ' + mc.glow + '40;">' + (m.emoji ? esc(m.emoji) : DEFAULT_AVATAR_SVG) + '</div>' +
+                    '<span class="pom-name" style="color:' + mc.glow + ';">' + esc(m.role) + (isMe ? '（我）' : '') + '</span>' +
+                    '<span style="font-size:0.5rem;color:#5a6480;">' + m.fragCount + '块</span>' +
+                '</div>';
+            }
+            legendHtml += '</div>';
+        }
+        // Stats line
+        legendHtml += '<div style="font-size:0.65rem;color:#5a6480;text-align:center;margin-bottom:8px;">' +
+            '共 ' + frags.length + ' 块 · 已认领 ' + claimedCount + ' · 已完成 ' + doneCount +
+        '</div>';
+        document.getElementById('puzzleMemberLegend').innerHTML = legendHtml;
 
         var rows = getPuzzleRows(frags.length);
         var html = '';
@@ -2678,7 +3392,8 @@
                 var claimed = (f.assignee && f.assignee !== user.uid) || (f.assignee === user.uid && !c.collabMode);
                 var mine = (f.assignee === user.uid);
                 var isOther = (f.assignee && f.assignee !== user.uid);
-                var color = isOther ? getMemberColor(space, f.assignee) : { glow: 'rgba(130,150,255,0.5)', name: 'sky', text: '#c7d1ff' };
+                // Use assignee's color for claimed fragments, including mine
+                var color = (f.assignee) ? getMemberColor(space, f.assignee) : { glow: 'rgba(130,150,255,0.5)', name: 'sky', text: '#c7d1ff', dark: '#3a8bc4', label: '天蓝' };
                 var cls = 'unclaimed';
                 if (mine && !c.collabMode) cls = 'claimed';
                 else if (isOther) cls = 'claimed';
@@ -2688,10 +3403,26 @@
                     ? 'onclick="togglePuzzleSelect(' + fi + ')"'
                     : 'onclick="openPersonalCard(' + idx + ',' + fi + ')"';
                 var label = f.assigneeName || f.name;
-                var assigneeTag = isOther ? '<div style="font-size:0.55rem;color:' + color.glow + ';margin-top:2px;">' + esc(f.assigneeName) + '</div>' : '';
-                html += '<div class="puzzle-piece-cell ' + cls + selected + '" style="--piece-glow:' + color.glow + '50;--piece-glow-text:' + color.text + ';" ' + onclick + ' title="' + esc(f.name) + '">' +
-                    '<svg width="64" height="64" viewBox="0 0 64 64">' +
-                        '<path class="puzzle-svg-fill" d="M14 10h14a4 4 0 008 0h14v14a4 4 0 000 8v14H36a4 4 0 00-8 0H14V36a4 4 0 000-8V10z" stroke-width="2" stroke-linejoin="round"/>' +
+                var assigneeTag = (f.assignee) ? '<div class="puzzle-piece-assignee" style="color:' + color.glow + ';">' + esc(f.assigneeName) + '</div>' : '';
+                // Cosmic liquid fill for claimed fragments with progress — unified blue with white stars
+                var cosmicHtml = '';
+                var hasCosmic = false;
+                var puzzleOutline = 'M14 10h14a4 4 0 008 0h14v14a4 4 0 000 8v14H36a4 4 0 00-8 0H14V36a4 4 0 000-8V10z';
+                if (cls === 'claimed' || cls === 'selected') {
+                    var prog = getFragmentProgress(f);
+                    var fillPct = f.done ? 100 : prog.pct;
+                    if (fillPct > 0) {
+                        var gradId = 'cg_' + idx + '_' + fi;
+                        cosmicHtml = renderCosmicLiquid(fillPct, gradId);
+                        hasCosmic = true;
+                    }
+                }
+                var cellClasses = 'puzzle-piece-cell ' + cls + selected;
+                if (hasCosmic) cellClasses += ' has-cosmic';
+                html += '<div class="' + cellClasses + '" style="--piece-glow:' + color.glow + '50;--piece-glow-text:' + color.text + ';" ' + onclick + ' title="' + esc(f.name) + '">' +
+                    '<svg width="80" height="80" viewBox="0 0 64 64">' +
+                        cosmicHtml +
+                        '<path class="puzzle-svg-fill" d="' + puzzleOutline + '" stroke-width="2" stroke-linejoin="round"/>' +
                         (f.done ? '<path d="M26 32l4 4 8-8" stroke="' + color.glow + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' : '') +
                     '</svg>' +
                     '<div class="puzzle-piece-label">' + esc(f.name) + '</div>' +
@@ -2711,6 +3442,39 @@
         document.getElementById('puzzleLayoutModal').classList.remove('active');
         puzzleLayoutIdx = -1;
         puzzleSelectedSet = {};
+        cancelPuzzleTitleEdit();
+    }
+
+    // ===== Puzzle layout title rename =====
+    function startPuzzleTitleEdit() {
+        if (puzzleLayoutIdx < 0) return;
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[puzzleLayoutIdx]) return;
+        var c = space.creations[puzzleLayoutIdx];
+        var input = document.getElementById('puzzleTitleInput');
+        input.value = c.name || '';
+        document.getElementById('puzzleLayoutTitleWrap').style.display = 'none';
+        document.getElementById('puzzleTitleEditRow').style.display = 'flex';
+        setTimeout(function() { input.focus(); input.select(); }, 50);
+    }
+    function confirmPuzzleTitleEdit() {
+        if (puzzleLayoutIdx < 0) return;
+        var newName = document.getElementById('puzzleTitleInput').value.trim();
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[puzzleLayoutIdx]) return;
+        space.creations[puzzleLayoutIdx].name = newName;
+        saveData(spaces);
+        document.getElementById('puzzleLayoutTitle').textContent = '🧩 ' + newName;
+        document.getElementById('puzzleLayoutTitleWrap').style.display = 'flex';
+        document.getElementById('puzzleTitleEditRow').style.display = 'none';
+        openSpaceDetail(currentSpaceId);
+        if (typeof renderSidebar === 'function') renderSidebar();
+    }
+    function cancelPuzzleTitleEdit() {
+        document.getElementById('puzzleLayoutTitleWrap').style.display = 'flex';
+        document.getElementById('puzzleTitleEditRow').style.display = 'none';
     }
 
     function togglePuzzleSelect(fi) {
@@ -2745,6 +3509,22 @@
         var spaces = loadData();
         var space = spaces.find(s => s.id === currentSpaceId);
         if (!space || !space.creations[puzzleLayoutIdx]) return;
+        var user = getCurrentUser();
+        
+        // If user hasn't picked a color yet, show color picker first
+        if (needsColorPick(space, user)) {
+            openColorPicker(function(chosenColor) {
+                doConfirmClaim(selected);
+            });
+            return;
+        }
+        doConfirmClaim(selected);
+    }
+    
+    function doConfirmClaim(selected) {
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[puzzleLayoutIdx]) return;
         var c = space.creations[puzzleLayoutIdx];
         var user = getCurrentUser();
         var color = getMemberColor(space, user.uid);
@@ -2763,7 +3543,7 @@
         if (!space.team) space.team = [];
         var alreadyInTeam = space.team.find(function(m) { return m.uid === user.uid; });
         if (!alreadyInTeam) {
-            space.team.push({ uid: user.uid, role: claimedNames[0], responsibility: '', emoji: '🧑' });
+            space.team.push({ uid: user.uid, role: claimedNames[0], responsibility: '', emoji: DEFAULT_AVATAR_EMOJI, colorChoice: color.name });
         }
         saveData(spaces);
         puzzleSelectedSet = {};
@@ -2806,6 +3586,60 @@
             openSpaceDetail(currentSpaceId);
             customAlert('已切换为团队协作模式！点击碎片版面按钮选择认领。', '🌐 团队协作');
         }
+    }
+
+    // ===== 双击内联编辑名称 =====
+    function inlineEditName(idx, el) {
+        if (el.querySelector('input')) return; // already editing
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[idx]) return;
+        var c = space.creations[idx];
+        var oldName = c.name || '';
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'creation-name-edit-input';
+        input.value = oldName;
+        input.placeholder = '起个名字…';
+        input.maxLength = 30;
+        el.innerHTML = '';
+        el.appendChild(input);
+        // Save / Cancel buttons
+        var btns = document.createElement('span');
+        btns.className = 'creation-name-edit-btns';
+        var saveBtn = document.createElement('button');
+        saveBtn.className = 'save-btn';
+        saveBtn.textContent = '✓';
+        saveBtn.title = '保存';
+        var cancelBtn = document.createElement('button');
+        cancelBtn.className = 'cancel-btn';
+        cancelBtn.textContent = '✕';
+        cancelBtn.title = '取消';
+        btns.appendChild(saveBtn);
+        btns.appendChild(cancelBtn);
+        el.appendChild(btns);
+        input.focus();
+        input.select();
+        function commit() {
+            var newName = input.value.trim();
+            var spaces2 = loadData();
+            var space2 = spaces2.find(s => s.id === currentSpaceId);
+            if (space2 && space2.creations[idx]) {
+                space2.creations[idx].name = newName;
+                saveData(spaces2);
+            }
+            openSpaceDetail(currentSpaceId);
+            if (typeof renderSidebar === 'function') renderSidebar();
+        }
+        function cancel() {
+            openSpaceDetail(currentSpaceId);
+        }
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); commit(); }
+            else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+        });
+        saveBtn.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); commit(); });
+        cancelBtn.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); cancel(); });
     }
 
     // ===== 任务轮次系统 =====
@@ -2892,8 +3726,10 @@
         saveData(spaces);
         closeTaskPublish();
         if (window.SFX) SFX.correct();
-        // Directly open timeline without re-rendering the whole space detail
-        openFragmentTimeline(savedRef.cIdx, savedRef.fIdx);
+        // Re-render space detail so the new round is visible in the card
+        _targetFragIdx = savedRef.fIdx;
+        _targetCreationIdx = savedRef.cIdx;
+        openSpaceDetail(currentSpaceId, savedRef.fIdx, savedRef.cIdx);
     }
 
     function toggleRoundTask(cIdx, fIdx, roundIdx, taskIdx) {
@@ -2915,22 +3751,14 @@
             task.completedByUid = null;
         }
 
-        // Check if all tasks in this round are done → mark fragment done
-        var allDone = frag.rounds[roundIdx].tasks.every(function(t) { return t.done; });
-        if (allDone) {
-            frag.done = true;
-            if (window.SFX) SFX.correct();
-        } else {
-            frag.done = false;
-        }
+        // Check if all tasks in this round are done
+        var allDone = frag.rounds[roundIdx].tasks.length > 0 && frag.rounds[roundIdx].tasks.every(function(t) { return t.done; });
+        // Don't auto-set frag.done — user manually decides when the fragment is truly complete
+        // (they may want to publish another round of tasks)
         saveData(spaces);
-        // If timeline modal is open, re-render it; otherwise re-render space detail
-        var timelineModal = document.getElementById('fragmentTimelineModal');
-        if (timelineModal && timelineModal.classList.contains('active') && currentFragmentRef) {
-            renderFragmentTimeline();
-        } else {
-            openSpaceDetail(currentSpaceId);
-        }
+        _targetFragIdx = fIdx;
+        _targetCreationIdx = cIdx;
+        openSpaceDetail(currentSpaceId, fIdx, cIdx);
     }
     function editRoundTaskName(cIdx, fIdx, roundIdx, taskIdx, newName) {
         var spaces = loadData();
@@ -2951,7 +3779,9 @@
         var taskNum = frag.rounds[roundIdx].tasks.length + 1;
         frag.rounds[roundIdx].tasks.push({ name: '任务' + taskNum, done: false });
         saveData(spaces);
-        openSpaceDetail(currentSpaceId);
+        _targetFragIdx = fIdx;
+        _targetCreationIdx = cIdx;
+        openSpaceDetail(currentSpaceId, fIdx, cIdx);
     }
 
     function removeRoundTask(cIdx, fIdx, roundIdx, taskIdx) {
@@ -2965,7 +3795,9 @@
         var allDone = frag.rounds[roundIdx].tasks.length > 0 && frag.rounds[roundIdx].tasks.every(function(t) { return t.done; });
         frag.done = allDone;
         saveData(spaces);
-        openSpaceDetail(currentSpaceId);
+        _targetFragIdx = fIdx;
+        _targetCreationIdx = cIdx;
+        openSpaceDetail(currentSpaceId, fIdx, cIdx);
     }
 
     function deleteTaskRound(cIdx, fIdx, roundIdx) {
@@ -2975,15 +3807,15 @@
         var frag = space.creations[cIdx].fragments[fIdx];
         if (!frag.rounds || !frag.rounds[roundIdx]) return;
         frag.rounds.splice(roundIdx, 1);
-        // Re-evaluate done status
-        if (frag.rounds.length === 0) {
-            frag.done = false;
-        } else {
-            var lastRound = frag.rounds[frag.rounds.length - 1];
-            frag.done = lastRound.tasks.length > 0 && lastRound.tasks.every(function(t) { return t.done; });
+        // Re-number rounds
+        for (var i = 0; i < frag.rounds.length; i++) {
+            frag.rounds[i].roundNum = i + 1;
         }
+        // Don't auto-set frag.done — user controls completion manually
         saveData(spaces);
-        openSpaceDetail(currentSpaceId);
+        _targetFragIdx = fIdx;
+        _targetCreationIdx = cIdx;
+        openSpaceDetail(currentSpaceId, fIdx, cIdx);
     }
 
     function getFragmentProgress(frag) {
@@ -3012,7 +3844,68 @@
         return html;
     }
 
-    // ===== 创造盒子蓝图 =====
+    /**
+     * Generate cosmic liquid fill SVG elements inside a puzzle piece.
+     * Unified blue cosmic liquid with white star sparkles — color is always blue,
+     * only the border/glow reflects the member color (handled by CSS).
+     * @param {number} pct - 0-100 progress
+     * @param {string} gradId - unique gradient ID for this piece
+     * @returns {string} SVG inner elements
+     */
+    function renderCosmicLiquid(pct, gradId) {
+        if (pct <= 0) return '';
+        var puzzlePath = 'M14 10h14a4 4 0 008 0h14v14a4 4 0 000 8v14H36a4 4 0 00-8 0H14V36a4 4 0 000-8V10z';
+        var fillTopY = 64 - (pct / 100) * 54;
+        if (fillTopY < 10) fillTopY = 10;
+        if (fillTopY > 64) fillTopY = 64;
+
+        var clipId = 'clip_' + gradId;
+        var html = '';
+
+        // Unified blue cosmic gradient
+        var liqLight = '#6ab4ff';
+        var liqMid = '#3d7fd4';
+        var liqDark = '#1a4a8a';
+
+        html += '<defs>' +
+            '<linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset="0%" stop-color="' + liqLight + '" stop-opacity="0.4"/>' +
+                '<stop offset="40%" stop-color="' + liqMid + '" stop-opacity="0.6"/>' +
+                '<stop offset="100%" stop-color="' + liqDark + '" stop-opacity="0.8"/>' +
+            '</linearGradient>' +
+            '<clipPath id="' + clipId + '">' +
+                '<path d="' + puzzlePath + '"/>' +
+            '</clipPath>' +
+        '</defs>';
+
+        // Liquid body
+        html += '<g clip-path="url(#' + clipId + ')">';
+        html += '<rect x="0" y="' + fillTopY + '" width="64" height="' + (64 - fillTopY) + '" fill="url(#' + gradId + ')"/>';
+
+        // Wave surface
+        var waveY = fillTopY;
+        html += '<path class="cosmic-wave" d="M0,' + waveY + ' Q16,' + (waveY - 2) + ' 32,' + waveY + ' T64,' + waveY + ' L64,' + (waveY + 3) + ' L0,' + (waveY + 3) + ' Z" fill="' + liqLight + '" fill-opacity="0.3" style="transform-origin: 32px ' + waveY + 'px;"/>';
+
+        // Surface highlight
+        if (pct > 5) {
+            html += '<ellipse class="cosmic-highlight" cx="32" cy="' + waveY + '" rx="20" ry="2.5" fill="' + liqLight + '" fill-opacity="0.25"/>';
+        }
+
+        // White star sparkles — scattered in liquid area
+        var starCount = Math.min(6, Math.ceil(pct / 18));
+        for (var si = 0; si < starCount; si++) {
+            var sx = 16 + Math.round(Math.random() * 32);
+            var sy = waveY + 3 + Math.round(Math.random() * Math.max(4, 64 - waveY - 5));
+            var sdelay = (Math.random() * 2).toFixed(2);
+            var sr = (0.7 + Math.random() * 0.6).toFixed(1);
+            html += '<circle class="cosmic-star" cx="' + sx + '" cy="' + sy + '" r="' + sr + '" fill="#ffffff" style="animation-delay:' + sdelay + 's;"/>';
+        }
+
+        html += '</g>';
+        return html;
+    }
+
+
     let blueprintEditIdx = -1;
 
     function getAutoBlueprintText(c, t) {
@@ -3026,6 +3919,121 @@
             }
         }
         return parts.join('\n');
+    }
+
+    var imageGuideIdx = -1;
+    var imgGuideUploadedData = '';
+    function openImageGuideModal(idx) {
+        imageGuideIdx = idx;
+        imgGuideUploadedData = '';
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[idx]) return;
+        var c = space.creations[idx];
+        var allTypes = getCreationTypes();
+        var t = allTypes[c.type] || { label: c.type, icon: '⭐' };
+        // Type-specific image guidance: { examples, hint, emoji }
+        var guides = {
+            novel:      { examples: '封面图、角色立绘、场景插图、世界地图', hint: '一张封面图能让故事瞬间有画面感', emoji: '📖' },
+            invention:  { examples: '产品效果图、结构示意图、功能演示图', hint: '用图片展示它长什么样、怎么用', emoji: '🔧' },
+            event:      { examples: '活动海报、场景布置图、流程示意图', hint: '让大家一眼看到活动的氛围', emoji: '🎪' },
+            shop:       { examples: '店铺概念图、产品展示图、空间设计', hint: '展示你的店铺长什么样', emoji: '🏪' },
+            fashion:    { examples: '设计草图、穿搭效果图、面料材质图', hint: '用图片呈现你的设计理念', emoji: '👗' },
+            architecture:{ examples: '建筑外观、空间布局、环境效果图', hint: '让建筑从图纸变成画面', emoji: '🏗️' },
+            art:        { examples: '作品效果图、风格参考、创作过程', hint: '艺术作品需要视觉呈现', emoji: '🎨' },
+            music:      { examples: '专辑封面、氛围意境图、乐器照片', hint: '为音乐配一幅视觉画面', emoji: '🎵' },
+            game:      { examples: '游戏画面概念图、角色设计、场景原画', hint: '让游戏世界有视觉雏形', emoji: '🎮' },
+            food:       { examples: '菜品摆盘图、餐厅氛围、食材照片', hint: '美食需要被看到', emoji: '🍜' }
+        };
+        var guide = guides[c.type] || { examples: '概念图、参考图、效果展示', hint: '一张图片胜过千言万语', emoji: '🖼️' };
+        var guideEl = document.getElementById('imageGuideContent');
+        if (guideEl) {
+            guideEl.innerHTML = '<div style="font-size:0.85rem;color:#c7d1ff;margin-bottom:6px;">' + guide.emoji + ' 为「' + esc(c.name || t.label || '创造物') + '」添加图片</div>' +
+                '<div style="color:#8299ff;margin-bottom:4px;">建议添加：' + esc(guide.examples) + '</div>' +
+                '<div style="color:#5a6480;font-size:0.72rem;">' + esc(guide.hint) + '</div>';
+        }
+        // Reset upload UI
+        document.getElementById('imgGuidePreview').style.display = 'none';
+        document.getElementById('imgGuideUploadHint').style.display = 'block';
+        document.getElementById('imgGuideFileInput').value = '';
+        var saveBtn = document.getElementById('imgGuideSaveBtn');
+        saveBtn.style.opacity = '0.5';
+        saveBtn.style.pointerEvents = 'none';
+        document.getElementById('imageGuideModal').classList.add('active');
+    }
+    function closeImageGuideModal() {
+        document.getElementById('imageGuideModal').classList.remove('active');
+        imgGuideUploadedData = '';
+    }
+    function handleImgGuideUpload(input) {
+        var file = input.files && input.files[0];
+        if (!file) return;
+        if (file.size > 500000) {
+            customAlert('图片太大（超过500KB），请压缩后再上传');
+            input.value = '';
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            imgGuideUploadedData = e.target.result;
+            document.getElementById('imgGuidePreviewImg').src = e.target.result;
+            document.getElementById('imgGuidePreview').style.display = 'block';
+            document.getElementById('imgGuideUploadHint').style.display = 'none';
+            var saveBtn = document.getElementById('imgGuideSaveBtn');
+            saveBtn.style.opacity = '1';
+            saveBtn.style.pointerEvents = 'auto';
+        };
+        reader.readAsDataURL(file);
+    }
+    function handleImgGuideDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.getElementById('imgGuideDropZone').style.borderColor = 'rgba(130,150,255,0.2)';
+        var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            customAlert('请拖入图片文件');
+            return;
+        }
+        if (file.size > 500000) {
+            customAlert('图片太大（超过500KB），请压缩后再上传');
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            imgGuideUploadedData = ev.target.result;
+            document.getElementById('imgGuidePreviewImg').src = ev.target.result;
+            document.getElementById('imgGuidePreview').style.display = 'block';
+            document.getElementById('imgGuideUploadHint').style.display = 'none';
+            var saveBtn = document.getElementById('imgGuideSaveBtn');
+            saveBtn.style.opacity = '1';
+            saveBtn.style.pointerEvents = 'auto';
+        };
+        reader.readAsDataURL(file);
+    }
+    // ===== Lightbox =====
+    function openLightbox(src) {
+        if (!src) return;
+        document.getElementById('lightboxImg').src = src;
+        document.getElementById('lightboxOverlay').classList.add('active');
+    }
+    function closeLightbox() {
+        document.getElementById('lightboxOverlay').classList.remove('active');
+        document.getElementById('lightboxImg').src = '';
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeLightbox();
+    });
+    function saveImgGuideUpload() {
+        if (!imgGuideUploadedData || imageGuideIdx < 0) return;
+        var spaces = loadData();
+        var space = spaces.find(s => s.id === currentSpaceId);
+        if (!space || !space.creations[imageGuideIdx]) return;
+        space.creations[imageGuideIdx].blueprintImg = imgGuideUploadedData;
+        saveData(spaces);
+        closeImageGuideModal();
+        if (window.SFX) SFX.correct();
+        openSpaceDetail(currentSpaceId);
     }
 
     function openBlueprintEditModal(idx) {
@@ -3061,6 +4069,21 @@
         } else {
             previewEl.innerHTML = '';
         }
+    }
+    function handleBpImgUpload(input) {
+        var file = input.files && input.files[0];
+        if (!file) return;
+        if (file.size > 500000) {
+            customAlert('图片太大（超过500KB），请压缩后再上传');
+            input.value = '';
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('bpEditImg').value = e.target.result;
+            updateBpImgPreview();
+        };
+        reader.readAsDataURL(file);
     }
     function saveCreationBlueprint() {
         if (blueprintEditIdx < 0) return;
@@ -3263,7 +4286,7 @@
             var tm = space.team[ti];
             var key = tm.uid || tm.role;
             if (!teamMap[key]) {
-                teamMap[key] = { uid: tm.uid, role: tm.role, emoji: tm.emoji || '🧑', fragments: [] };
+                teamMap[key] = { uid: tm.uid, role: tm.role, emoji: tm.emoji || DEFAULT_AVATAR_EMOJI, fragments: [] };
                 teamOrder.push(key);
             }
         }
@@ -3276,7 +4299,7 @@
                 if (f2.assignee) {
                     var key2 = f2.assignee;
                     if (!teamMap[key2]) {
-                        teamMap[key2] = { uid: f2.assignee, role: f2.assigneeName || f2.assignee, emoji: '🧑', fragments: [] };
+                        teamMap[key2] = { uid: f2.assignee, role: f2.assigneeName || f2.assignee, emoji: DEFAULT_AVATAR_EMOJI, fragments: [] };
                         teamOrder.push(key2);
                     }
                     teamMap[key2].fragments.push({
@@ -3310,7 +4333,7 @@
                 var isMe = (m.uid === myKey);
 
                 html += '<div class="tm-member-row" onclick="toggleTmMember(this)">' +
-                    '<div class="tm-member-avatar" style="border-color:' + mc.glow + ';box-shadow:0 0 6px ' + mc.glow + '40;">' + (m.emoji || '🧑') + '</div>' +
+                    '<div class="tm-member-avatar" style="border-color:' + mc.glow + ';box-shadow:0 0 6px ' + mc.glow + '40;">' + (m.emoji ? esc(m.emoji) : DEFAULT_AVATAR_SVG) + '</div>' +
                     '<div class="tm-member-info">' +
                         '<div class="tm-member-name" style="color:' + mc.glow + ';">' + esc(m.role) + (isMe ? '（我）' : '') + '</div>' +
                         '<div class="tm-member-stats">' + memFrags.length + '碎片 · 完成' + fragDone + '</div>' +
@@ -3521,14 +4544,27 @@
         currentFragmentRef = { cIdx: cIdx, fIdx: fIdx };
         window._currentFragmentView = { cIdx: cIdx, fIdx: fIdx };
         if (window._sidebarSetActiveKey) window._sidebarSetActiveKey(window._sidebarKey('fragment', currentSpaceId, cIdx, fIdx));
-        renderFragmentTimeline();
         closePuzzleMap();
-        document.getElementById('fragmentTimelineModal').classList.add('active');
+        // Close the modal if it was open
+        var modal = document.getElementById('fragmentTimelineModal');
+        if (modal) modal.classList.remove('active');
+        // Open space detail with target fragment — it will auto-expand and we scroll to it
+        _targetFragIdx = fIdx;
+        openSpaceDetail(currentSpaceId, fIdx, cIdx);
+        // Scroll to the fragment card after DOM is built
+        setTimeout(function() {
+            var card = document.getElementById('fragCard_' + cIdx + '_' + fIdx);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            _targetFragIdx = -1; // Reset after use
+            _targetCreationIdx = -1;
+        }, 300);
         if (typeof renderSidebar === 'function') renderSidebar();
-        if (typeof updatePagePinBtn === 'function') updatePagePinBtn();
     }
     function closeFragmentTimeline() {
-        document.getElementById('fragmentTimelineModal').classList.remove('active');
+        var modal = document.getElementById('fragmentTimelineModal');
+        if (modal) modal.classList.remove('active');
         currentFragmentRef = null;
         window._currentFragmentView = null;
         if (window._sidebarSetActiveKey) window._sidebarSetActiveKey(window._sidebarKey('space', currentSpaceId));
@@ -3575,7 +4611,12 @@
         if (input) input.value = '';
         var imgInput = document.getElementById('timelineImgInput');
         if (imgInput) imgInput.value = '';
-        renderFragmentTimeline();
+        var modal = document.getElementById('fragmentTimelineModal');
+        if (modal && modal.classList.contains('active')) {
+            renderFragmentTimeline();
+        } else {
+            openSpaceDetail(currentSpaceId);
+        }
     }
 
     function revokeTask(cIdx, fIdx, roundIdx, taskIdx) {
@@ -3592,7 +4633,7 @@
         // Un-complete the fragment if it was marked done
         frag.done = false;
         saveData(spaces);
-        renderFragmentTimeline();
+        openSpaceDetail(currentSpaceId);
         customAlert('已撤回「' + task.name + '」，可以重新完成。', '↩ 已撤回');
     }
 
@@ -3602,7 +4643,9 @@
         const container = document.getElementById('spaceListContainer');
         const sFlowers = getSFlowers();
         document.getElementById('sFlowerBalance').textContent = sFlowers;
-        document.getElementById('pagePinBtn').style.display = 'flex';
+
+        // Determine if first space is free (no spaces have been created yet)
+        var isFirstFree = spaces.length === 0;
 
         // 更新创造卡片冰冻状态
         const createCard = document.getElementById('createCard');
@@ -3611,22 +4654,36 @@
         if (sCountEl) sCountEl.textContent = sFlowers;
         const iceSCountEl = document.getElementById('iceSCount');
         if (iceSCountEl) iceSCountEl.textContent = sFlowers;
-        if (sFlowers >= 3) {
+        // Free first space: no flower check needed
+        var canCreate = isFirstFree || sFlowers >= 3;
+        if (canCreate) {
             createCard.classList.remove('frozen');
             if (iceCover) iceCover.style.display = 'none';
         } else {
             createCard.classList.add('frozen');
             if (iceCover) iceCover.style.display = 'flex';
         }
+        // Update cost text with strikethrough for free first space
+        var costEl = document.getElementById('createCostText');
+        if (costEl) {
+            if (isFirstFree) {
+                costEl.innerHTML = '<span style="text-decoration:line-through;color:#5a6480;">消耗 3 朵 🏵️</span> <span style="color:#4ec9b0;">首次免费 · 0 朵</span> · 当前拥有 ' + sFlowers + ' 朵';
+            } else {
+                costEl.textContent = '消耗 3 朵 🏵️S级小红花 · 当前拥有 ' + sFlowers + ' 朵';
+            }
+        }
 
         if (spaces.length === 0) {
-            container.innerHTML = `<div class="empty-hint">还没有创造空间<br>集齐 3 朵 🏵️ 即可解锁</div>`;
+            container.innerHTML = `<div class="empty-hint">还没有创造空间<br>首次创建免费 · 集齐 3 朵 🏵️ 解锁更多</div>`;
             return;
         }
 
-        container.innerHTML = spaces.map(s => `
+        container.innerHTML = spaces.map(s => {
+            const spIcon = s.icon || (s.type === 'project' ? '⚙️' : '🌌');
+            return `
             <div class="space-card" onclick="openSpaceDetail('${s.id}')">
                 <div class="space-card-header">
+                    <span class="space-icon-lg" style="font-size:1.4rem;margin-right:6px;">${spIcon}</span>
                     <span class="space-name">${esc(s.name)}</span>
                     <span class="space-type-badge ${s.type === 'project' ? 'project' : ''}">${s.type === 'project' ? '⚙️ 项目制' : '🌌 主题式'}</span>
                 </div>
@@ -3637,7 +4694,8 @@
                     <span>伙伴 ${s.team?.length || 0}</span>
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     function esc(s) {
@@ -3650,9 +4708,12 @@
     // 点击创造卡片：检查花朵→扣花→打开编辑表单→保存进入空间/取消退款
     function tryCreateSpace() {
         const sCount = getSFlowers();
-        if (sCount < 3) {
+        const spaces = loadData();
+        var isFirstFree = spaces.length === 0;
+        var cost = isFirstFree ? 0 : 3;
+        var canCreate = isFirstFree || sCount >= 3;
+        if (!canCreate) {
             // 冰冻状态，不允许点击
-            const need = 3 - sCount;
             const iceCover = document.getElementById('createIceCover');
             if (iceCover) {
                 iceCover.style.animation = 'none';
@@ -3661,8 +4722,8 @@
             }
             return;
         }
-        // 先扣花
-        deductSFlowers(3);
+        // 扣花（首次免费则扣0）
+        if (cost > 0) deductSFlowers(cost);
         // 刷新显示
         renderSpaceList();
         // 打开编辑表单
@@ -3674,41 +4735,58 @@
         var draft = null;
         try { draft = JSON.parse(localStorage.getItem('dreamspace_create_draft') || 'null'); } catch(e) {}
         document.getElementById('newSpaceName').value = (draft && draft.name) || '';
+        var iconInput = document.getElementById('newSpaceIcon');
+        if (iconInput) iconInput.value = (draft && draft.icon) || '';
         document.getElementById('newSpaceLaws').value = (draft && draft.laws) || '';
         var bpInput = document.getElementById('newSpaceBlueprint');
         if (bpInput) bpInput.value = (draft && draft.blueprint) || '';
         newSpaceType = (draft && draft.type) || 'theme';
         document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
         document.querySelector('.type-option[data-type="' + newSpaceType + '"]').classList.add('selected');
+        // Update modal cost text
+        var spaces = loadData();
+        var isFirstFree = spaces.length === 0;
+        var modalCostEl = document.getElementById('modalCostText');
+        if (modalCostEl) {
+            modalCostEl.textContent = isFirstFree
+                ? '✦ 首创免费！填写信息后创造你的世界'
+                : '✦ 花朵已扣除，填写信息后创造你的世界';
+        }
         document.getElementById('createModal').classList.add('active');
 
         // 绑定自动保存草稿
         var nameInput = document.getElementById('newSpaceName');
         var lawsInput = document.getElementById('newSpaceLaws');
-        var bpInput = document.getElementById('newSpaceBlueprint');
+        var bpInput2 = document.getElementById('newSpaceBlueprint');
         function saveDraft() {
-            var d = { name: nameInput.value, laws: lawsInput.value, type: newSpaceType, blueprint: bpInput ? bpInput.value : '' };
+            var d = { name: nameInput.value, icon: iconInput ? iconInput.value : '', laws: lawsInput.value, type: newSpaceType, blueprint: bpInput2 ? bpInput2.value : '' };
             localStorage.setItem('dreamspace_create_draft', JSON.stringify(d));
         }
         nameInput.oninput = saveDraft;
+        if (iconInput) iconInput.oninput = saveDraft;
         lawsInput.oninput = saveDraft;
-        if (bpInput) bpInput.oninput = saveDraft;
+        if (bpInput2) bpInput2.oninput = saveDraft;
     }
 
     function clearCreateDraft() {
         localStorage.removeItem('dreamspace_create_draft');
         var nameInput = document.getElementById('newSpaceName');
+        var iconInput = document.getElementById('newSpaceIcon');
         var lawsInput = document.getElementById('newSpaceLaws');
         var bpInput = document.getElementById('newSpaceBlueprint');
         if (nameInput) nameInput.oninput = null;
+        if (iconInput) iconInput.oninput = null;
         if (lawsInput) lawsInput.oninput = null;
         if (bpInput) bpInput.oninput = null;
     }
 
     function closeCreateModal() {
         document.getElementById('createModal').classList.remove('active');
-        // 取消则退还花朵并清除草稿
-        refundSFlowers(3);
+        // 取消则退还花朵（首次免费退还0）
+        const spaces = loadData();
+        var wasFirstFree = spaces.length === 0;
+        var refund = wasFirstFree ? 0 : 3;
+        if (refund > 0) refundSFlowers(refund);
         clearCreateDraft();
         renderSpaceList();
     }
@@ -3717,6 +4795,16 @@
         newSpaceType = type;
         document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
         document.querySelector(`.type-option[data-type="${type}"]`).classList.add('selected');
+        // 主题式 → 问"主题"；项目式 → 问"蓝图"
+        var bpLabel = document.getElementById('blueprintLabel');
+        var bpInput = document.getElementById('newSpaceBlueprint');
+        if (type === 'project') {
+            if (bpLabel) bpLabel.textContent = '蓝图（选填）';
+            if (bpInput) bpInput.placeholder = '这个项目的蓝图是什么？具体描绘一下目标画面…';
+        } else {
+            if (bpLabel) bpLabel.textContent = '主题（选填）';
+            if (bpInput) bpInput.placeholder = '描绘这个世界是什么样…';
+        }
     }
 
     function confirmCreate() {
@@ -3727,19 +4815,23 @@
         const lawsText = document.getElementById('newSpaceLaws').value.trim();
         const laws = lawsText ? lawsText.split('\n').map(l => l.trim()).filter(l => l) : [];
         const blueprint = (document.getElementById('newSpaceBlueprint') && document.getElementById('newSpaceBlueprint').value.trim()) || '';
+        const icon = (document.getElementById('newSpaceIcon') && document.getElementById('newSpaceIcon').value.trim()) || '';
 
+        const spaces = loadData();
+        var isFirstFree = spaces.length === 0;
         const space = {
             id: 'ds_' + Date.now(),
             name: name,
+            icon: icon,
             type: newSpaceType,
             laws: laws,
             blueprint: blueprint,
             creations: [],
             team: [],
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            _wasFirstFree: isFirstFree
         };
 
-        const spaces = loadData();
         spaces.unshift(space);
         saveData(spaces);
 
@@ -3753,42 +4845,47 @@
     }
 
     // ===== 空间详情 =====
-    function openSpaceDetail(id) {
+    function openSpaceDetail(id, targetFrag, targetCreation) {
         currentSpaceId = id;
         if (window._sidebarSetActiveKey) window._sidebarSetActiveKey(window._sidebarKey('space', id));
         window._currentFragmentView = null;
         const spaces = loadData();
         const space = spaces.find(s => s.id === id);
         if (!space) return;
+        _targetFragIdx = (typeof targetFrag === 'number') ? targetFrag : -1;
+        _targetCreationIdx = (typeof targetCreation === 'number') ? targetCreation : -1;
 
         document.getElementById('spaceListView').style.display = 'none';
         const detail = document.getElementById('spaceDetailView');
         detail.classList.add('active');
-        document.getElementById('pagePinBtn').style.display = 'flex';
 
         const typeLabel = space.type === 'project' ? '⚙️ 项目制' : '🌌 主题式';
         const typeClass = space.type === 'project' ? 'project' : '';
+        const spIcon = space.icon || (space.type === 'project' ? '⚙️' : '🌌');
+        const bpTitle = space.type === 'project' ? '🗺️ 蓝图' : '🌌 主题';
+        const bpPlaceholder = space.type === 'project' ? '这个项目的蓝图是什么？具体描绘一下目标画面…' : '描绘这个世界是什么样…';
 
         detail.innerHTML = `
             <div class="detail-header">
                 <button class="detail-back" onclick="backToList()">← 返回</button>
+                <span style="font-size:1.4rem;margin-right:4px;">${spIcon}</span>
                 <span class="detail-title">${esc(space.name)}</span>
                 <span class="space-type-badge ${typeClass}">${typeLabel}</span>
                 <button onclick="openPuzzleMap()" title="团队地图" style="background:rgba(130,150,255,0.08);border:1px solid rgba(130,150,255,0.15);color:#8299ff;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:0.75rem;white-space:nowrap;">🧩 地图</button>
                 <button onclick="deleteSpace('${space.id}')" title="删除空间并退还花朵" style="background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.15);color:#ff6b6b;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:0.75rem;white-space:nowrap;margin-left:auto;">🗑 删除</button>
             </div>
 
-            <!-- 蓝图（不可折叠，始终展开） -->
+            <!-- 蓝图/主题（不可折叠，始终展开） -->
             <div class="blueprint-bar">
                 <div class="blueprint-bar-header">
-                    <span class="sub-title">🗺️ 蓝图</span>
-                    <button class="blueprint-edit-btn" onclick="toggleBlueprintEdit(true)" title="编辑蓝图">✏️</button>
+                    <span class="sub-title">${bpTitle}</span>
+                    <button class="blueprint-edit-btn" onclick="toggleBlueprintEdit(true)" title="编辑">✏️</button>
                 </div>
                 <div id="blueprintView" style="display:${(space.blueprint || space.vision) ? 'block' : 'none'};">
                     <div class="blueprint-text" id="blueprintText">${esc(space.blueprint || space.vision || '')}</div>
                 </div>
                 <div id="blueprintEdit" style="display:${(space.blueprint || space.vision) ? 'none' : 'block'};">
-                    <textarea class="form-input" id="blueprintInput" placeholder="描绘这个世界是什么样…" style="min-height:80px;">${esc(space.blueprint || space.vision || '')}</textarea>
+                    <textarea class="form-input" id="blueprintInput" placeholder="${bpPlaceholder}" style="min-height:80px;">${esc(space.blueprint || space.vision || '')}</textarea>
                     <div style="margin-top:6px;display:flex;gap:6px;">
                         <button class="add-btn" onclick="saveBlueprint()">保存</button>
                         <button class="modal-btn cancel" style="font-size:0.75rem;padding:4px 10px;" onclick="toggleBlueprintEdit(false)">取消</button>
@@ -3825,38 +4922,241 @@
 
             <!-- 创造盒子 -->
             <div class="sub-section">
-                <div class="sub-header" onclick="toggleSub(this)">
+                <div class="sub-header" onclick="toggleSub(this)" style="position:relative;">
                     <span class="sub-title">🎁 创造盒子</span>
+                    <button class="type-lib-btn" style="font-size:0.72rem;padding:3px 10px;width:auto;border-radius:6px;gap:3px;" onclick="event.stopPropagation();openManageTypesModal()" title="类目库">🏷️ 类目库</button>
                     <svg class="sub-chevron" width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="#5a6480" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
                 </div>
-                <div class="sub-body" id="creationsBody">
-                    <div id="creationsList">
-                        ${(space.creations || []).map((c, i) => renderCreation(c, i)).join('')}
-                    </div>
-                    <div id="creationTypeBtns" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
-                    <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
-                        <button class="add-btn" style="font-size:0.7rem;padding:4px 10px;" onclick="openManageTypesModal()">🏷️ 类目库</button>
-                    </div>
+                <div class="sub-body open" id="creationsBody">
+                    ${renderCreationsTabArea(space)}
                 </div>
             </div>
 
         `;
-        renderCreationTypeBtns();
         if (typeof renderSidebar === 'function') renderSidebar();
         if (typeof updatePagePinBtn === 'function') updatePagePinBtn();
     }
 
-    function renderCreationTypeBtns() {
-        var types = getCreationTypes();
-        var container = document.getElementById('creationTypeBtns');
-        if (!container) return;
-        var html = '';
-        for (var k in types) {
-            var t = types[k];
-            html += '<button class="add-btn" style="font-size:0.75rem;" onclick="addCreation(\'' + k + '\')">' +
-                (t.icon || '⭐') + ' ' + (t.label || k) + '</button>';
+    // ===== 创造盒子标签栏 =====
+    var _activeCreationTab = {}; // { spaceId: creationIdx }
+
+    function getCreationTabOrder(space) {
+        var creations = space.creations || [];
+        if (!space.tabOrder || space.tabOrder.length !== creations.length) {
+            // Initialize: group by type, preserve original order within each type
+            var typeOrder = [];
+            var typeGroups = {};
+            for (var i = 0; i < creations.length; i++) {
+                var t = creations[i].type || 'default';
+                if (typeGroups[t] === undefined) {
+                    typeGroups[t] = [];
+                    typeOrder.push(t);
+                }
+                typeGroups[t].push(i);
+            }
+            var order = [];
+            for (var ti = 0; ti < typeOrder.length; ti++) {
+                var group = typeGroups[typeOrder[ti]];
+                for (var gi = 0; gi < group.length; gi++) {
+                    order.push(group[gi]);
+                }
+            }
+            return order;
         }
-        container.innerHTML = html;
+        return space.tabOrder;
+    }
+
+    function saveCreationTabOrder(spaceId, order) {
+        var spaces = loadData();
+        var space = spaces.find(function(s) { return s.id === spaceId; });
+        if (!space) return;
+        space.tabOrder = order;
+        saveData(spaces);
+    }
+
+    function getActiveCreationTab(spaceId, creationsCount) {
+        var idx = _activeCreationTab[spaceId];
+        if (idx === undefined || idx < 0 || idx >= creationsCount) {
+            idx = 0;
+        }
+        return idx;
+    }
+
+    function setActiveCreationTab(spaceId, creationIdx) {
+        _activeCreationTab[spaceId] = creationIdx;
+        // Re-render only the tab content area
+        var contentEl = document.getElementById('creationTabContent');
+        if (!contentEl) return;
+        var spaces = loadData();
+        var space = spaces.find(function(s) { return s.id === spaceId; });
+        if (!space || !space.creations) return;
+        var order = getCreationTabOrder(space);
+        var actualIdx = order[creationIdx];
+        if (actualIdx === undefined) actualIdx = creationIdx;
+        var c = space.creations[actualIdx];
+        if (c) {
+            contentEl.innerHTML = renderCreation(c, actualIdx);
+        }
+        // Update tab active states
+        var tabs = document.querySelectorAll('.creation-tab');
+        tabs.forEach(function(t) { t.classList.remove('active'); });
+        var activeTab = document.querySelector('.creation-tab[data-tab-idx="' + creationIdx + '"]');
+        if (activeTab) {
+            activeTab.classList.add('active');
+            activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    }
+
+    // Drag-to-reorder
+    var _draggedTabIdx = null;
+    function onTabDragStart(e, tabIdx) {
+        _draggedTabIdx = tabIdx;
+        e.dataTransfer.effectAllowed = 'move';
+        e.target.classList.add('dragging');
+    }
+    function onTabDragEnd(e) {
+        e.target.classList.remove('dragging');
+        document.querySelectorAll('.creation-tab').forEach(function(t) { t.classList.remove('drag-over'); });
+    }
+    function onTabDragOver(e, tabIdx) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        document.querySelectorAll('.creation-tab').forEach(function(t) { t.classList.remove('drag-over'); });
+        if (_draggedTabIdx !== null && _draggedTabIdx !== tabIdx) {
+            var tab = document.querySelector('.creation-tab[data-tab-idx="' + tabIdx + '"]');
+            if (tab) tab.classList.add('drag-over');
+        }
+    }
+    function onTabDrop(e, tabIdx) {
+        e.preventDefault();
+        if (_draggedTabIdx === null || _draggedTabIdx === tabIdx) return;
+        var spaces = loadData();
+        var space = spaces.find(function(s) { return s.id === currentSpaceId; });
+        if (!space) return;
+        var order = getCreationTabOrder(space);
+        // Move dragged item to new position
+        var moved = order.splice(_draggedTabIdx, 1)[0];
+        order.splice(tabIdx, 0, moved);
+        saveCreationTabOrder(currentSpaceId, order);
+        // Update active tab to follow the moved item
+        var activeIdx = getActiveCreationTab(currentSpaceId, order.length);
+        var activeCreation = order[activeIdx];
+        var newActivePos = order.indexOf(activeCreation);
+        _activeCreationTab[currentSpaceId] = newActivePos;
+        _draggedTabIdx = null;
+        openSpaceDetail(currentSpaceId);
+    }
+
+    // ===== Tab rename =====
+    function onTabClick(e, spaceId, tabIdx, creationIdx) {
+        // 如果卡片是开着的，先关闭（点击卡片内按钮也会到这里，但卡片有 onclick=stopPropagation，不会触发）
+        var card = document.getElementById('tabRename_' + tabIdx);
+        if (card && card.classList.contains('active')) {
+            closeTabRename(tabIdx);
+            return;
+        }
+        setActiveCreationTab(spaceId, tabIdx);
+    }
+
+    function openTabRename(tabIdx, spaceId, creationIdx) {
+        // Close any open cards first
+        closeAllTabRenames();
+        var card = document.getElementById('tabRename_' + tabIdx);
+        if (!card) return;
+        var input = document.getElementById('tabRenameInput_' + tabIdx);
+        var spaces = loadData();
+        var space = spaces.find(function(s) { return s.id === spaceId; });
+        if (!space || !space.creations[creationIdx]) return;
+        input.value = space.creations[creationIdx].name || '';
+        card.classList.add('active');
+        setTimeout(function() { input.focus(); input.select(); }, 50);
+    }
+    function closeTabRename(tabIdx) {
+        var card = document.getElementById('tabRename_' + tabIdx);
+        if (card) card.classList.remove('active');
+    }
+    function closeAllTabRenames() {
+        document.querySelectorAll('.tab-rename-card.active').forEach(function(c) {
+            c.classList.remove('active');
+        });
+    }
+    function confirmTabRename(tabIdx, spaceId, creationIdx) {
+        var input = document.getElementById('tabRenameInput_' + tabIdx);
+        if (!input) return;
+        var newName = input.value.trim();
+        var spaces = loadData();
+        var space = spaces.find(function(s) { return s.id === spaceId; });
+        if (!space || !space.creations[creationIdx]) return;
+        space.creations[creationIdx].name = newName;
+        saveData(spaces);
+        closeTabRename(tabIdx);
+        openSpaceDetail(currentSpaceId);
+        if (typeof renderSidebar === 'function') renderSidebar();
+    }
+    // Close rename cards when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.tab-rename-card')) {
+            closeAllTabRenames();
+        }
+    });
+
+    function renderCreationsTabArea(space) {
+        var creations = space.creations || [];
+        if (creations.length === 0) {
+            return '<div id="creationsList" style="padding:20px 0;text-align:center;color:#3d4a6a;font-size:0.82rem;">还没有创造盒子，点击「🏷️ 类目库」开始创建</div>';
+        }
+        var order = getCreationTabOrder(space);
+        var allTypes = getCreationTypes();
+        var activeTab = getActiveCreationTab(space.id, creations.length);
+
+        // Build tab bar
+        var tabsHtml = '<div class="creation-tab-bar">';
+        for (var ti = 0; ti < order.length; ti++) {
+            var ci = order[ti];
+            var c = creations[ci];
+            if (!c) continue;
+            var tInfo = allTypes[c.type] || { label: c.type || '未知', icon: '⭐' };
+            var tabLabel = c.name || (tInfo.label + (ci + 1));
+            var isActive = (ti === activeTab);
+            // Type-based color dot for visual grouping
+            var typeColors = {
+                novel: '#ffd700', invention: '#4ec9b0', event: '#ff7e6b', shop: '#c9a0ff',
+                fashion: '#ff9ec4', architecture: '#7ec8ff', art: '#a8e063', music: '#e8c87a',
+                game: '#ff6b9d', food: '#ffa54f'
+            };
+            var dotColor = typeColors[c.type] || '#8299ff';
+            tabsHtml += '<div class="creation-tab' + (isActive ? ' active' : '') + '" data-tab-idx="' + ti + '" ' +
+                'onclick="onTabClick(event,\'' + space.id + '\',' + ti + ',' + ci + ')" ' +
+                'ondblclick="event.stopPropagation();openTabRename(' + ti + ',\'' + space.id + '\',' + ci + ')" ' +
+                'draggable="true" ' +
+                'ondragstart="onTabDragStart(event,' + ti + ')" ' +
+                'ondragend="onTabDragEnd(event)" ' +
+                'ondragover="onTabDragOver(event,' + ti + ')" ' +
+                'ondrop="onTabDrop(event,' + ti + ')">' +
+                '<div class="creation-tab-type-dot" style="background:' + dotColor + ';"></div>' +
+                '<span>' + (tInfo.icon || '⭐') + '</span>' +
+                '<span>' + esc(tabLabel) + '</span>' +
+                '<div class="tab-rename-card" id="tabRename_' + ti + '" onclick="event.stopPropagation()">' +
+                    '<input type="text" id="tabRenameInput_' + ti + '" maxlength="30" placeholder="起个名字…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmTabRename(' + ti + ',\'' + space.id + '\',' + ci + ');}else if(event.key===\'Escape\'){closeTabRename(' + ti + ');}" />' +
+                    '<div class="rename-btns">' +
+                        '<button class="save-btn" onclick="confirmTabRename(' + ti + ',\'' + space.id + '\',' + ci + ')">保存</button>' +
+                        '<button class="cancel-btn" onclick="closeTabRename(' + ti + ')">取消</button>' +
+                    '</div>' +
+                '</div>' +
+                '</div>';
+        }
+        tabsHtml += '</div>';
+
+        // Build content area (only active tab's content)
+        var actualIdx = order[activeTab];
+        if (actualIdx === undefined) actualIdx = 0;
+        var contentHtml = '<div class="creation-tab-content" id="creationTabContent">';
+        if (creations[actualIdx]) {
+            contentHtml += renderCreation(creations[actualIdx], actualIdx);
+        }
+        contentHtml += '</div>';
+
+        return tabsHtml + contentHtml;
     }
 
     function renderCreation(c, idx) {
@@ -3867,29 +5167,127 @@
         var _spaces = loadData();
         var space = _spaces.find(function(s){ return s.id === currentSpaceId; });
 
-        // 竣工态：显示星球
+        // 竣工态：显示星球（进化系统）
         if (c.completed) {
             var planetId = c.planetId || 'P-????';
-            var planetSvg = '<svg class="planet-svg" width="80" height="80" viewBox="0 0 100 100">' +
-                '<defs>' +
-                '<radialGradient id="planetGrad' + idx + '" cx="35%" cy="35%">' +
-                '<stop offset="0%" stop-color="#e3f2ff"/>' +
-                '<stop offset="30%" stop-color="#7ec8ff"/>' +
-                '<stop offset="70%" stop-color="#5b6eff"/>' +
-                '<stop offset="100%" stop-color="#2d3a8c"/>' +
-                '</radialGradient>' +
-                '<radialGradient id="planetGlow' + idx + '">' +
-                '<stop offset="0%" stop-color="#7ec8ff" stop-opacity="0.4"/>' +
-                '<stop offset="100%" stop-color="#7ec8ff" stop-opacity="0"/>' +
-                '</radialGradient>' +
-                '</defs>' +
-                '<circle cx="50" cy="50" r="42" fill="url(#planetGlow' + idx + ')"/>' +
-                '<circle cx="50" cy="50" r="28" fill="url(#planetGrad' + idx + ')" stroke="#7ec8ff" stroke-width="0.5"/>' +
-                '<ellipse cx="50" cy="50" rx="40" ry="8" fill="none" stroke="#8299ff" stroke-width="1.5" opacity="0.4" transform="rotate(-20 50 50)"/>' +
-                '<ellipse cx="50" cy="50" rx="36" ry="6" fill="none" stroke="#8299ff" stroke-width="1" opacity="0.2" transform="rotate(-20 50 50)"/>' +
-                '<circle cx="42" cy="44" r="3" fill="#fff" opacity="0.3"/>' +
-                '<circle cx="55" cy="55" r="2" fill="#fff" opacity="0.2"/>' +
-                '</svg>';
+            var planetVer = c.planetVersion || '1.0.0';
+            var verParts = planetVer.split('.');
+            var verMajor = parseInt(verParts[0]) || 1;
+            var verMinor = parseInt(verParts[1]) || 0;
+            var verPatch = parseInt(verParts[2]) || 0;
+
+            // === Planet evolution SVG ===
+            var planetUid = 'ds_planet_' + idx + '_' + Math.random().toString(36).substr(2, 5);
+
+            if (verMajor < 2) {
+                // V1.x.x → 星辰阶段：黄色立体五角星
+                var starR2 = 18 + Math.min(verMinor * 2 + verPatch, 12);
+                var glowR2 = starR2 + 14;
+                var planetSvg = '<svg class="planet-svg" width="80" height="80" viewBox="0 0 100 100">' +
+                    '<defs>' +
+                    '<radialGradient id="' + planetUid + '_grad" cx="40%" cy="35%">' +
+                    '<stop offset="0%" stop-color="#fff8dc"/>' +
+                    '<stop offset="30%" stop-color="#ffd700"/>' +
+                    '<stop offset="80%" stop-color="#daa520"/>' +
+                    '<stop offset="100%" stop-color="#8b6914"/>' +
+                    '</radialGradient>' +
+                    '<radialGradient id="' + planetUid + '_glow">' +
+                    '<stop offset="0%" stop-color="#ffd700" stop-opacity="0.35"/>' +
+                    '<stop offset="60%" stop-color="#ffd700" stop-opacity="0.1"/>' +
+                    '<stop offset="100%" stop-color="#ffd700" stop-opacity="0"/>' +
+                    '</radialGradient>' +
+                    '<filter id="' + planetUid + '_shadow" x="-30%" y="-30%" width="160%" height="160%">' +
+                    '<feDropShadow dx="2" dy="3" stdDeviation="2.5" flood-color="#000" flood-opacity="0.4"/>' +
+                    '</filter>' +
+                    '</defs>' +
+                    '<circle cx="50" cy="50" r="' + glowR2 + '" fill="url(#' + planetUid + '_glow)"/>' +
+                    '<path d="M50 ' + (50 - starR2) +
+                    ' L' + (50 + starR2 * 0.354) + ' ' + (50 - starR2 * 0.354) +
+                    ' L' + (50 + starR2 * 0.951) + ' ' + (50 - starR2 * 0.309) +
+                    ' L' + (50 + starR2 * 0.588) + ' ' + (50 + starR2 * 0.309) +
+                    ' L' + (50 + starR2 * 0.809) + ' ' + (50 + starR2 * 0.951) +
+                    ' L50 ' + (50 + starR2 * 0.5) +
+                    ' L' + (50 - starR2 * 0.809) + ' ' + (50 + starR2 * 0.951) +
+                    ' L' + (50 - starR2 * 0.588) + ' ' + (50 + starR2 * 0.309) +
+                    ' L' + (50 - starR2 * 0.951) + ' ' + (50 - starR2 * 0.309) +
+                    ' L' + (50 - starR2 * 0.354) + ' ' + (50 - starR2 * 0.354) +
+                    ' Z" fill="url(#' + planetUid + '_grad)" stroke="#fff8dc" stroke-width="0.4" filter="url(#' + planetUid + '_shadow)"/>' +
+                    '<ellipse cx="' + (50 - starR2 * 0.2) + '" cy="' + (50 - starR2 * 0.3) + '" rx="' + (starR2 * 0.18) + '" ry="' + (starR2 * 0.1) + '" fill="#fff" opacity="0.5"/>' +
+                    '</svg>';
+            } else {
+                // V2+ → 行星阶段：球体 + 团队颜色条纹混合
+                var planetR2 = 20 + Math.min((verMajor - 2) * 3 + verMinor, 18);
+                var glowR3 = planetR2 + 12;
+                var ringOp2 = Math.min(0.3 + (verMajor - 1) * 0.08, 0.65);
+
+                // Build team color strands
+                var strands2 = '';
+                var memberUids2 = c.planetMembers ? Object.keys(c.planetMembers) : [];
+                for (var mi2 = 0; mi2 < memberUids2.length; mi2++) {
+                    var mc2 = getMemberColor(space, memberUids2[mi2]);
+                    var pct2 = c.planetMembers[memberUids2[mi2]] || 0;
+                    if (pct2 < 1) continue;
+                    var strandW2 = Math.max(pct2 / 100 * planetR2 * 1.5, 4);
+                    var cy2 = 50 - planetR2 * 0.6 + (mi2 / Math.max(memberUids2.length, 1)) * planetR2 * 1.2;
+                    var cx2 = 50 - planetR2 * 0.3 + (mi2 % 3) * planetR2 * 0.3;
+                    var bandPath2 = 'M' + (50 - planetR2 * 0.85) + ' ' + cy2 +
+                        ' Q ' + (cx2 - strandW2 * 0.5) + ' ' + (cy2 - strandW2 * 0.4) +
+                        ' ' + cx2 + ' ' + cy2 +
+                        ' Q ' + (cx2 + strandW2 * 0.5) + ' ' + (cy2 + strandW2 * 0.4) +
+                        ' ' + (50 + planetR2 * 0.85) + ' ' + cy2;
+                    strands2 += '<path d="' + bandPath2 + '" fill="none" stroke="' + mc2.glow + '" stroke-width="' + strandW2 + '" stroke-linecap="round" opacity="0.55" clip-path="url(#' + planetUid + '_clip)"/>';
+                }
+
+                // Starlight sparkles
+                var sparkles2 = '';
+                var sc = Math.min(Math.floor(planetR2 / 3), 8);
+                var seed2 = 0;
+                var pid2 = planetId;
+                for (var si2 = 0; si2 < pid2.length; si2++) { seed2 = ((seed2 << 5) - seed2 + pid2.charCodeAt(si2)) | 0; }
+                for (var sp2 = 0; sp2 < sc; sp2++) {
+                    seed2 = (seed2 * 1103515245 + 12345) & 0x7fffffff;
+                    var ang = (seed2 / 0x7fffffff) * Math.PI * 2;
+                    seed2 = (seed2 * 1103515245 + 12345) & 0x7fffffff;
+                    var dst = (seed2 / 0x7fffffff) * planetR2 * 0.7;
+                    var sxs = 50 + Math.cos(ang) * dst;
+                    var sys = 50 + Math.sin(ang) * dst;
+                    seed2 = (seed2 * 1103515245 + 12345) & 0x7fffffff;
+                    var srs = 0.8 + (seed2 / 0x7fffffff) * 1.5;
+                    sparkles2 += '<circle cx="' + sxs.toFixed(1) + '" cy="' + sys.toFixed(1) + '" r="' + srs.toFixed(1) + '" fill="#fff" opacity="0.6"/>';
+                }
+
+                // Rings
+                var rings2 = '<ellipse cx="50" cy="50" rx="' + (planetR2 + 10) + '" ry="6" fill="none" stroke="#8299ff" stroke-width="1.2" opacity="' + ringOp2 + '" transform="rotate(-18 50 50)"/>';
+                if (verMajor >= 3) {
+                    rings2 += '<ellipse cx="50" cy="50" rx="' + (planetR2 + 16) + '" ry="9" fill="none" stroke="#8299ff" stroke-width="0.8" opacity="' + (ringOp2 * 0.5) + '" transform="rotate(-18 50 50)"/>';
+                    rings2 += '<ellipse cx="50" cy="50" rx="' + (planetR2 + 6) + '" ry="4" fill="none" stroke="#4ec9b0" stroke-width="0.5" opacity="0.3" transform="rotate(-18 50 50)"/>';
+                }
+
+                var planetSvg = '<svg class="planet-svg" width="80" height="80" viewBox="0 0 100 100">' +
+                    '<defs>' +
+                    '<radialGradient id="' + planetUid + '_base" cx="35%" cy="35%">' +
+                    '<stop offset="0%" stop-color="#e3f2ff"/>' +
+                    '<stop offset="30%" stop-color="#7ec8ff"/>' +
+                    '<stop offset="70%" stop-color="#4a6cff"/>' +
+                    '<stop offset="100%" stop-color="#1a2a6c"/>' +
+                    '</radialGradient>' +
+                    '<radialGradient id="' + planetUid + '_glow">' +
+                    '<stop offset="0%" stop-color="#7ec8ff" stop-opacity="0.3"/>' +
+                    '<stop offset="100%" stop-color="#7ec8ff" stop-opacity="0"/>' +
+                    '</radialGradient>' +
+                    '<clipPath id="' + planetUid + '_clip">' +
+                    '<circle cx="50" cy="50" r="' + planetR2 + '"/>' +
+                    '</clipPath>' +
+                    '</defs>' +
+                    '<circle cx="50" cy="50" r="' + glowR3 + '" fill="url(#' + planetUid + '_glow)"/>' +
+                    rings2 +
+                    '<circle cx="50" cy="50" r="' + planetR2 + '" fill="url(#' + planetUid + '_base)"/>' +
+                    strands2 +
+                    sparkles2 +
+                    '<ellipse cx="' + (50 - planetR2 * 0.25) + '" cy="' + (50 - planetR2 * 0.3) + '" rx="' + (planetR2 * 0.2) + '" ry="' + (planetR2 * 0.12) + '" fill="#fff" opacity="0.25"/>' +
+                    '<circle cx="50" cy="50" r="' + planetR2 + '" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>' +
+                    '</svg>';
+            }
             var planetDesc = c.vision || c.description || '';
             // Show member completions
             var memberCompHtml = '';
@@ -3922,18 +5320,19 @@
             return '<div class="creation-card" style="border-color:rgba(126,200,255,0.15);">' +
                 '<div class="creation-name">' +
                     '<span class="creation-type ' + cls + '" style="background:rgba(126,200,255,0.08);color:#7ec8ff;">' + (t.icon || '⭐') + ' ' + (t.label || c.type) + '</span>' +
-                    '<span style="color:#7ec8ff;">' + esc(c.name) + '</span>' +
-                    '<span style="font-size:0.6rem;background:rgba(126,200,255,0.12);color:#7ec8ff;padding:1px 6px;border-radius:4px;margin-left:4px;">已竣工</span>' +
+                    (c.name ? '<span class="creation-name-text" ondblclick="inlineEditName(' + idx + ', this)" style="color:#7ec8ff;">' + esc(c.name) + '</span>' : '<span class="creation-name-text" ondblclick="inlineEditName(' + idx + ', this)" style="color:#5a6480;font-style:italic;">双击命名</span>') +
+                    '<span style="font-size:0.6rem;background:rgba(126,200,255,0.12);color:#7ec8ff;padding:1px 6px;border-radius:4px;margin-left:4px;">v' + planetVer + '</span>' +
                 '</div>' +
                 '<div class="planet-achievement">' + planetSvg +
-                    '<div class="planet-name">' + esc(c.name) + '</div>' +
-                    '<div class="planet-id">' + planetId + '</div>' +
+                    '<div class="planet-name">' + esc(c.name || '') + '</div>' +
+                    '<div class="planet-id">' + planetId + ' · v' + planetVer + '</div>' +
                     (planetDesc ? '<div style="font-size:0.7rem;color:#8a94a6;margin-top:4px;">' + esc(planetDesc) + '</div>' : '') +
                     (memberCompHtml ? '<div style="margin-top:8px;padding:6px 10px;background:rgba(130,150,255,0.04);border-radius:8px;">' + memberCompHtml + '</div>' : '') +
                 '</div>' +
                 '<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">' +
                     '<button class="add-btn" style="font-size:0.7rem;padding:4px 8px;" onclick="editCreation(' + idx + ')">编辑</button>' +
-                    '<button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;" onclick="uncompleteCreation(' + idx + ')">撤销竣工</button>' +
+                    '<button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;background:rgba(255,215,0,0.08);color:#ffd700;border-color:rgba(255,215,0,0.15);" onclick="completeCreation(' + idx + ')" title="发起一轮更新竣工">⭐ 更新竣工</button>' +
+                    '<button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;" onclick="uncompleteCreation(' + idx + ')" title="撤销最近一次竣工">↩ 撤销</button>' +
                     '<button class="law-del" onclick="removeCreation(' + idx + ')">删除</button>' +
                 '</div>' +
             '</div>';
@@ -3945,7 +5344,7 @@
             for (const [k, v] of Object.entries(c.details)) {
                 const field = (t.fields || []).find(f => f.split(':')[0] === k);
                 const label = field ? field.split(':')[1] : k;
-                detailHtml += `<div class="creation-detail-item"><b>${esc(label)}:</b> ${esc(v)}</div>`;
+                detailHtml += `<div class="creation-detail-item" ondblclick="editCreationFocus(${idx},'${k}')" title="双击编辑" style="cursor:text;border-radius:4px;padding:1px 4px;margin:-1px -4px;" onmouseover="this.style.background='rgba(130,150,255,0.06)'" onmouseout="this.style.background='transparent'"><b>${esc(label)}:</b> ${esc(v)}</div>`;
             }
             detailHtml += '</div>';
         }
@@ -3969,11 +5368,13 @@
             const done = frags.filter(f => f.done);
             var myUid = getCurrentUser().uid;
             fragmentHtml = '<div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(130,153,255,0.1);">' +
-                '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer;" onclick="openPuzzleOverview(' + idx + ')">' +
+                '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">' +
                     '<svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 3h6v3.5a1.5 1.5 0 003 0V3h3v6h-3.5a1.5 1.5 0 000 3H21v6h-6v-3.5a1.5 1.5 0 00-3 0V18H6v-6h3.5a1.5 1.5 0 000-3H6V3h3z" fill="none" stroke="#8299ff" stroke-width="1.5" stroke-linejoin="round"/></svg>' +
-                    '<span style="font-size:0.68rem;color:#8299ff;">碎片拼图</span>' +
-                    '<span style="font-size:0.62rem;color:#5a6480;">共<b style="color:#c7d1ff;">' + frags.length + '</b>块 · 已认领<b style="color:#c7d1ff;">' + claimed.length + '</b> · 已完成<b style="color:#4ec9b0;">' + done.length + '</b></span>' +
+                    '<span style="font-size:0.75rem;color:#8299ff;">' + (c.collabMode ? '碎片拼图' : '工作组件') + '</span>' +
+                    '<span style="font-size:0.7rem;color:#5a6480;">共<b style="color:#c7d1ff;">' + frags.length + '</b>块 · ' + (c.collabMode ? '已认领<b style="color:#c7d1ff;">' + claimed.length + '</b> · ' : '') + '已完成<b style="color:#4ec9b0;">' + done.length + '</b></span>' +
                 '</div>';
+
+            // Member color legend removed — member info is shown on each fragment card directly
 
             // Separate: my fragments (expanded by default) + others (collapsed)
             var myFrags = [];
@@ -3990,25 +5391,46 @@
                 if (f.assignee === myUid) cardClass += ' mine';
                 if (f.done) cardClass += ' done';
                 if (expanded) cardClass += ' expanded';
+                // Use assignee color for card border
+                var cardBorderColor = fragColor ? fragColor.glow : 'rgba(130,150,255,0.1)';
+                var cardBorderAlpha = fragColor ? '30' : '10';
 
+                // Dot uses assignee's color; name shown after title in assignee's color
                 var dotColor = f.done ? '#4ec9b0' : (f.assignee ? (fragColor ? fragColor.glow : '#8299ff') : '#5a6480');
-                var assigneeText = '';
-                if (f.done) assigneeText = '<span class="frag-h-assignee" style="color:#4ec9b0;">✓ 已完成</span>';
-                else if (f.assignee === myUid) assigneeText = '<span class="frag-h-assignee" style="color:#ffd700;">我</span>';
-                else if (f.assignee) assigneeText = '<span class="frag-h-assignee" style="color:' + (fragColor ? fragColor.glow : '#8a94a6') + ';">' + esc(f.assigneeName || f.assignee) + '</span>';
-                else assigneeText = '<span class="frag-h-assignee" style="color:#4ec9b0;">未认领</span>';
+                var assigneeTag = '';
+                if (f.done) assigneeTag = '<span class="frag-h-assignee" style="color:#4ec9b0;">✓ 已完成</span>';
+                else if (f.assignee === myUid) assigneeTag = '<span class="frag-h-assignee" style="color:' + (fragColor ? fragColor.glow : '#8299ff') + ';">我</span>';
+                else if (f.assignee) assigneeTag = '<span class="frag-h-assignee" style="color:' + (fragColor ? fragColor.glow : '#8a94a6') + ';">' + esc(f.assigneeName || f.assignee) + '</span>';
+                else assigneeTag = '<span class="frag-h-assignee" style="color:#4ec9b0;">未认领</span>';
+
+                // Progress bar inline on header for my fragments
+                var prog = getFragmentProgress(f);
+                var progHtml = '';
+                if (prog.total > 0) {
+                    // Unified blue cosmic liquid — same color for all fragments
+                    var fillPct = f.done ? 100 : prog.pct;
+                    progHtml = '<span class="frag-liquid-container" style="margin-left:8px;">' +
+                        '<span class="frag-liquid-fill" style="height:' + fillPct + '%;"></span>' +
+                        generateStarlights(fillPct) +
+                        '<span class="frag-liquid-text">' + prog.done + '/' + prog.total + '</span>' +
+                    '</span>';
+                    var roundCount = f.rounds ? f.rounds.length : 0;
+                    if (roundCount > 0) {
+                        progHtml += '<span style="color:#8299ff;font-size:0.68rem;margin-left:6px;">' + roundCount + '轮</span>';
+                    }
+                }
 
                 var actionsHtml = '<div class="frag-h-actions">';
                 if (!f.assignee) {
                     actionsHtml += '<button class="frag-btn claim" onclick="event.stopPropagation();claimFragment(' + idx + ',' + fi2 + ')">认领</button>';
-                } else if (f.assignee === myUid && !f.done) {
-                    actionsHtml += '<button class="frag-btn done-btn" onclick="event.stopPropagation();completeFragment(' + idx + ',' + fi2 + ')">完成</button>';
+                } else if (f.assignee === myUid) {
+                    actionsHtml += '<button class="frag-btn done-btn" onclick="event.stopPropagation();completeFragment(' + idx + ',' + fi2 + ')">' + (f.done ? '✓ 已竣工' : '完成') + '</button>';
+                    if (f.done) {
+                        actionsHtml += '<button class="frag-btn" onclick="event.stopPropagation();uncompleteFragment(' + idx + ',' + fi2 + ')">撤销竣工</button>';
+                    }
                     actionsHtml += '<button class="frag-btn release" onclick="event.stopPropagation();releaseFragment(' + idx + ',' + fi2 + ')">释放</button>';
-                    actionsHtml += '<button class="frag-btn" style="font-size:0.6rem;padding:2px 6px;background:rgba(130,153,255,0.1);color:#8299ff;border-color:rgba(130,150,255,0.2);" onclick="event.stopPropagation();publishTaskRound(' + idx + ',' + fi2 + ')">+ 发布任务</button>';
-                } else if (f.done && f.assignee === myUid) {
-                    actionsHtml += '<button class="frag-btn" onclick="event.stopPropagation();uncompleteFragment(' + idx + ',' + fi2 + ')">撤销</button>';
+                    actionsHtml += '<button class="frag-btn" style="font-size:0.72rem;padding:3px 8px;background:rgba(130,153,255,0.1);color:#8299ff;border-color:rgba(130,150,255,0.2);" onclick="event.stopPropagation();publishTaskRound(' + idx + ',' + fi2 + ')">+ 发布任务</button>';
                 }
-                actionsHtml += '<button class="frag-btn" style="font-size:0.6rem;padding:2px 6px;background:rgba(255,215,0,0.06);color:#8a94a6;border-color:rgba(255,215,0,0.1);" onclick="event.stopPropagation();openPersonalCard(' + idx + ',' + fi2 + ')" title="详情">卡片</button>';
                 actionsHtml += '</div>';
 
                 // Rounds/tasks
@@ -4019,90 +5441,237 @@
                         var round = f.rounds[ri];
                         var rDone = round.tasks.filter(function(t){return t.done;}).length;
                         var rTotal = round.tasks.length;
-                        roundsHtml += '<div style="font-size:0.6rem;color:#8a94a6;margin-top:4px;">第' + round.roundNum + '轮 (' + rDone + '/' + rTotal + ')</div>';
+                        roundsHtml += '<div style="font-size:0.75rem;color:#8a94a6;margin-top:6px;margin-bottom:4px;">第' + round.roundNum + '轮 (' + rDone + '/' + rTotal + ')</div>';
                         for (var ti = 0; ti < round.tasks.length; ti++) {
                             var task = round.tasks[ti];
                             var completerColor = task.completedByUid ? getMemberColor(space, task.completedByUid) : null;
-                            var checkBg = task.done ? (completerColor ? completerColor.glow : '#4ec9b0') : 'transparent';
-                            var checkBorder = task.done ? (completerColor ? completerColor.glow : '#4ec9b0') : 'rgba(130,150,255,0.3)';
-                            var taskColor = task.done ? (completerColor ? completerColor.dark : '#2d8a78') : '#5a6480';
+                            // Completed: check uses completer's color; Uncompleted: border uses assignee's color
+                            var checkBg = task.done ? (completerColor ? completerColor.glow : '#4ec9b0') : (fragColor ? fragColor.glow + '15' : 'transparent');
+                            var checkBorder = task.done ? (completerColor ? completerColor.glow : '#4ec9b0') : (fragColor ? fragColor.glow : 'rgba(130,150,255,0.3)');
+                            var taskColor = task.done ? (completerColor ? completerColor.dark : '#2d8a78') : '#8a94a6';
 
-                            // Subtasks
+                            // Subtasks — checkbox color = creator's color, show creator name
                             var subtaskHtml = '';
                             if (task.subtasks && task.subtasks.length > 0) {
                                 subtaskHtml = '<div class="frag-h-subtask-list">';
                                 for (var si = 0; si < task.subtasks.length; si++) {
                                     var st = task.subtasks[si];
                                     var stColor = st.createdByUid ? getMemberColor(space, st.createdByUid) : null;
+                                    var stCheckBg = st.done ? (stColor ? stColor.glow : '#4ec9b0') : 'transparent';
+                                    var stCheckBorder = stColor ? stColor.glow : '#8a94a6';
                                     subtaskHtml += '<div class="frag-h-subtask-item">' +
-                                        '<span style="color:' + (st.done ? '#4ec9b0' : (stColor ? stColor.glow : '#8a94a6')) + ';">' + (st.done ? '✓' : '•') + '</span>' +
+                                        '<div class="frag-h-task-check" style="width:14px;height:14px;background:' + stCheckBg + ';border-color:' + stCheckBorder + ';color:#fff;">' + (st.done ? '✓' : '') + '</div>' +
                                         '<span style="color:#8a94a6;">' + esc(st.name) + '</span>' +
-                                        (st.createdBy ? '<span style="font-size:0.5rem;color:' + (stColor ? stColor.glow : '#5a6480') + ';">←' + esc(st.createdBy) + '</span>' : '') +
+                                        (st.createdBy && st.createdByUid !== f.assignee ? '<span style="font-size:0.68rem;color:' + (stColor ? stColor.glow : '#5a6480') + ';margin-left:auto;">←' + esc(st.createdBy) + '</span>' : '') +
                                     '</div>';
                                 }
                                 subtaskHtml += '</div>';
                             }
 
+                            // My fragment: click toggles task done; no self-name shown
+                            // Other's fragment: no click action (input always visible below)
                             var taskOnclick = '';
                             if (f.assignee === myUid) {
                                 taskOnclick = 'toggleRoundTask(' + idx + ',' + fi2 + ',' + ri + ',' + ti + ')';
                             } else {
-                                taskOnclick = 'showSubtaskInput(this,' + idx + ',' + fi2 + ',' + ri + ',' + ti + ')';
+                                taskOnclick = '';
                             }
 
-                            roundsHtml += '<div class="frag-h-task-row" onclick="' + taskOnclick + '">' +
+                            // Task row: show completer name only if it's not the assignee (i.e. someone else completed it)
+                            var taskRightHtml = '';
+                            if (task.done && task.completedBy && task.completedByUid !== f.assignee) {
+                                taskRightHtml = '<span style="font-size:0.68rem;color:' + (completerColor ? completerColor.glow : '#5a6480') + ';margin-left:auto;">←' + esc(task.completedBy) + '</span>';
+                            }
+
+                            var taskRowAttrs = taskOnclick ? ('onclick="' + taskOnclick + '"') : '';
+                            roundsHtml += '<div class="frag-h-task-row" ' + taskRowAttrs + '>' +
                                 '<div class="frag-h-task-check" style="background:' + checkBg + ';border-color:' + checkBorder + ';color:#fff;">' + (task.done ? '✓' : '') + '</div>' +
                                 '<span style="color:' + taskColor + ';">' + esc(task.name) + '</span>' +
-                                (task.done && task.completedBy ? '<span style="font-size:0.5rem;color:' + (completerColor ? completerColor.glow : '#5a6480') + ';margin-left:auto;">←' + esc(task.completedBy) + '</span>' : (f.assignee !== myUid ? '<span style="font-size:0.5rem;color:#5a6480;margin-left:auto;">点击反馈</span>' : '')) +
+                                taskRightHtml +
                             '</div>' + subtaskHtml;
+
+                            // For others' fragments: always show a feedback input under each task
+                            if (f.assignee !== myUid) {
+                                roundsHtml += '<input class="frag-h-subtask-input" style="margin-left:24px;" placeholder="+ 反馈/子任务…（回车提交）" onkeydown="if(event.key===\x27Enter\x27){event.preventDefault();addSubtaskToTask(' + idx + ',' + fi2 + ',' + ri + ',' + ti + ',this.value);this.value=\x27\x27;}" onclick="event.stopPropagation()">';
+                            }
                         }
-                        // Add task input (only for my fragments)
+                        // Add task input — Enter = add/split a subtask (only for my fragments)
                         if (f.assignee === myUid) {
-                            roundsHtml += '<input class="frag-h-subtask-input" placeholder="+ 添加任务…" onkeydown="if(event.key===\x27Enter\x27){addRoundTaskFromInput(' + idx + ',' + fi2 + ',' + ri + ',this.value);this.value=\x27\x27;}" onclick="event.stopPropagation()">';
+                            roundsHtml += '<input class="frag-h-subtask-input" placeholder="+ 添加任务…（回车切分）" onkeydown="if(event.key===\x27Enter\x27){event.preventDefault();addRoundTaskFromInput(' + idx + ',' + fi2 + ',' + ri + ',this.value);this.value=\x27\x27;}" onclick="event.stopPropagation()">';
+                        }
+                    }
+                    // After all rounds: if last round fully done and fragment not yet completed → prompt next round
+                    if (f.assignee === myUid && !f.done) {
+                        var lastRound = f.rounds[f.rounds.length - 1];
+                        var lastAllDone = lastRound.tasks.length > 0 && lastRound.tasks.every(function(t) { return t.done; });
+                        if (lastAllDone) {
+                            var nextRoundNum = f.rounds.length + 1;
+                            roundsHtml += '<div style="margin-top:8px;padding:10px 12px;background:rgba(78,201,176,0.08);border:1px dashed rgba(78,201,176,0.25);border-radius:8px;text-align:center;">' +
+                                '<div style="font-size:0.75rem;color:#4ec9b0;margin-bottom:6px;">✓ 第' + lastRound.roundNum + '轮任务已全部完成</div>' +
+                                '<button class="frag-btn" style="font-size:0.75rem;padding:4px 14px;background:rgba(78,201,176,0.12);color:#4ec9b0;border-color:rgba(78,201,176,0.3);" onclick="event.stopPropagation();publishTaskRound(' + idx + ',' + fi2 + ')">📋 开始第' + nextRoundNum + '轮任务</button>' +
+                                '<div style="font-size:0.68rem;color:#5a6480;margin-top:4px;">或点击「完成」直接竣工此碎片</div>' +
+                            '</div>';
                         }
                     }
                     roundsHtml += '</div>';
+                } else if (f.assignee === myUid) {
+                    // My fragment with no rounds yet — show quick-add input so user can start adding tasks
+                    roundsHtml = '<div class="frag-h-rounds">' +
+                        '<div style="font-size:0.75rem;color:#5a6480;padding:6px 0;">还没有任务，添加第一个开始吧</div>' +
+                        '<input class="frag-h-subtask-input" placeholder="+ 添加任务…（回车切分）" onkeydown="if(event.key===\x27Enter\x27){event.preventDefault();addFirstTaskFromCard(' + idx + ',' + fi2 + ',this.value);this.value=\x27\x27;}" onclick="event.stopPropagation()">' +
+                    '</div>';
+                } else {
+                    // Someone else's fragment, no rounds — show a hint
+                    roundsHtml = '<div class="frag-h-rounds"><div style="font-size:0.75rem;color:#5a6480;padding:6px 0;">暂无任务</div></div>';
                 }
 
-                return '<div class="' + cardClass + '" id="fragCard_' + idx + '_' + fi2 + '">' +
+                // Unified work records section: manual timeline entries + completed task entries
+                var recordsHtml = '';
+                var records = [];
+                var tl = f.timeline || [];
+                for (var tli = 0; tli < tl.length; tli++) {
+                    records.push({
+                        ts: tl[tli].createdAt || '',
+                        type: 'manual',
+                        text: tl[tli].text,
+                        img: tl[tli].img || '',
+                        author: tl[tli].author || '',
+                        authorUid: tl[tli].authorUid || ''
+                    });
+                }
+                if (f.rounds) {
+                    for (var rri = 0; rri < f.rounds.length; rri++) {
+                        var rr = f.rounds[rri];
+                        for (var rti = 0; rti < rr.tasks.length; rti++) {
+                            var rt = rr.tasks[rti];
+                            if (rt.done && rt.completedAt) {
+                                var cc = rt.completedByUid ? getMemberColor(space, rt.completedByUid) : null;
+                                records.push({
+                                    ts: rt.completedAt,
+                                    type: 'task',
+                                    text: '完成「' + rt.name + '」',
+                                    author: rt.completedBy || '',
+                                    authorUid: rt.completedByUid || '',
+                                    completerColor: cc
+                                });
+                            }
+                        }
+                    }
+                }
+                records.sort(function(a, b) {
+                    if (!a.ts) return 1;
+                    if (!b.ts) return -1;
+                    return b.ts.localeCompare(a.ts);
+                });
+                if (records.length > 0) {
+                    recordsHtml = '<div class="frag-h-records">';
+                    recordsHtml += '<div style="font-size:0.75rem;color:#8a94a6;margin-bottom:6px;">🕘 工作记录</div>';
+                    for (var rk = 0; rk < Math.min(records.length, 12); rk++) {
+                        var re = records[rk];
+                        var rdt = re.ts ? new Date(re.ts).toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+                        var rdotStyle = '';
+                        var rprefix = '';
+                        if (re.type === 'task') {
+                            var rcColor = re.completerColor ? re.completerColor.glow : '#4ec9b0';
+                            rdotStyle = ' style="background:' + rcColor + ';"';
+                            rprefix = '<span style="color:' + rcColor + ';font-size:0.8rem;">✓</span> ';
+                        }
+                        recordsHtml += '<div class="frag-h-record-item">' +
+                            '<div class="timeline-dot"' + rdotStyle + '></div>' +
+                            '<div style="flex:1;">' +
+                            '<div style="font-size:0.78rem;color:#8a94a6;">' + rprefix + esc(re.text) + '</div>' +
+                            (re.img ? '<img src="' + esc(re.img) + '" style="max-width:100%;border-radius:6px;margin-top:4px;border:1px solid rgba(130,150,255,0.1);">' : '') +
+                            '<div class="timeline-meta">' + rdt + (re.author ? ' · ' + esc(re.author) : '') + '</div>' +
+                            '</div></div>';
+                    }
+                    if (records.length > 12) {
+                        recordsHtml += '<div style="font-size:0.68rem;color:#5a6480;text-align:center;padding:4px 0;">还有 ' + (records.length - 12) + ' 条记录…</div>';
+                    }
+                    recordsHtml += '</div>';
+                }
+
+                // Work record input — Enter = add a record (only for my fragments)
+                var recordInputHtml = '';
+                if (f.assignee === myUid) {
+                    recordInputHtml = '<div class="frag-h-record-input-row">' +
+                        '<input class="frag-h-record-input" id="fragRecordInput_' + idx + '_' + fi2 + '" placeholder="记录工作…（回车留痕）" onkeydown="if(event.key===\x27Enter\x27){event.preventDefault();saveFragRecordFromCard(' + idx + ',' + fi2 + ',this.value);this.value=\x27\x27;}" onclick="event.stopPropagation()">' +
+                        '<label class="frag-h-record-img-btn" title="添加图片" onclick="event.stopPropagation()">' +
+                            '📷' +
+                            '<input type="file" id="fragRecordImg_' + idx + '_' + fi2 + '" accept="image/*" style="display:none;" onchange="var f=this.files[0];if(f&&f.size>500000){customAlert(\x27图片太大（超过500KB），请压缩后再上传\x27);this.value=\x27\x27;}">' +
+                        '</label>' +
+                    '</div>';
+                }
+
+                return '<div class="' + cardClass + '" id="fragCard_' + idx + '_' + fi2 + '" style="border-color:' + cardBorderColor + cardBorderAlpha + ';">' +
                     '<div class="frag-h-header" onclick="toggleFragCard(' + idx + ',' + fi2 + ')">' +
                         '<div class="frag-h-dot" style="background:' + dotColor + ';box-shadow:0 0 6px ' + dotColor + '60;"></div>' +
                         '<span class="frag-h-name">' + esc(f.name) + '</span>' +
-                        assigneeText +
+                        progHtml +
+                        assigneeTag +
                     '</div>' +
                     '<div class="frag-h-body">' +
                         actionsHtml +
                         roundsHtml +
+                        recordInputHtml +
+                        recordsHtml +
                     '</div>' +
                 '</div>';
             }
 
             // My fragments (expanded)
             for (var mi = 0; mi < myFrags.length; mi++) {
-                fragmentHtml += renderFragCard(myFrags[mi].f, myFrags[mi].idx, true);
+                var isTarget = (_targetFragIdx === myFrags[mi].idx && _targetCreationIdx === idx);
+                // My fragments are expanded by default; target fragment is always expanded
+                fragmentHtml += renderFragCard(myFrags[mi].f, myFrags[mi].idx, true || isTarget);
             }
 
             // Others toggle
             if (otherFrags.length > 0) {
-                fragmentHtml += '<div class="frag-h-others-toggle" onclick="toggleOthersFragments(this)">▸ 展开[' + otherFrags.length + ']个其他碎片</div>';
-                fragmentHtml += '<div class="frag-h-layout" id="othersFrags_' + idx + '" style="display:none;">';
-                for (var oi = 0; oi < otherFrags.length; oi++) {
-                    fragmentHtml += renderFragCard(otherFrags[oi].f, otherFrags[oi].idx, false);
+                // If target frag is in others, pull it out — show it expanded above the rest
+                var targetOtherIdx = -1;
+                if (_targetFragIdx >= 0 && _targetCreationIdx === idx) {
+                    for (var toi = 0; toi < otherFrags.length; toi++) {
+                        if (otherFrags[toi].idx === _targetFragIdx) {
+                            targetOtherIdx = toi;
+                            break;
+                        }
+                    }
                 }
-                fragmentHtml += '</div>';
+                if (targetOtherIdx >= 0) {
+                    // Render the target fragment expanded, outside the collapsible section
+                    fragmentHtml += renderFragCard(otherFrags[targetOtherIdx].f, otherFrags[targetOtherIdx].idx, true);
+                }
+                var remainingOthers = [];
+                for (var roi = 0; roi < otherFrags.length; roi++) {
+                    if (roi !== targetOtherIdx) remainingOthers.push(otherFrags[roi]);
+                }
+                // Only show toggle + collapsed section for non-target others
+                if (remainingOthers.length > 0) {
+                    var othersDisplay = 'none';
+                    var othersToggleText = '▸ 展开[' + remainingOthers.length + ']个其他' + (c.collabMode ? '碎片' : '组件');
+                    fragmentHtml += '<div class="frag-h-others-toggle" onclick="toggleOthersFragments(this)">' + othersToggleText + '</div>';
+                    fragmentHtml += '<div class="frag-h-layout" id="othersFrags_' + idx + '" style="display:' + othersDisplay + ';">';
+                    for (var oi = 0; oi < remainingOthers.length; oi++) {
+                        fragmentHtml += renderFragCard(remainingOthers[oi].f, remainingOthers[oi].idx, false);
+                    }
+                    fragmentHtml += '</div>';
+                }
             }
 
             fragmentHtml += '</div>';
         } else {
             // No fragments: show import elements button if elements exist, or split button
+            var splitBtnLabel = c.collabMode ? '🧩 拆分碎片' : '🧩 拆解工作组件';
+            var importBtnLabel = c.collabMode ? '🧩 要素导入碎片' : '🧩 要素导入组件';
+            var manualBtnLabel = c.collabMode ? '手动拆分' : '手动拆解';
             if (c.elements && c.elements.length > 0) {
                 fragmentHtml = '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">' +
-                    '<button class="frag-btn" style="font-size:0.68rem;padding:3px 8px;" onclick="importElementsToFragments(' + idx + ')">🧩 要素导入碎片</button>' +
-                    '<button class="frag-btn" style="font-size:0.68rem;padding:3px 8px;" onclick="openSplitModal(' + idx + ')">手动拆分</button>' +
+                    '<button class="frag-btn" style="font-size:0.68rem;padding:3px 8px;" onclick="importElementsToFragments(' + idx + ')">' + importBtnLabel + '</button>' +
+                    '<button class="frag-btn" style="font-size:0.68rem;padding:3px 8px;" onclick="openSplitModal(' + idx + ')">' + manualBtnLabel + '</button>' +
                 '</div>';
             } else {
                 fragmentHtml = '<div style="margin-top:8px;">' +
-                    '<button class="frag-btn" style="font-size:0.68rem;padding:3px 8px;" onclick="openSplitModal(' + idx + ')">🧩 拆分碎片</button>' +
+                    '<button class="frag-btn" style="font-size:0.68rem;padding:3px 8px;" onclick="openSplitModal(' + idx + ')">' + splitBtnLabel + '</button>' +
                 '</div>';
             }
             }
@@ -4128,16 +5697,15 @@
             }
             bpText = autoParts.join('\n');
         }
-        var hasBlueprint = (c.blueprintText !== undefined && c.blueprintText !== null) || bpImg;
+        var hasBlueprint = (c.blueprintText !== undefined && c.blueprintText !== null);
         var blueprintHtml = '<div class="creation-blueprint">' +
-            '<div style="font-size:0.68rem;color:#8a94a6;margin-bottom:2px;">📋 蓝图</div>';
-        if (bpImg) {
-            blueprintHtml += '<img class="creation-blueprint-img" src="' + esc(bpImg) + '" onerror="this.style.display=\'none\'" loading="lazy">';
-        }
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">' +
+                '<span style="font-size:0.68rem;color:#8a94a6;">📋 设计图</span>' +
+                '<button class="frag-btn" style="font-size:0.6rem;padding:2px 6px;background:rgba(130,150,255,0.06);color:#8299ff;border-color:rgba(130,150,255,0.15);" onclick="openImageGuideModal(' + idx + ')" title="' + (bpImg ? '更换图片' : '添加图片') + '">' + (bpImg ? '🖼️ 更换图片' : '🖼️ 添加图片') + '</button>' +
+            '</div>';
         if (bpText) {
             blueprintHtml += '<div class="creation-blueprint-text">' + esc(bpText) + '</div>';
-        }
-        if (!bpText && !bpImg) {
+        } else {
             blueprintHtml += '<div class="creation-blueprint-text"></div>';
         }
         blueprintHtml += '</div>';
@@ -4153,12 +5721,13 @@
             <div class="creation-card">
                 <div class="creation-name">
                     <span class="creation-type ${cls}" style="background:rgba(130,150,255,0.1);color:#8299ff;">${t.icon || '⭐'} ${t.label || c.type}</span>
-                    ${esc(c.name)}
+                    <span class="creation-name-text" ondblclick="inlineEditName(${idx}, this)">${c.name ? esc(c.name) : ''}</span>
                     <div style="margin-left:auto;display:flex;gap:4px;align-items:center;">
                         ${frags.length > 0 ? `<button class="puzzle-mini-btn" onclick="openPuzzleLayout(${idx})" title="碎片版面">${getPuzzleMiniSvg(frags.length)}</button>` : ''}
-                        <button class="collab-toggle-btn ${c.collabMode ? 'active' : ''}" onclick="toggleCollab(${idx})" title="${c.collabMode ? '当前：团队协作' : '当前：个人'}">${c.collabMode ? '🌐' : '👤'}</button>
+                        <button class="collab-toggle-btn ${c.collabMode ? 'team' : 'personal'}" onclick="toggleCollab(${idx})" title="${c.collabMode ? '当前：团队协作' : '当前：个人'}">${c.collabMode ? '🌐' : '👤'}</button>
                     </div>
                 </div>
+                ${bpImg ? '<img class="creation-cover-img" src="' + esc(bpImg) + '" onclick="openLightbox(this.src)" onerror="this.style.display=\'none\'" loading="lazy" title="点击查看大图">' : ''}
                 <div class="creation-desc">${esc(c.description || '')}</div>
                 ${detailHtml}
                 ${elementsHtml}
@@ -4167,8 +5736,7 @@
                 ${fragmentHtml}
                 <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
                     <button class="add-btn" style="font-size:0.7rem;padding:4px 8px;" onclick="editCreation(${idx})">编辑</button>
-                    <button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;" onclick="openBlueprintEditModal(${idx})">📋 蓝图</button>
-                    ${frags.length > 0 ? '<button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;" onclick="openSplitModal(' + idx + ')">管理碎片</button>' : ''}
+                    <button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;" onclick="openBlueprintEditModal(${idx})">📋 设计图</button>
                     ${frags.length > 0 ? '<button class="my-completion-btn" onclick="openMyCompletion(' + idx + ')">📊 我的完成度</button>' : ''}
                     <button class="frag-btn" style="font-size:0.65rem;padding:3px 8px;background:rgba(255,215,0,0.08);color:#ffd700;border-color:rgba(255,215,0,0.15);" onclick="completeCreation(${idx})">⭐ 竣工</button>
                     <button class="law-del" onclick="removeCreation(${idx})">删除</button>
@@ -4193,17 +5761,21 @@
         if (!space) return;
         var creationCount = (space.creations || []).length;
 
-        // Refund policy: full refund within 24h, no refund after
+        // Refund policy: full refund within 24h, no refund after. First space (free) never refunds.
         var createdAt = space.createdAt ? new Date(space.createdAt).getTime() : 0;
         var ageMs = Date.now() - createdAt;
         var within24h = ageMs < 24 * 60 * 60 * 1000;
-        var refundAmount = within24h ? 3 : 0;
+        // Check if this was the first (free) space — if it's the only space and was free, no refund
+        var wasFirstFree = spaces.length === 1 && space._wasFirstFree;
+        var refundAmount = wasFirstFree ? 0 : (within24h ? 3 : 0);
 
         var msg = '删除「' + space.name + '」';
         if (creationCount > 0) {
             msg += '（内含 ' + creationCount + ' 个创造盒子，将一并删除）';
         }
-        if (within24h) {
+        if (wasFirstFree) {
+            msg += '\n\n该空间为首创免费空间，删除不退还花朵。';
+        } else if (within24h) {
             msg += '\n\n创建未满24小时，将退还 3 朵太阳花。';
         } else {
             msg += '\n\n创建已超过24小时，不退还太阳花。';
@@ -4283,6 +5855,20 @@
         // Load work splits from existing fragments (name only, preserve order)
         cmWorkSplits = ((c.fragments || []).map(function(f) { return f.name; }));
         openCreationModal(true, c.type, c);
+    }
+
+    // Double-click a detail field → open edit card and focus that field
+    function editCreationFocus(idx, fieldKey) {
+        editCreation(idx);
+        // The modal is now open; find the field input and focus it
+        var el = document.getElementById('cmField_' + fieldKey);
+        if (el) {
+            setTimeout(function() { el.focus(); el.select(); }, 50);
+            // Scroll the field into view within the modal
+            setTimeout(function() {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
     }
 
     function openCreationModal(isEdit, type, existing) {
@@ -4413,7 +5999,7 @@
 
     function confirmCreationModal() {
         var name = document.getElementById('cmName').value.trim();
-        if (!name) name = '未命名';
+        // 无名称时留空，不写"未命名"——留给用户无名的前语言自由
         var desc = document.getElementById('cmDesc').value.trim();
 
         // Collect type fields
@@ -4490,9 +6076,16 @@
                 collabMode: false
             });
         }
+        // Reset tab order so new creation gets grouped properly
+        space.tabOrder = null;
         saveData(spaces);
         closeCreationModal();
         if (window.SFX) SFX.correct();
+        // Set active tab to the new/edited creation
+        var newOrder = getCreationTabOrder(space);
+        var newCreationIdx = (cmEditingIdx !== null) ? cmEditingIdx : (space.creations.length - 1);
+        var tabPos = newOrder.indexOf(newCreationIdx);
+        if (tabPos >= 0) _activeCreationTab[currentSpaceId] = tabPos;
         openSpaceDetail(currentSpaceId);
     }
 
@@ -4510,7 +6103,7 @@
         // Pre-fill split modal with element names
         openSplitModal(idx);
         setTimeout(function() {
-            document.getElementById('splitFragments').value = elements.join('\n');
+            renderSplitFragmentRows(elements);
         }, 50);
     }
 
@@ -4615,9 +6208,10 @@
                 var prog = getFragmentProgress(fr);
                 var progHtml = '';
                 if (prog.total > 0) {
+                    var fpct = fr.done ? 100 : prog.pct;
                     progHtml = '<span class="frag-liquid-container" style="margin-left:6px;">' +
-                        '<span class="frag-liquid-fill" style="height:' + prog.pct + '%;"></span>' +
-                        generateStarlights(prog.pct) +
+                        '<span class="frag-liquid-fill" style="height:' + fpct + '%;"></span>' +
+                        generateStarlights(fpct) +
                         '<span class="frag-liquid-text">' + prog.done + '/' + prog.total + '</span>' +
                     '</span>';
                     // Show round count
@@ -4649,9 +6243,13 @@
         var c = space.creations[cIdx];
         var user = getCurrentUser();
         var myUid = user.uid;
+        var isPersonal = !c.collabMode;
 
-        document.getElementById('myCompTitle').textContent = '📊 我的完成度 — ' + c.name;
-        document.getElementById('myCompInfo').innerHTML = '查看你在「' + esc(c.name) + '」各任务阶段的碎片完成度。一次竣工 = 一颗星球。';
+        document.getElementById('myCompTitle').textContent =
+            (isPersonal ? '📊 工作组件完成度 — ' : '📊 我的完成度 — ') + c.name;
+        document.getElementById('myCompInfo').innerHTML = isPersonal
+            ? '查看「' + esc(c.name) + '」各工作组件的完成度。每个组件独立追踪，算术平均为综合完成度。一次竣工 = 一颗星球。'
+            : '查看你在「' + esc(c.name) + '」各任务阶段的碎片完成度。一次竣工 = 一颗星球。';
 
         var frags = c.fragments || [];
         var myFrags = frags.filter(function(f){ return f.assignee === myUid; });
@@ -4659,7 +6257,11 @@
         var html = '';
 
         if (myFrags.length === 0) {
-            html = '<div style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:20px 0;">你还没有认领碎片。去认领碎片后，完成度会在这里展示。</div>';
+            html = '<div style="color:#3d4a6a;font-size:0.75rem;text-align:center;padding:20px 0;">' +
+                (isPersonal
+                    ? '还没有工作组件。去拆解项目后，完成度会在这里展示。'
+                    : '你还没有认领碎片。去认领碎片后，完成度会在这里展示。') +
+                '</div>';
         } else {
             // Overall completion = arithmetic average of all my fragments
             var totalPct = 0;
@@ -4675,7 +6277,7 @@
             '</div>';
 
             // Per-fragment (per stage) breakdown
-            html += '<div style="font-size:0.72rem;color:#8299ff;margin-bottom:6px;font-weight:500;">📋 各碎片完成度</div>';
+            html += '<div style="font-size:0.72rem;color:#8299ff;margin-bottom:6px;font-weight:500;">📋 ' + (isPersonal ? '各工作组件完成度' : '各碎片完成度') + '</div>';
             for (var j = 0; j < myFrags.length; j++) {
                 var f = myFrags[j];
                 var fp = getFragmentProgress(f);
@@ -4706,7 +6308,7 @@
                 '</div>';
             } else {
                 html += '<div style="margin-top:14px;padding:10px;background:rgba(255,215,0,0.03);border-radius:10px;text-align:center;">' +
-                    '<div style="font-size:0.65rem;color:#8a94a6;">竣工后获得星球，碎片完成度算术平均为个人完成度</div>' +
+                    '<div style="font-size:0.65rem;color:#5a6480;">注：竣工后获得星球，完成度按算术平均记录</div>' +
                 '</div>';
             }
         }
@@ -4717,103 +6319,6 @@
 
     function closeMyCompletion() {
         document.getElementById('myCompletionModal').classList.remove('active');
-    }
-
-    // ===== 碎片总览弹窗 =====
-    function openPuzzleOverview(cIdx) {
-        var spaces = loadData();
-        var space = spaces.find(function(s){ return s.id === currentSpaceId; });
-        if (!space || !space.creations || !space.creations[cIdx]) return;
-        var c = space.creations[cIdx];
-        var frags = c.fragments || [];
-
-        document.getElementById('puzzleOverviewTitle').textContent = '🧩 碎片总览 — ' + c.name;
-
-        var html = '';
-
-        // Section 1: 成员圈
-        var teamMap = {};
-        var teamOrder = [];
-        for (var ti = 0; ti < (space.team || []).length; ti++) {
-            var tm = space.team[ti];
-            var key = tm.uid || tm.role;
-            if (!teamMap[key]) { teamMap[key] = { uid: tm.uid, role: tm.role, emoji: tm.emoji || '🧑', fragCount: 0 }; teamOrder.push(key); }
-        }
-        for (var fi = 0; fi < frags.length; fi++) {
-            var f = frags[fi];
-            if (f.assignee) {
-                var key2 = f.assignee;
-                if (!teamMap[key2]) { teamMap[key2] = { uid: f.assignee, role: f.assigneeName || f.assignee, emoji: '🧑', fragCount: 0 }; teamOrder.push(key2); }
-                teamMap[key2].fragCount++;
-            }
-        }
-
-        if (teamOrder.length > 0) {
-            html += '<div class="puzzle-overview-members">';
-            var currentUser = getCurrentUser();
-            var sortedTeam = teamOrder.filter(function(k){ return k === currentUser.uid; })
-                .concat(teamOrder.filter(function(k){ return k !== currentUser.uid; }));
-            for (var oi = 0; oi < sortedTeam.length; oi++) {
-                var m = teamMap[sortedTeam[oi]];
-                var mc = getMemberColor(space, m.uid || m.role);
-                var isMe = (m.uid === currentUser.uid);
-                html += '<div class="pom-member">' +
-                    '<div class="pom-avatar" style="border-color:' + mc.glow + ';box-shadow:0 0 8px ' + mc.glow + '40;">' + (m.emoji || '🧑') + '</div>' +
-                    '<span class="pom-name" style="color:' + mc.glow + ';">' + esc(m.role) + (isMe ? '（我）' : '') + '</span>' +
-                    '<span style="font-size:0.5rem;color:#5a6480;">' + m.fragCount + '块</span>' +
-                '</div>';
-            }
-            html += '</div>';
-        }
-
-        // Section 2: 拼图编号+认领者
-        html += '<div style="font-size:0.68rem;color:#8299ff;margin-bottom:8px;">碎片分工</div>';
-        html += '<div class="pom-pieces">';
-        for (var pi = 0; pi < frags.length; pi++) {
-            var pf = frags[pi];
-            var pfColor = getFragmentAssigneeColor(space, pf);
-            var pieceClass = 'pom-piece';
-            var canClaim = false;
-            var pieceBg = '';
-            var pieceText = '#fff';
-            var label = '';
-
-            if (pf.done) {
-                pieceBg = '#4ec9b0';
-                label = '✓';
-            } else if (pf.assignee) {
-                pieceBg = pfColor ? pfColor.glow : '#8299ff';
-                label = esc(pf.assigneeName || pf.assignee).slice(0, 3);
-            } else {
-                pieceBg = 'rgba(130,150,255,0.1)';
-                pieceText = '#4ec9b0';
-                pieceClass += ' claimable';
-                canClaim = true;
-                label = '认领';
-            }
-
-            html += '<div class="' + pieceClass + '"' +
-                (canClaim ? ' onclick="claimFragment(' + cIdx + ',' + pi + ');closePuzzleOverview();"' : ' onclick="toggleFragCard(' + cIdx + ',' + pi + ');closePuzzleOverview();"') +
-                ' title="' + esc(pf.name) + '">' +
-                '<div class="pom-piece-num" style="background:' + pieceBg + ';color:' + pieceText + ';">' + label + '</div>' +
-                '<span style="font-size:0.6rem;color:#5a6480;">' + (pi + 1) + '. ' + esc(pf.name) + '</span>' +
-            '</div>';
-        }
-        html += '</div>';
-
-        // Stats
-        var claimed = frags.filter(function(f){ return f.assignee; }).length;
-        var doneCount = frags.filter(function(f){ return f.done; }).length;
-        html += '<div style="margin-top:12px;font-size:0.65rem;color:#5a6480;text-align:center;">' +
-            '共 ' + frags.length + ' 块 · 已认领 ' + claimed + ' · 已完成 ' + doneCount +
-        '</div>';
-
-        document.getElementById('puzzleOverviewBody').innerHTML = html;
-        document.getElementById('puzzleOverviewModal').classList.add('active');
-    }
-
-    function closePuzzleOverview() {
-        document.getElementById('puzzleOverviewModal').classList.remove('active');
     }
 
     // ===== 碎片卡片展开/折叠 =====
@@ -4844,7 +6349,24 @@
         var user = getCurrentUser();
         frag.rounds[roundIdx].tasks.push({ name: taskName.trim(), done: false });
         saveData(spaces);
-        openSpaceDetail(currentSpaceId);
+        _targetFragIdx = fIdx;
+        _targetCreationIdx = cIdx;
+        openSpaceDetail(currentSpaceId, fIdx, cIdx);
+    }
+
+    // First task from card (no rounds yet) — auto-create round 1 with this task
+    function addFirstTaskFromCard(cIdx, fIdx, taskName) {
+        if (!taskName || !taskName.trim()) return;
+        var spaces = loadData();
+        var space = spaces.find(function(s){ return s.id === currentSpaceId; });
+        if (!space || !space.creations[cIdx] || !space.creations[cIdx].fragments) return;
+        var frag = space.creations[cIdx].fragments[fIdx];
+        if (!frag.rounds) frag.rounds = [];
+        frag.rounds.push({ roundNum: 1, tasks: [{ name: taskName.trim(), done: false }] });
+        saveData(spaces);
+        _targetFragIdx = fIdx;
+        _targetCreationIdx = cIdx;
+        openSpaceDetail(currentSpaceId, fIdx, cIdx);
     }
 
     // ===== 子任务反馈（对他人的任务添加子任务） =====
@@ -4870,6 +6392,7 @@
     }
 
     function addSubtaskToTask(cIdx, fIdx, roundIdx, taskIdx, subtaskName) {
+        if (!subtaskName || !subtaskName.trim()) return;
         var spaces = loadData();
         var space = spaces.find(function(s){ return s.id === currentSpaceId; });
         if (!space || !space.creations[cIdx] || !space.creations[cIdx].fragments) return;
@@ -4881,7 +6404,50 @@
         var user = getCurrentUser();
         task.subtasks.push({ name: subtaskName, done: false, createdBy: user.name, createdByUid: user.uid });
         saveData(spaces);
-        openSpaceDetail(currentSpaceId);
+        _targetFragIdx = fIdx;
+        _targetCreationIdx = cIdx;
+        openSpaceDetail(currentSpaceId, fIdx, cIdx);
+    }
+
+    // ===== Save work record directly from fragment card (Enter = add record) =====
+    function saveFragRecordFromCard(cIdx, fIdx, text) {
+        if (!text || !text.trim()) return;
+        var spaces = loadData();
+        var space = spaces.find(function(s){ return s.id === currentSpaceId; });
+        if (!space || !space.creations[cIdx] || !space.creations[cIdx].fragments) return;
+        var f = space.creations[cIdx].fragments[fIdx];
+        if (!f) return;
+        if (!f.timeline) f.timeline = [];
+        var imgInput = document.getElementById('fragRecordImg_' + cIdx + '_' + fIdx);
+        var img = '';
+        if (imgInput && imgInput.files && imgInput.files[0]) {
+            var file = imgInput.files[0];
+            if (file.size > 500000) {
+                customAlert('图片太大（超过500KB），请压缩后再上传', '上传限制', {
+                    solution: { text: '我知道了', action: function() {} }
+                });
+                return;
+            }
+            // Read as data URL synchronously is not possible; save text first, then handle image
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var user = getCurrentUser();
+                f.timeline.push({ text: text.trim(), img: e.target.result, createdAt: new Date().toISOString(), author: user.name, authorUid: user.uid });
+                saveData(spaces);
+                imgInput.value = '';
+                _targetFragIdx = fIdx;
+                _targetCreationIdx = cIdx;
+                openSpaceDetail(currentSpaceId, fIdx, cIdx);
+            };
+            reader.readAsDataURL(file);
+            return;
+        }
+        var user = getCurrentUser();
+        f.timeline.push({ text: text.trim(), img: '', createdAt: new Date().toISOString(), author: user.name, authorUid: user.uid });
+        saveData(spaces);
+        _targetFragIdx = fIdx;
+        _targetCreationIdx = cIdx;
+        openSpaceDetail(currentSpaceId, fIdx, cIdx);
     }
 
     // ===== 竣工 =====
@@ -4893,20 +6459,51 @@
         var fragInfo = '';
         if (c.fragments && c.fragments.length > 0) {
             var done = c.fragments.filter(function(f){return f.done;}).length;
-            fragInfo = '<br>当前碎片完成度：' + done + '/' + c.fragments.length;
+            var fragLabel = c.collabMode ? '碎片' : '工作组件';
+            fragInfo = '<div style="margin-top:8px;text-align:center;">' +
+                '<span style="font-size:0.88rem;font-weight:700;color:#4ec9b0;">' + done + '</span>' +
+                '<span style="font-size:0.82rem;color:#8a94a6;"> / ' + c.fragments.length + '</span>' +
+                '<span style="font-size:0.72rem;color:#8a94a6;margin-left:4px;">' + fragLabel + '完成度</span>' +
+                '</div>';
             if (done < c.fragments.length) {
-                fragInfo += '<br>注意：部分碎片未完成，竣工后仍获得一颗星球，完成度按算术平均记录。';
+                fragInfo += '<div style="font-size:0.65rem;color:#5a6480;margin-top:4px;text-align:center;">' +
+                    '注：部分' + fragLabel + '未完成，竣工后仍获得一颗星球，完成度按算术平均记录。' +
+                    '</div>';
             }
         }
-        var confirmMsg = '确认「' + c.name + '」竣工？<br>竣工后获得一颗星球，代表此项目。不论碎片多少，每个项目 = 一颗星球。碎片完成度算术平均为个人完成度。' + fragInfo;
-        customConfirm(confirmMsg, '竣工确认', function() {
+        var isUpdate = c.completed === true;
+        var confirmMsg;
+        if (isUpdate) {
+            confirmMsg = '<div style="text-align:center;line-height:1.8;">' +
+                '<div style="font-size:0.88rem;color:#c7d1ff;">确认「' + esc(c.name) + '」发起更新竣工？</div>' +
+                '<div style="font-size:0.78rem;color:#8a94a6;">星球将从 v' + (c.planetVersion || '1.0.0') + ' 升级到新版本</div>' +
+                '</div>' + fragInfo;
+        } else {
+            confirmMsg = '<div style="text-align:center;line-height:1.8;">' +
+                '<div style="font-size:0.88rem;color:#c7d1ff;">确认「' + esc(c.name) + '」竣工？</div>' +
+                '<div style="font-size:0.78rem;color:#8a94a6;">获得 v1.0.0 宝宝星球，代表此项目诞生</div>' +
+                '<div style="font-size:0.72rem;color:#5a6480;">后续可持续发起更新</div>' +
+                '</div>' + fragInfo;
+        }
+        customConfirm(confirmMsg, isUpdate ? '更新竣工' : '竣工确认', function() {
+            // === actual completion logic (runs after second confirmation) ===
             c.completed = true;
             c.completedAt = new Date().toISOString();
-            // Generate planet ID
-            var now = new Date();
-            var ts = now.getFullYear().toString().slice(-2) + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2);
-            var rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-            c.planetId = 'P-' + ts + '-' + rand;
+            // Planet version system: 1.0.0 (birth) → 1.0.1 → ... → 1.0.9 → 1.1.0 → ... → 1.9.9 → 2.0.0
+            c.planetVersion = bumpPlanetVersion(c.planetVersion);
+            // Generate planet ID on first completion only
+            if (!c.planetId) {
+                var now = new Date();
+                var ts = now.getFullYear().toString().slice(-2) + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2);
+                var rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+                c.planetId = 'P-' + ts + '-' + rand;
+            }
+            // Record version history
+            if (!c.planetHistory) c.planetHistory = [];
+            c.planetHistory.push({
+                version: c.planetVersion,
+                at: new Date().toISOString()
+            });
             // Calculate each member's completion
             if (c.fragments && c.fragments.length > 0) {
                 var memberStats = {};
@@ -4926,22 +6523,115 @@
                 }
             }
             saveData(spaces);
+
+            // === 行星沉淀回流：将星球信息写入 lifeBlueprint.stars ===
+            var bp = loadLifeBlueprint();
+            if (bp) {
+                var starUser = getCurrentUser();
+                var starUserPct = c.planetMembers ? (c.planetMembers[starUser.uid] || 0) : 0;
+                var starRole = '';
+                if (space.team) {
+                    var starMember = space.team.find(function(m){ return m.uid === starUser.uid; });
+                    if (starMember) starRole = starMember.role || '';
+                }
+                var starData = {
+                    planetId: c.planetId,
+                    planetVersion: c.planetVersion,
+                    creationName: c.name,
+                    spaceId: space.id,
+                    spaceName: space.name,
+                    spaceIcon: space.icon || '',
+                    creationType: c.type,
+                    role: starRole,
+                    completionPct: starUserPct,
+                    completedAt: c.completedAt,
+                    planetHistory: c.planetHistory || [],
+                    planetMembers: c.planetMembers ? JSON.parse(JSON.stringify(c.planetMembers)) : {}
+                };
+                var existingIdx = -1;
+                for (var si = 0; si < bp.stars.length; si++) {
+                    if (bp.stars[si].planetId === c.planetId) { existingIdx = si; break; }
+                }
+                if (existingIdx >= 0) {
+                    bp.stars[existingIdx] = starData;
+                } else {
+                    bp.stars.push(starData);
+                }
+                saveLifeBlueprint(bp);
+            }
+
             if (window.SFX) SFX.master();
             openSpaceDetail(currentSpaceId);
-            customAlert('🌟「' + c.name + '」已竣工！<br>星球编号：' + c.planetId + '<br>不论项目大小，这都是你的一颗星球。', '竣工成功');
+            var msg = isUpdate
+                ? '🌟「' + c.name + '」已更新竣工！星球升级为 v' + c.planetVersion + '。'
+                : '🌟「' + c.name + '」已竣工！<br>星球编号：' + c.planetId + '（v' + c.planetVersion + ' 宝宝星球）';
+            customAlert(msg, isUpdate ? '更新竣工' : '竣工成功');
+        }, null, {
+            doubleConfirm: {
+                msg: '<div style="text-align:center;font-size:0.9rem;color:#ffd700;font-weight:600;">确认竣工吗？</div><div style="font-size:0.72rem;color:#8a94a6;margin-top:6px;">此操作将正式立项，不可撤回</div>',
+                title: '⚠️ 最后确认'
+            }
         });
+    }
+
+    // 1.0.0 → 1.0.1 → ... → 1.0.9 → 1.1.0 → ... → 1.9.9 → 2.0.0 → ... → 9.9.9 → 10.0.0
+    function bumpPlanetVersion(ver) {
+        if (!ver) return '1.0.0';
+        var parts = ver.split('.').map(function(n) { return parseInt(n) || 0; });
+        while (parts.length < 3) parts.push(0);
+        // bump patch (last digit), carry at 10
+        parts[2]++;
+        if (parts[2] >= 10) { parts[2] = 0; parts[1]++; }
+        if (parts[1] >= 10) { parts[1] = 0; parts[0]++; }
+        return parts.join('.');
     }
 
     function uncompleteCreation(idx) {
         var spaces = loadData();
         var space = spaces.find(s => s.id === currentSpaceId);
         if (!space || !space.creations[idx]) return;
-        space.creations[idx].completed = false;
-        delete space.creations[idx].completedAt;
-        delete space.creations[idx].planetId;
-        delete space.creations[idx].planetMembers;
+        var c = space.creations[idx];
+        var histLen = (c.planetHistory || []).length;
+        var msg;
+        if (histLen > 1) {
+            // Revert to previous version
+            c.planetHistory.pop();
+            var prev = c.planetHistory[c.planetHistory.length - 1];
+            c.planetVersion = prev.version;
+            msg = '已撤销最近一次更新竣工，星球回退到 v' + prev.version;
+        } else {
+            // First completion — full revert
+            c.completed = false;
+            delete c.completedAt;
+            delete c.planetId;
+            delete c.planetMembers;
+            delete c.planetVersion;
+            delete c.planetHistory;
+            msg = '已撤销竣工';
+        }
         saveData(spaces);
+
+        // === 行星墙同步 ===
+        var bp = loadLifeBlueprint();
+        if (bp) {
+            if (histLen > 1) {
+                // 版本回退：更新行星墙上的星球版本
+                for (var si = 0; si < bp.stars.length; si++) {
+                    if (bp.stars[si].planetId === c.planetId) {
+                        bp.stars[si].planetVersion = prev.version;
+                        bp.stars[si].planetHistory = c.planetHistory || [];
+                        break;
+                    }
+                }
+            } else {
+                // 完全撤销：从行星墙移除星球
+                bp.stars = bp.stars.filter(function(s){ return s.planetId !== c.planetId; });
+            }
+            saveLifeBlueprint(bp);
+        }
+
         openSpaceDetail(currentSpaceId);
+        customAlert(msg);
     }
 
     function removeCreation(idx) {
@@ -4949,7 +6639,13 @@
         const space = spaces.find(s => s.id === currentSpaceId);
         if (!space || !space.creations) return;
         space.creations.splice(idx, 1);
+        space.tabOrder = null; // Reset tab order after deletion
         saveData(spaces);
+        // Reset active tab if needed
+        var activeTab = _activeCreationTab[currentSpaceId];
+        if (activeTab && activeTab >= space.creations.length) {
+            _activeCreationTab[currentSpaceId] = 0;
+        }
         openSpaceDetail(currentSpaceId);
     }
 
@@ -4957,7 +6653,7 @@
     function addTeamMember() {
         const role = document.getElementById('memberRole').value.trim();
         const resp = document.getElementById('memberResp').value.trim();
-        const emoji = document.getElementById('memberEmoji').value.trim() || '🧑';
+        const emoji = document.getElementById('memberEmoji').value.trim() || DEFAULT_AVATAR_EMOJI;
         if (!role) { customAlert('请输入角色'); return; }
 
         const spaces = loadData();

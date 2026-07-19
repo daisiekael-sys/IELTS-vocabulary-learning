@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>个人主页 - 雅思词汇学习中心</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a2345">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IELTS词汇">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <script src="config.js?v=3"></script>
+    <script src="firebase-config.js?v=3"></script>
+    <script src="auth.js?v=3"></script>
+    <script src="sfx.js?v=1"></script>
+    <script src="sidebar.js?v=2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", Arial, sans-serif; }
+        body {
+            background: #0a1028;
+            background-image: radial-gradient(circle at 50% 50%, #1a2345 0%, #050714 100%);
+            color: #e6edf7;
+            min-height: 100vh;
+        }
+
+        /* 全局滚动条 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(130,150,255,0.12); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(130,150,255,0.2); }
+        * { scrollbar-width: thin; scrollbar-color: rgba(130,150,255,0.12) transparent; }
+
+        /* === 侧边栏导航 === */
+        .sidebar-overlay {
+            position: fixed; inset: 0;
+            background: rgba(5,7,20,0.5);
+            backdrop-filter: blur(3px);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 199;
+        }
+        .sidebar-overlay.show { opacity: 1; pointer-events: auto; }
+        .sidebar {
+            position: fixed; top: 0; left: 0;
+            width: 260px; height: 100vh;
+            background: linear-gradient(180deg, rgba(16,24,52,0.98), rgba(10,16,40,0.98));
+            border-right: 1px solid rgba(130,150,255,0.12);
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            z-index: 200;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(130,150,255,0.1);
+        }
+        .sidebar-title { font-size: 0.92rem; color: #c7d1ff; font-weight: 600; }
+        .sidebar-close {
+            background: none; border: none; cursor: pointer;
+            color: #5a6480; font-size: 1.1rem; padding: 4px 8px;
+            border-radius: 6px; transition: all 0.2s;
+        }
+        .sidebar-close:hover { color: #c7d1ff; background: rgba(130,150,255,0.15); }
+        .sidebar-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+
+        .tree-node { }
+        .tree-row {
+            display: flex; align-items: center; gap: 6px;
+            padding: 7px 16px; cursor: pointer;
+            transition: background 0.15s;
+            position: relative;
+        }
+        .tree-row:hover { background: rgba(130,150,255,0.06); }
+        .tree-row.active {
+            background: rgba(130,150,255,0.08);
+            box-shadow: inset 2px 0 0 #ffd700;
+        }
+        .tree-chevron {
+            flex-shrink: 0; width: 14px; height: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: #5a6480; transition: transform 0.2s;
+        }
+        .tree-chevron.open { transform: rotate(90deg); }
+        .tree-chevron.hidden { visibility: hidden; }
+        .tree-icon { flex-shrink: 0; font-size: 0.85rem; width: 18px; text-align: center; }
+        .tree-label {
+            flex: 1; font-size: 0.78rem; color: #c7d1ff;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .tree-row.active .tree-label { color: #ffd700; }
+        .tree-pin {
+            flex-shrink: 0; width: 14px; height: 14px;
+            opacity: 0; transition: opacity 0.2s;
+            cursor: pointer; color: #5a6480;
+        }
+        .tree-row:hover .tree-pin { opacity: 0.5; }
+        .tree-pin.pinned { opacity: 1; color: #ffd700; }
+        .tree-pin:hover { opacity: 1 !important; }
+        .tree-children { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+        .tree-children.open { max-height: 2000px; }
+        .tree-show-all-toggle {
+            font-size: 0.68rem; color: #5a6480; cursor: pointer;
+            padding: 4px 12px 4px 26px; text-align: left;
+            transition: color 0.15s;
+        }
+        .tree-show-all-toggle:hover { color: #8299ff; }
+        .tree-tag {
+            font-size: 0.55rem; color: #5a6480;
+            background: rgba(130,150,255,0.08);
+            padding: 1px 5px; border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .tree-divider {
+            height: 1px; margin: 6px 12px;
+            background: rgba(130,150,255,0.08);
+        }
+
+        /* === 顶部导航 === */
+        .top-bar {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 20px;
+            background: rgba(10,16,40,0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(130,150,255,0.1);
+        }
+        .hamburger-btn, .back-btn {
+            background: none; border: none; cursor: pointer;
+            color: #8a94a6; display: flex; align-items: center; gap: 4px;
+            font-size: 0.82rem; transition: color 0.2s;
+        }
+        .hamburger-btn:hover, .back-btn:hover { color: #c7d1ff; }
+        .top-title {
+            font-size: 0.92rem; color: #c7d1ff; font-weight: 600;
+        }
+
+        /* === 主内容区 === */
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+        }
+
+        /* 用户信息卡 */
+        .user-card {
+            display: flex; align-items: center; gap: 16px;
+            padding: 20px;
+            background: rgba(130,150,255,0.04);
+            border: 1px solid rgba(130,150,255,0.1);
+            border-radius: 14px;
+            margin-bottom: 24px;
+        }
+        .user-avatar {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(135deg, #6a85ff, #4a6cff);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #fff; font-size: 22px;
+            border: 2px solid rgba(130,150,255,0.3);
+            flex-shrink: 0;
+        }
+        .user-avatar-guest {
+            background: rgba(130,150,255,0.1);
+            color: #8a94a6;
+            border-color: rgba(130,150,255,0.2);
+        }
+        .user-info-name {
+            font-size: 1.1rem; font-weight: 600; color: #c7d1ff;
+        }
+        .user-info-email {
+            font-size: 0.78rem; color: #5a6480; margin-top: 2px;
+        }
+        .profile-login-btn {
+            flex-shrink: 0;
+            display: inline-flex; align-items: center;
+            padding: 8px 18px;
+            background: linear-gradient(135deg, #6a85ff, #4a6cff);
+            color: #fff; font-size: 0.82rem; font-weight: 600;
+            border: none; border-radius: 10px; cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 12px rgba(106,133,255,0.3);
+        }
+        .profile-login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 18px rgba(106,133,255,0.45);
+        }
+        .profile-login-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 区块通用 */
+        .section-card {
+            background: rgba(130,150,255,0.03);
+            border: 1px solid rgba(130,150,255,0.1);
+            border-radius: 14px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .section-header {
+            display: flex; align-items: center; gap: 8px;
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(130,150,255,0.08);
+        }
+        .section-icon { font-size: 1.1rem; }
+        .section-title {
+            font-size: 0.92rem; font-weight: 600; color: #c7d1ff;
+        }
+        .section-body { padding: 16px 20px; }
+
+        /* 人生蓝图编辑 */
+        .vision-text {
+            font-size: 0.85rem; color: #e6edf3; line-height: 1.8;
+            min-height: 60px; padding: 12px 14px;
+            background: rgba(130,150,255,0.04);
+            border: 1px solid rgba(130,150,255,0.1);
+            border-radius: 10px;
+            cursor: text; transition: border-color 0.2s;
+            white-space: pre-wrap; word-break: break-word;
+        }
+        .vision-text:hover { border-color: rgba(130,150,255,0.2); }
+        .vision-text.editing {
+            outline: none; border-color: #8299ff;
+            box-shadow: 0 0 0 2px rgba(130,150,255,0.1);
+        }
+        .vision-text.empty {
+            color: #3d4a6a; font-style: italic;
+        }
+        .vision-edit-hint {
+            font-size: 0.65rem; color: #5a6480;
+            margin-top: 8px; text-align: right;
+        }
+
+        /* 世界法则 */
+        .laws-list { }
+        .law-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 0;
+        }
+        .law-bullet {
+            color: #ffd700; font-size: 0.85rem; flex-shrink: 0;
+        }
+        .law-input {
+            flex: 1; background: none; border: none;
+            color: #e6edf3; font-size: 0.82rem;
+            outline: none; padding: 4px 0;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .law-input:focus { border-bottom-color: rgba(130,150,255,0.3); }
+        .law-input::placeholder { color: #3d4a6a; }
+        .law-add-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 0; margin-top: 4px;
+        }
+        .law-add-btn {
+            background: none; border: none; cursor: pointer;
+            color: #5a6480; font-size: 0.78rem;
+            display: flex; align-items: center; gap: 4px;
+            transition: color 0.2s;
+        }
+        .law-add-btn:hover { color: #8299ff; }
+
+        /* 行星墙 */
+        .stars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .star-card {
+            background: radial-gradient(circle at 50% 30%, rgba(130,150,255,0.06) 0%, transparent 70%);
+            border: 1px solid rgba(130,150,255,0.1);
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .star-card:hover {
+            border-color: rgba(130,150,255,0.2);
+            background: radial-gradient(circle at 50% 30%, rgba(130,150,255,0.1) 0%, transparent 70%);
+        }
+        .star-card-planet {
+            filter: drop-shadow(0 2px 8px rgba(130,150,255,0.25));
+            animation: planetGlow 3s ease-in-out infinite;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        @keyframes planetGlow {
+            0%, 100% { filter: drop-shadow(0 2px 6px rgba(130,150,255,0.2)); }
+            50% { filter: drop-shadow(0 2px 14px rgba(130,150,255,0.4)); }
+        }
+        .star-card-id {
+            font-size: 0.65rem; color: #ffd700; margin-top: 8px;
+            font-weight: 600; letter-spacing: 0.5px;
+        }
+        .star-card-name {
+            font-size: 0.82rem; color: #c7d1ff; margin-top: 4px;
+            font-weight: 500;
+        }
+        .star-card-meta {
+            font-size: 0.68rem; color: #8a94a6; margin-top: 6px;
+            line-height: 1.5;
+        }
+        .star-card-pct {
+            font-size: 0.75rem; color: #4ec9b0; margin-top: 4px;
+            font-weight: 600;
+        }
+        .star-card-version {
+            display: inline-block;
+            font-size: 0.6rem; color: #8299ff;
+            background: rgba(130,150,255,0.08);
+            padding: 1px 6px; border-radius: 4px;
+            margin-top: 6px;
+        }
+        .stars-empty {
+            text-align: center; padding: 40px 20px;
+            color: #3d4a6a; font-size: 0.78rem;
+        }
+        .stars-empty-icon { font-size: 2rem; margin-bottom: 8px; }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .profile-container { padding: 16px 12px 40px; }
+            .stars-grid { grid-template-columns: 1fr; }
+            .user-card { padding: 14px; }
+            .user-avatar { width: 44px; height: 44px; font-size: 18px; }
+            .section-body { padding: 12px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 侧边栏遮罩 -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+
+<!-- 侧边栏 -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <span class="sidebar-title">🧭 导航</span>
+        <button class="sidebar-close" onclick="toggleSidebar(false)">✕</button>
+    </div>
+    <div class="sidebar-body" id="sidebarBody"></div>
+</div>
+
+<!-- 顶部导航 -->
+<div class="top-bar">
+    <div style="display:flex;align-items:center;gap:8px;">
+        <button class="hamburger-btn" onclick="toggleSidebar()" title="导航列表">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="back-btn" onclick="history.back()">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            返回
+        </button>
+    </div>
+    <span class="top-title">🧭 个人主页</span>
+    <div style="width:60px;"></div>
+</div>
+
+<!-- 主内容 -->
+<div class="profile-container">
+
+    <!-- 用户信息 -->
+    <div class="user-card">
+        <div class="user-avatar" id="profileAvatar">D</div>
+        <div style="flex:1;">
+            <div class="user-info-name" id="profileName">用户</div>
+            <div class="user-info-email" id="profileEmail"></div>
+        </div>
+        <button class="profile-login-btn" id="profileLoginBtn" style="display:none;" onclick="location.href='login.html'">
+            <svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            登录
+        </button>
+    </div>
+
+    <!-- 人生蓝图 -->
+    <div class="section-card">
+        <div class="section-header">
+            <span class="section-icon">📜</span>
+            <span class="section-title">人生蓝图</span>
+        </div>
+        <div class="section-body">
+            <div class="vision-text empty" id="visionText" contenteditable="true" 
+                 onfocus="onVisionFocus()" onblur="onVisionBlur()"
+                 oninput="onVisionInput()">双击此处，写下你向往的人生状态…</div>
+            <div class="vision-edit-hint" id="visionHint">双击编辑 · 自动保存</div>
+        </div>
+    </div>
+
+    <!-- 世界法则 -->
+    <div class="section-card">
+        <div class="section-header">
+            <span class="section-icon">⚖️</span>
+            <span class="section-title">我的世界法则</span>
+        </div>
+        <div class="section-body">
+            <div class="laws-list" id="lawsList"></div>
+            <div class="law-add-row">
+                <button class="law-add-btn" onclick="addLawRow()">
+                    <svg width="12" height="12" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    添加法则
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 行星墙 -->
+    <div class="section-card">
+        <div class="section-header">
+            <span class="section-icon">🌟</span>
+            <span class="section-title">行星墙</span>
+        </div>
+        <div class="section-body">
+            <div id="starsContainer"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var STORAGE_KEY = 'ielts_learning_system';
+
+    // ===== 工具函数 =====
+    function esc(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    function getCurrentUser() {
+        if (window.firebaseInitialized && window.auth && window.auth.currentUser) {
+            var user = window.auth.currentUser;
+            var email = user.email || '';
+            var name = email ? email.split('@')[0] : 'me';
+            return { uid: user.uid, name: name, email: email, loggedIn: true };
+        }
+        return { uid: 'me', name: '我', email: '', loggedIn: false };
+    }
+
+    // ===== lifeBlueprint 数据读写 =====
+    function loadLifeBlueprint() {
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return null;
+            var data = JSON.parse(raw);
+            if (!data.lifeBlueprint) {
+                data.lifeBlueprint = {
+                    vision: '',
+                    laws: [],
+                    stars: [],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            }
+            return data.lifeBlueprint;
+        } catch(e) {
+            console.error('[profile] loadLifeBlueprint error:', e);
+            return null;
+        }
+    }
+
+    function saveLifeBlueprint(bp) {
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            var data = JSON.parse(raw);
+            data.lifeBlueprint = bp;
+            data.lifeBlueprint.updatedAt = new Date().toISOString();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch(e) {
+            console.error('[profile] saveLifeBlueprint error:', e);
+        }
+    }
+
+    // ===== 页面初始化 =====
+    var bp = null;
+    var lawRowSeq = 0;
+
+    // ===== 成员颜色（与 dreamspace.html 同步） =====
+    var MEMBER_COLORS = [
+        { name: 'amber',    glow: '#ffd700', dark: '#b8860b' },
+        { name: 'teal',     glow: '#4ec9b0', dark: '#2d8a78' },
+        { name: 'coral',    glow: '#ff7e6b', dark: '#c44a3a' },
+        { name: 'lavender', glow: '#c9a0ff', dark: '#7d5cc4' },
+        { name: 'sky',      glow: '#7ec8ff', dark: '#3a8bc4' },
+        { name: 'lime',     glow: '#a8e063', dark: '#5a8a2e' },
+        { name: 'rose',     glow: '#ff9ec4', dark: '#c4597d' },
+        { name: 'sand',     glow: '#e8c87a', dark: '#a08840' }
+    ];
+
+    function getMemberColorByUid(uid) {
+        var hash = 0;
+        for (var c = 0; c < uid.length; c++) {
+            hash = ((hash << 5) - hash + uid.charCodeAt(c)) | 0;
+        }
+        return MEMBER_COLORS[Math.abs(hash) % MEMBER_COLORS.length];
+    }
+
+    // ===== 行星进化渲染系统 =====
+    // Evolution path:
+    //   V1.0.0–V1.9.9  → 星辰阶段：黄色立体五角星，随版本增大、光晕增强
+    //   V2.0.0+         → 行星阶段：球体，团队成员颜色以一缕缕条纹混合到星球表面
+    //   V3.0.0+         → 星环阶段：行星 + 更丰富的环系统和表面纹理
+    function renderPlanetSvg(star, idx) {
+        var ver = star.planetVersion || '1.0.0';
+        var parts = ver.split('.');
+        var major = parseInt(parts[0]) || 1;
+        var minor = parseInt(parts[1]) || 0;
+        var patch = parseInt(parts[2]) || 0;
+        var uid = 'planet_' + idx + '_' + Math.random().toString(36).substr(2, 5);
+
+        if (major < 2) {
+            // === 星辰阶段：黄色立体五角星 ===
+            var starR = 18 + Math.min(minor * 2 + patch, 12); // 18→30
+            var glowR = starR + 14;
+            var svg = '<svg width="60" height="60" viewBox="0 0 100 100">' +
+                '<defs>' +
+                '<radialGradient id="' + uid + '_grad" cx="40%" cy="35%">' +
+                '<stop offset="0%" stop-color="#fff8dc"/>' +
+                '<stop offset="30%" stop-color="#ffd700"/>' +
+                '<stop offset="80%" stop-color="#daa520"/>' +
+                '<stop offset="100%" stop-color="#8b6914"/>' +
+                '</radialGradient>' +
+                '<radialGradient id="' + uid + '_glow">' +
+                '<stop offset="0%" stop-color="#ffd700" stop-opacity="0.35"/>' +
+                '<stop offset="60%" stop-color="#ffd700" stop-opacity="0.1"/>' +
+                '<stop offset="100%" stop-color="#ffd700" stop-opacity="0"/>' +
+                '</radialGradient>' +
+                '<filter id="' + uid + '_shadow" x="-30%" y="-30%" width="160%" height="160%">' +
+                '<feDropShadow dx="2" dy="3" stdDeviation="2.5" flood-color="#000" flood-opacity="0.4"/>' +
+                '</filter>' +
+                '</defs>' +
+                // glow halo
+                '<circle cx="50" cy="50" r="' + glowR + '" fill="url(#' + uid + '_glow)"/>' +
+                // star with drop shadow
+                '<path d="M50 ' + (50 - starR) +
+                ' L' + (50 + starR * 0.354) + ' ' + (50 - starR * 0.354) +
+                ' L' + (50 + starR * 0.951) + ' ' + (50 - starR * 0.309) +
+                ' L' + (50 + starR * 0.588) + ' ' + (50 + starR * 0.309) +
+                ' L' + (50 + starR * 0.809) + ' ' + (50 + starR * 0.951) +
+                ' L50 ' + (50 + starR * 0.5) +
+                ' L' + (50 - starR * 0.809) + ' ' + (50 + starR * 0.951) +
+                ' L' + (50 - starR * 0.588) + ' ' + (50 + starR * 0.309) +
+                ' L' + (50 - starR * 0.951) + ' ' + (50 - starR * 0.309) +
+                ' L' + (50 - starR * 0.354) + ' ' + (50 - starR * 0.354) +
+                ' Z" fill="url(#' + uid + '_grad)" stroke="#fff8dc" stroke-width="0.4" filter="url(#' + uid + '_shadow)"/>' +
+                // highlight
+                '<ellipse cx="' + (50 - starR * 0.2) + '" cy="' + (50 - starR * 0.3) + '" rx="' + (starR * 0.18) + '" ry="' + (starR * 0.1) + '" fill="#fff" opacity="0.5"/>' +
+                '</svg>';
+            return svg;
+        }
+
+        // === 行星阶段：球体 + 团队颜色条纹 ===
+        var planetR = 20 + Math.min((major - 2) * 3 + minor, 18); // 20→38
+        var glowR = planetR + 12;
+        var ringOpacity = Math.min(0.3 + (major - 1) * 0.08, 0.65);
+
+        // Collect member colors from planetMembers
+        var members = star.planetMembers || {};
+        var memberUids = Object.keys(members);
+        var colorStrands = '';
+
+        // Generate wisp-like color strands on the planet surface
+        // Each member contributes a swirling band of their color
+        for (var mi = 0; mi < memberUids.length; mi++) {
+            var mc = getMemberColorByUid(memberUids[mi]);
+            var pct = members[memberUids[mi]] || 0;
+            if (pct < 1) continue;
+            // Width of the strand proportional to contribution
+            var strandW = Math.max(pct / 100 * planetR * 1.5, 4);
+            // Position: distribute strands across the sphere
+            var cy = 50 - planetR * 0.6 + (mi / Math.max(memberUids.length, 1)) * planetR * 1.2;
+            var cx = 50 - planetR * 0.3 + (mi % 3) * planetR * 0.3;
+
+            // Wavy band path — a curving stripe across the sphere
+            var bandPath = 'M' + (50 - planetR * 0.85) + ' ' + cy +
+                ' Q ' + (cx - strandW * 0.5) + ' ' + (cy - strandW * 0.4) +
+                ' ' + cx + ' ' + cy +
+                ' Q ' + (cx + strandW * 0.5) + ' ' + (cy + strandW * 0.4) +
+                ' ' + (50 + planetR * 0.85) + ' ' + cy;
+
+            colorStrands += '<path d="' + bandPath + '" fill="none" stroke="' + mc.glow + '" stroke-width="' + strandW + '" stroke-linecap="round" opacity="0.55" clip-path="url(#' + uid + '_clip)"/>';
+        }
+
+        // Starlight sparkle dots on surface
+        var sparkles = '';
+        var sparkleCount = Math.min(Math.floor(planetR / 3), 8);
+        // Deterministic seed from planetId
+        var seed = 0;
+        var pid = star.planetId || '';
+        for (var si = 0; si < pid.length; si++) { seed = ((seed << 5) - seed + pid.charCodeAt(si)) | 0; }
+        for (var sp = 0; sp < sparkleCount; sp++) {
+            seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+            var angle = (seed / 0x7fffffff) * Math.PI * 2;
+            seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+            var dist = (seed / 0x7fffffff) * planetR * 0.7;
+            var sx = 50 + Math.cos(angle) * dist;
+            var sy = 50 + Math.sin(angle) * dist;
+            seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+            var sr = 0.8 + (seed / 0x7fffffff) * 1.5;
+            sparkles += '<circle cx="' + sx.toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="' + sr.toFixed(1) + '" fill="#fff" opacity="0.6"/>';
+        }
+
+        // Ring system (V2+ gets thin ring, V3+ gets double ring)
+        var rings = '';
+        if (major >= 2) {
+            rings += '<ellipse cx="50" cy="50" rx="' + (planetR + 10) + '" ry="6" fill="none" stroke="#8299ff" stroke-width="1.2" opacity="' + ringOpacity + '" transform="rotate(-18 50 50)"/>';
+        }
+        if (major >= 3) {
+            rings += '<ellipse cx="50" cy="50" rx="' + (planetR + 16) + '" ry="9" fill="none" stroke="#8299ff" stroke-width="0.8" opacity="' + (ringOpacity * 0.5) + '" transform="rotate(-18 50 50)"/>';
+            rings += '<ellipse cx="50" cy="50" rx="' + (planetR + 6) + '" ry="4" fill="none" stroke="#4ec9b0" stroke-width="0.5" opacity="0.3" transform="rotate(-18 50 50)"/>';
+        }
+
+        var svg = '<svg width="60" height="60" viewBox="0 0 100 100">' +
+            '<defs>' +
+            '<radialGradient id="' + uid + '_base" cx="35%" cy="35%">' +
+            '<stop offset="0%" stop-color="#e3f2ff"/>' +
+            '<stop offset="30%" stop-color="#7ec8ff"/>' +
+            '<stop offset="70%" stop-color="#4a6cff"/>' +
+            '<stop offset="100%" stop-color="#1a2a6c"/>' +
+            '</radialGradient>' +
+            '<radialGradient id="' + uid + '_glow">' +
+            '<stop offset="0%" stop-color="#7ec8ff" stop-opacity="0.3"/>' +
+            '<stop offset="100%" stop-color="#7ec8ff" stop-opacity="0"/>' +
+            '</radialGradient>' +
+            '<clipPath id="' + uid + '_clip">' +
+            '<circle cx="50" cy="50" r="' + planetR + '"/>' +
+            '</clipPath>' +
+            '</defs>' +
+            // glow
+            '<circle cx="50" cy="50" r="' + glowR + '" fill="url(#' + uid + '_glow)"/>' +
+            // rings behind planet
+            rings +
+            // planet base sphere
+            '<circle cx="50" cy="50" r="' + planetR + '" fill="url(#' + uid + '_base)"/>' +
+            // team color strands (clipped to sphere)
+            colorStrands +
+            // starlight sparkles
+            sparkles +
+            // surface highlight
+            '<ellipse cx="' + (50 - planetR * 0.25) + '" cy="' + (50 - planetR * 0.3) + '" rx="' + (planetR * 0.2) + '" ry="' + (planetR * 0.12) + '" fill="#fff" opacity="0.25"/>' +
+            // subtle rim
+            '<circle cx="50" cy="50" r="' + planetR + '" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>' +
+            '</svg>';
+        return svg;
+    }
+
+    function initProfile() {
+        // 初始化 lifeBlueprint
+        bp = loadLifeBlueprint();
+        if (!bp) {
+            bp = { vision: '', laws: [], stars: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+        }
+
+        // 用户信息
+        var user = getCurrentUser();
+        var avatarEl = document.getElementById('profileAvatar');
+        var nameEl = document.getElementById('profileName');
+        var emailEl = document.getElementById('profileEmail');
+        if (user.loggedIn) {
+            avatarEl.textContent = (user.name || 'D').charAt(0).toUpperCase();
+            avatarEl.classList.remove('user-avatar-guest');
+            nameEl.textContent = user.name || '用户';
+            emailEl.textContent = user.email || '';
+            document.getElementById('profileLoginBtn').style.display = 'none';
+        } else {
+            avatarEl.textContent = '我';
+            avatarEl.classList.add('user-avatar-guest');
+            nameEl.textContent = '我';
+            emailEl.textContent = '未登录 · 单机模式';
+            document.getElementById('profileLoginBtn').style.display = 'inline-flex';
+        }
+
+        // 人生蓝图
+        renderVision();
+
+        // 世界法则
+        renderLaws();
+
+        // 行星墙
+        renderStars();
+    }
+
+    // ===== 人生蓝图 =====
+    function renderVision() {
+        var el = document.getElementById('visionText');
+        var hint = document.getElementById('visionHint');
+        if (bp.vision && bp.vision.trim()) {
+            el.textContent = bp.vision;
+            el.classList.remove('empty');
+            hint.textContent = '双击编辑 · 自动保存';
+        } else {
+            el.textContent = '双击此处，写下你向往的人生状态…';
+            el.classList.add('empty');
+        }
+    }
+
+    var visionEditing = false;
+    function onVisionFocus() {
+        var el = document.getElementById('visionText');
+        if (el.classList.contains('empty')) {
+            el.textContent = '';
+            el.classList.remove('empty');
+        }
+        el.classList.add('editing');
+        visionEditing = true;
+    }
+
+    function onVisionBlur() {
+        var el = document.getElementById('visionText');
+        el.classList.remove('editing');
+        var text = el.textContent.trim();
+        bp.vision = text;
+        saveLifeBlueprint(bp);
+        visionEditing = false;
+        if (!text) {
+            el.textContent = '双击此处，写下你向往的人生状态…';
+            el.classList.add('empty');
+        }
+        document.getElementById('visionHint').textContent = '已保存 · 双击编辑';
+    }
+
+    function onVisionInput() {
+        // 实时不保存，blur 时保存
+    }
+
+    // ===== 世界法则 =====
+    function renderLaws() {
+        var container = document.getElementById('lawsList');
+        container.innerHTML = '';
+        if (!bp.laws || bp.laws.length === 0) {
+            // 渲染一个空行供输入
+            addLawRowTo(container, '');
+            return;
+        }
+        for (var i = 0; i < bp.laws.length; i++) {
+            addLawRowTo(container, bp.laws[i]);
+        }
+    }
+
+    function addLawRowTo(container, value) {
+        var rowId = 'lawRow_' + (++lawRowSeq);
+        var row = document.createElement('div');
+        row.className = 'law-row';
+        row.id = rowId;
+        row.innerHTML =
+            '<span class="law-bullet">•</span>' +
+            '<input class="law-input" type="text" placeholder="写下一条法则…" ' +
+            'onkeydown="handleLawKeydown(event, \'' + rowId + '\')">';
+        container.appendChild(row);
+        if (value) row.querySelector('.law-input').value = value;
+        return row;
+    }
+
+    function addLawRow() {
+        var container = document.getElementById('lawsList');
+        // 如果只有一个空行，聚焦它
+        var inputs = container.querySelectorAll('.law-input');
+        if (inputs.length === 1 && !inputs[0].value.trim()) {
+            inputs[0].focus();
+            return;
+        }
+        var newRow = addLawRowTo(container, '');
+        newRow.querySelector('.law-input').focus();
+    }
+
+    function handleLawKeydown(e, rowId) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            var input = e.target;
+            if (!input.value.trim()) return;
+            saveLaws();
+            addLawRow();
+        } else if (e.key === 'Backspace' && e.target.value === '') {
+            // 空行按退格 → 删掉这行
+            e.preventDefault();
+            var row = document.getElementById(rowId);
+            if (!row) return;
+            var container = document.getElementById('lawsList');
+            var inputs = container.querySelectorAll('.law-input');
+            if (inputs.length <= 1) return; // 至少保留一行
+            var idx = -1;
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i] === e.target) { idx = i; break; }
+            }
+            row.remove();
+            saveLaws();
+            // 聚焦上一行末尾
+            var remaining = container.querySelectorAll('.law-input');
+            if (remaining.length > 0 && idx > 0) {
+                var prevInput = remaining[idx - 1];
+                prevInput.focus();
+                var len = prevInput.value.length;
+                if (prevInput.setSelectionRange) {
+                    prevInput.setSelectionRange(len, len);
+                }
+            }
+        }
+    }
+
+    function saveLaws() {
+        var inputs = document.querySelectorAll('#lawsList .law-input');
+        var laws = [];
+        for (var i = 0; i < inputs.length; i++) {
+            var v = inputs[i].value.trim();
+            if (v) laws.push(v);
+        }
+        bp.laws = laws;
+        saveLifeBlueprint(bp);
+    }
+
+    // 定期保存法则（失焦时也保存）
+    document.addEventListener('blur', function(e) {
+        if (e.target && e.target.classList && e.target.classList.contains('law-input')) {
+            saveLaws();
+        }
+    }, true);
+
+    // ===== 行星墙 =====
+    function renderStars() {
+        var container = document.getElementById('starsContainer');
+        var stars = (bp && bp.stars) ? bp.stars : [];
+
+        if (stars.length === 0) {
+            container.innerHTML =
+                '<div class="stars-empty">' +
+                    '<div class="stars-empty-icon">🌌</div>' +
+                    '这里还没有你的行星。去创造空间，把一个想法变成属于你的第一颗星球' +
+                '</div>';
+            return;
+        }
+
+        var html = '<div class="stars-grid">';
+        for (var i = 0; i < stars.length; i++) {
+            var s = stars[i];
+            var ver = s.planetVersion || '1.0.0';
+            var major = parseInt(ver.split('.')[0]) || 1;
+            var stageLabel = major < 2 ? '星辰' : (major >= 3 ? '星环' : '行星');
+            html += '<div class="star-card">' +
+                '<div class="star-card-planet">' + renderPlanetSvg(s, i) + '</div>' +
+                '<div class="star-card-id">' + esc(s.planetId || '—') + '</div>' +
+                '<div class="star-card-name">' + esc(s.creationName || '未命名') + '</div>' +
+                '<div class="star-card-meta">' + esc(s.spaceIcon || '') + ' ' + esc(s.spaceName || '') + '</div>' +
+                '<div class="star-card-pct">建造进度 ' + (s.completionPct || 0) + '%</div>' +
+                '<span class="star-card-version">' + stageLabel + ' v' + esc(ver) + '</span>' +
+            '</div>';
+        }
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    // ===== SW 注册 =====
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').then(function(reg) {
+                reg.addEventListener('updatefound', function() {
+                    var nw = reg.installing;
+                    if (nw) {
+                        nw.addEventListener('statechange', function() {
+                            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                                nw.postMessage({ type: 'SKIP_WAITING' });
+                            }
+                        });
+                    }
+                });
+            }).catch(function(e) { console.log('SW error:', e); });
+        });
+    }
+
+    // ===== 初始化 =====
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initProfile);
+    } else {
+        initProfile();
+    }
+
+    // 页面重新可见时刷新行星数据（从 dreamspace 竣工后返回）
+    window.addEventListener('pageshow', function() {
+        if (bp) {
+            var fresh = loadLifeBlueprint();
+            if (fresh) {
+                bp = fresh;
+                renderStars();
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

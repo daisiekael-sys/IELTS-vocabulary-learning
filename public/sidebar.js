@@ -6,7 +6,11 @@
 
     var sidebarPins = {};
     var sidebarTreeState = {};
+    var sidebarShowAll = {}; // parentKey -> true: show all children; false/undefined: show only pinned
     var sidebarActiveKey = null;
+
+    // 默认所有节点展开
+    var DEFAULT_OPEN = true;
 
     // ---- Utilities ----
     function esc(s) {
@@ -78,12 +82,24 @@
     };
 
     // ---- Toggle tree node expand/collapse ----
+    // Handles two conventions:
+    //   - Default-open nodes (home, modules, dreamspace, spaces): undefined = open
+    //   - Default-closed nodes (creations): undefined = closed
     window.toggleTreeNode = function(key) {
-        sidebarTreeState[key] = !sidebarTreeState[key];
         var el = document.getElementById('treeChildren_' + key);
         var chev = document.getElementById('treeChev_' + key);
-        if (el) el.classList.toggle('open', sidebarTreeState[key]);
-        if (chev) chev.classList.toggle('open', sidebarTreeState[key]);
+        var currentlyOpen = el ? el.classList.contains('open') : false;
+        var newOpen = !currentlyOpen;
+        sidebarTreeState[key] = newOpen;
+        if (el) el.classList.toggle('open', newOpen);
+        if (chev) chev.classList.toggle('open', newOpen);
+    };
+
+    // ---- Toggle show all / only pinned children ----
+    window.toggleShowAll = function(parentKey, ev) {
+        if (ev) ev.stopPropagation();
+        sidebarShowAll[parentKey] = !sidebarShowAll[parentKey];
+        window.renderSidebar();
     };
 
     // ---- Toggle pin ----
@@ -198,6 +214,43 @@
     // ---- Chevron SVG ----
     var CHEVRON_SVG = '<svg width="10" height="10" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>';
 
+    // Helper: is a node open? (default open unless explicitly closed)
+    function isNodeOpen(key, pinned) {
+        if (pinned) return true;
+        return sidebarTreeState[key] !== false; // undefined = open, true = open, false = closed
+    }
+
+    // Helper: should we show all children or only pinned ones?
+    function shouldShowAllChildren(parentKey, childKeys) {
+        // If no pinned children, show all
+        var hasPinned = false;
+        for (var i = 0; i < childKeys.length; i++) {
+            if (sidebarPins[childKeys[i]]) { hasPinned = true; break; }
+        }
+        if (!hasPinned) return true; // no pinned → show all
+        // If explicitly toggled to show all, show all
+        if (sidebarShowAll[parentKey]) return true;
+        // Default: only show pinned
+        return false;
+    }
+
+    // Helper: is child visible under current pin-filtering?
+    function isChildVisible(parentKey, childKey, childKeys) {
+        var showAll = shouldShowAllChildren(parentKey, childKeys);
+        if (showAll) return true;
+        return !!sidebarPins[childKey];
+    }
+
+    // Helper: count pinned and unpinned children
+    function countPinnedChildren(childKeys) {
+        var pinned = 0, unpinned = 0;
+        for (var i = 0; i < childKeys.length; i++) {
+            if (sidebarPins[childKeys[i]]) pinned++;
+            else unpinned++;
+        }
+        return { pinned: pinned, unpinned: unpinned };
+    }
+
     // ---- Render sidebar tree ----
     window.renderSidebar = function() {
         var body = document.getElementById('sidebarBody');
@@ -205,11 +258,11 @@
         var spaces = loadData();
         var html = '';
 
-        // Home node (links to index.html)
+        // Home — top-level header button (not a sibling of modules)
         var homeKey = sidebarKey('home');
         var homePinned = !!sidebarPins[homeKey];
         var homeActive = isIndexPage() && !window.currentSpaceId;
-        html += '<div class="tree-node">';
+        html += '<div class="tree-node tree-home">';
         html += '<div class="tree-row' + (homeActive ? ' active' : '') + '" id="treeRow_' + homeKey + '" onclick="sidebarNavigate(\'home\')">';
         html += '<div class="tree-chevron hidden"></div>';
         html += '<span class="tree-icon">🏠</span>';
@@ -218,10 +271,13 @@
         html += '</div>';
         html += '</div>';
 
-        // Learning modules (only show on index page or as quick links)
+        // Divider
+        html += '<div class="tree-divider"></div>';
+
+        // Learning modules
         var modulesKey = sidebarKey('modules');
         var modulesPinned = !!sidebarPins[modulesKey];
-        var modulesOpen = !!sidebarTreeState[modulesKey] || modulesPinned;
+        var modulesOpen = isNodeOpen(modulesKey, modulesPinned);
         var moduleItems = [
             {url:'ebbinghaus.html', icon:'📖', name:'艾宾浩斯宇宙版'},
             {url:'synonyms.html', icon:'🔄', name:'高频同义替换'},
@@ -237,11 +293,18 @@
         html += pinSvgForKey(modulesKey, modulesPinned);
         html += '</div>';
         html += '<div class="tree-children' + (modulesOpen ? ' open' : '') + '" id="treeChildren_' + modulesKey + '">';
+        // Build module child keys for pin-filtering
+        var moduleChildKeys = [];
+        for (var mci = 0; mci < moduleItems.length; mci++) {
+            moduleChildKeys.push(sidebarKey('module', moduleItems[mci].url));
+        }
+        var modCounts = countPinnedChildren(moduleChildKeys);
         for (var mi = 0; mi < moduleItems.length; mi++) {
             var mod = moduleItems[mi];
             var modKey = sidebarKey('module', mod.url);
             var modPinned = !!sidebarPins[modKey];
             var modActive = window.location.pathname.endsWith(mod.url);
+            if (!isChildVisible(modulesKey, modKey, moduleChildKeys)) continue;
             html += '<div class="tree-node">';
             html += '<div class="tree-row' + (modActive ? ' active' : '') + '" id="treeRow_' + modKey + '" onclick="sidebarNavigate(\'module\',\'' + mod.url + '\')">';
             html += '<div class="tree-chevron hidden"></div>';
@@ -250,138 +313,160 @@
             html += pinSvgForKey(modKey, modPinned);
             html += '</div></div>';
         }
+        // Show toggle if some children are hidden
+        if (modCounts.pinned > 0 && modCounts.unpinned > 0) {
+            var modShowAll = shouldShowAllChildren(modulesKey, moduleChildKeys);
+            html += '<div class="tree-show-all-toggle" onclick="toggleShowAll(\'' + modulesKey + '\',event)">' +
+                (modShowAll ? '▾ 收起' : '▸ 其他' + modCounts.unpinned + '项') + '</div>';
+        }
         html += '</div></div>';
 
-        // Dreamspace entry
+        // Dreamspace — expandable parent node (click text → navigate, click arrow → toggle)
         var dsEntryKey = sidebarKey('dreamspace');
         var dsEntryPinned = !!sidebarPins[dsEntryKey];
         var dsEntryActive = isDreamspacePage() && !window.currentSpaceId;
+        var dsHasChildren = spaces.length > 0;
+        var dsOpen = isNodeOpen(dsEntryKey, dsEntryPinned);
         html += '<div class="tree-node">';
         html += '<div class="tree-row' + (dsEntryActive ? ' active' : '') + '" id="treeRow_' + dsEntryKey + '" onclick="sidebarNavigate(\'module\',\'dreamspace.html\')">';
-        html += '<div class="tree-chevron hidden"></div>';
+        html += '<div class="tree-chevron' + (dsOpen ? ' open' : '') + (dsHasChildren ? '' : ' hidden') + '" id="treeChev_' + dsEntryKey + '" onclick="event.stopPropagation();toggleTreeNode(\'' + dsEntryKey + '\')">' + CHEVRON_SVG + '</div>';
         html += '<span class="tree-icon">🏵️</span>';
         html += '<span class="tree-label">创造空间</span>';
         html += pinSvgForKey(dsEntryKey, dsEntryPinned);
-        html += '</div></div>';
+        html += '</div>';
 
-        // Spaces section (expandable group)
-        if (spaces.length > 0) {
-            var spacesGroupKey = sidebarKey('spacesgroup');
-            var sgPinned = !!sidebarPins[spacesGroupKey];
-            var sgOpen = !!sidebarTreeState[spacesGroupKey] || sgPinned;
+        // Spaces as children of dreamspace
+        if (dsHasChildren) {
+            html += '<div class="tree-children' + (dsOpen ? ' open' : '') + '" id="treeChildren_' + dsEntryKey + '">';
 
-            html += '<div class="tree-node">';
-            html += '<div class="tree-row' + (sidebarActiveKey === spacesGroupKey ? ' active' : '') + '" id="treeRow_' + spacesGroupKey + '" onclick="toggleTreeNode(\'' + spacesGroupKey + '\')">';
-            html += '<div class="tree-chevron' + (sgOpen ? ' open' : '') + '" id="treeChev_' + spacesGroupKey + '">' + CHEVRON_SVG + '</div>';
-            html += '<span class="tree-icon">🌌</span>';
-            html += '<span class="tree-label">我的空间 (' + spaces.length + ')</span>';
-            html += pinSvgForKey(spacesGroupKey, sgPinned);
-            html += '</div>';
-            html += '<div class="tree-children' + (sgOpen ? ' open' : '') + '" id="treeChildren_' + spacesGroupKey + '">';
+            // Build space child keys for pin-filtering
+            var spaceChildKeys = [];
+            for (var sci = 0; sci < spaces.length; sci++) {
+                spaceChildKeys.push(sidebarKey('space', spaces[sci].id));
+            }
+            var spCounts = countPinnedChildren(spaceChildKeys);
 
             for (var si = 0; si < spaces.length; si++) {
                 var sp = spaces[si];
                 var spKey = sidebarKey('space', sp.id);
+                // Pin-filter: skip if not visible
+                if (!isChildVisible(dsEntryKey, spKey, spaceChildKeys)) continue;
                 var spPinned = !!sidebarPins[spKey];
-                var spOpen = !!sidebarTreeState[spKey] || spPinned;
-                var hasChildren = (sp.creations && sp.creations.length > 0) || (sp.laws && sp.laws.length > 0) || (sp.blueprint || sp.vision);
+                var spOpen = isNodeOpen(spKey, spPinned);
+                var spHasCreations = (sp.creations && sp.creations.length > 0);
                 var isActive = (window.currentSpaceId === sp.id);
+                var spIcon = sp.icon || (sp.type === 'project' ? '⚙️' : '🌌');
+                var spTag = sp.type === 'project' ? '项目式' : '主题式';
 
                 html += '<div class="tree-node">';
                 html += '<div class="tree-row' + (isActive ? ' active' : '') + '" id="treeRow_' + spKey + '" onclick="sidebarNavigate(\'space\',\'' + sp.id + '\')">';
-                html += '<div class="tree-chevron' + (spOpen ? ' open' : '') + (hasChildren ? '' : ' hidden') + '" id="treeChev_' + spKey + '" onclick="toggleTreeNode(\'' + spKey + '\')">' + CHEVRON_SVG + '</div>';
-                html += '<span class="tree-icon">' + (sp.type === 'project' ? '⚙️' : '🌌') + '</span>';
+                html += '<div class="tree-chevron' + (spOpen ? ' open' : '') + (spHasCreations ? '' : ' hidden') + '" id="treeChev_' + spKey + '" onclick="event.stopPropagation();toggleTreeNode(\'' + spKey + '\')">' + CHEVRON_SVG + '</div>';
+                html += '<span class="tree-icon">' + spIcon + '</span>';
                 html += '<span class="tree-label">' + esc(sp.name) + '</span>';
+                html += '<span class="tree-tag">' + spTag + '</span>';
                 html += pinSvgForKey(spKey, spPinned);
                 html += '</div>';
 
-                if (hasChildren) {
+                if (spHasCreations) {
                     html += '<div class="tree-children' + (spOpen ? ' open' : '') + '" id="treeChildren_' + spKey + '">';
 
-                    // Blueprint
-                    if (sp.blueprint || sp.vision) {
-                        var bpKey = sidebarKey('blueprint', sp.id);
-                        html += '<div class="tree-node"><div class="tree-row' + (sidebarActiveKey === bpKey ? ' active' : '') + '" id="treeRow_' + bpKey + '" onclick="sidebarNavigate(\'blueprint\',\'' + sp.id + '\')">';
-                        html += '<div class="tree-chevron hidden"></div><span class="tree-icon">🗺️</span><span class="tree-label">蓝图</span>';
-                        html += pinSvgForKey(bpKey, !!sidebarPins[bpKey]);
-                        html += '</div></div>';
-                    }
-
-                    // Laws
-                    if (sp.laws && sp.laws.length > 0) {
-                        var lawsKey = sidebarKey('laws', sp.id);
-                        html += '<div class="tree-node"><div class="tree-row' + (sidebarActiveKey === lawsKey ? ' active' : '') + '" id="treeRow_' + lawsKey + '" onclick="sidebarNavigate(\'laws\',\'' + sp.id + '\')">';
-                        html += '<div class="tree-chevron hidden"></div><span class="tree-icon">📜</span><span class="tree-label">世界法则 (' + sp.laws.length + ')</span>';
-                        html += pinSvgForKey(lawsKey, !!sidebarPins[lawsKey]);
-                        html += '</div></div>';
-                    }
-
-                    // Creations (创造盒子)
                     var creations = sp.creations || [];
-                    var cbKey = sidebarKey('creationbox', sp.id);
-                    var cbPinned = !!sidebarPins[cbKey];
-                    var cbOpen = !!sidebarTreeState[cbKey] || cbPinned;
+                    // Build creation child keys for pin-filtering
+                    var creationChildKeys = [];
+                    for (var cci = 0; cci < creations.length; cci++) {
+                        creationChildKeys.push(sidebarKey('creation', sp.id, cci));
+                    }
+                    var cCounts = countPinnedChildren(creationChildKeys);
 
-                    html += '<div class="tree-node">';
-                    html += '<div class="tree-row' + (sidebarActiveKey === cbKey ? ' active' : '') + '" id="treeRow_' + cbKey + '" onclick="toggleTreeNode(\'' + cbKey + '\')">';
-                    html += '<div class="tree-chevron' + (cbOpen ? ' open' : '') + (creations.length > 0 ? '' : ' hidden') + '" id="treeChev_' + cbKey + '">' + CHEVRON_SVG + '</div>';
-                    html += '<span class="tree-icon">🎁</span><span class="tree-label">创造盒子 (' + creations.length + ')</span>';
-                    html += pinSvgForKey(cbKey, cbPinned);
-                    html += '</div>';
+                    for (var ci = 0; ci < creations.length; ci++) {
+                        var c = creations[ci];
+                        var cKey = sidebarKey('creation', sp.id, ci);
+                        // Pin-filter: skip if not visible
+                        if (!isChildVisible(spKey, cKey, creationChildKeys)) continue;
+                        var cPinned = !!sidebarPins[cKey];
+                        var cOpen = sidebarTreeState[cKey] === true;
+                        var frags = c.fragments || [];
+                        var allTypes = getCreationTypes();
+                        var ct = allTypes[c.type] || {icon:'⭐', label:c.type};
+                        var cDisplayName = c.name || (ct.label || c.type);
 
-                    if (creations.length > 0) {
-                        html += '<div class="tree-children' + (cbOpen ? ' open' : '') + '" id="treeChildren_' + cbKey + '">';
-                        for (var ci = 0; ci < creations.length; ci++) {
-                            var c = creations[ci];
-                            var cKey = sidebarKey('creation', sp.id, ci);
-                            var cPinned = !!sidebarPins[cKey];
-                            var cOpen = !!sidebarTreeState[cKey] || cPinned;
-                            var frags = c.fragments || [];
-                            var allTypes = getCreationTypes();
-                            var ct = allTypes[c.type] || {icon:'⭐', label:c.type};
+                        html += '<div class="tree-node">';
+                        html += '<div class="tree-row' + (sidebarActiveKey === cKey ? ' active' : '') + '" id="treeRow_' + cKey + '" onclick="sidebarNavigate(\'creation\',\'' + sp.id + '\',' + ci + ')">';
+                        html += '<div class="tree-chevron' + (cOpen ? ' open' : '') + (frags.length > 0 ? '' : ' hidden') + '" id="treeChev_' + cKey + '" onclick="event.stopPropagation();toggleTreeNode(\'' + cKey + '\')">' + CHEVRON_SVG + '</div>';
+                        html += '<span class="tree-icon">' + (ct.icon || '⭐') + '</span>';
+                        html += '<span class="tree-label">' + esc(cDisplayName) + '</span>';
+                        html += pinSvgForKey(cKey, cPinned);
+                        html += '</div>';
 
-                            html += '<div class="tree-node">';
-                            html += '<div class="tree-row' + (sidebarActiveKey === cKey ? ' active' : '') + '" id="treeRow_' + cKey + '" onclick="sidebarNavigate(\'creation\',\'' + sp.id + '\',' + ci + ')">';
-                            html += '<div class="tree-chevron' + (cOpen ? ' open' : '') + (frags.length > 0 ? '' : ' hidden') + '" id="treeChev_' + cKey + '" onclick="toggleTreeNode(\'' + cKey + '\')">' + CHEVRON_SVG + '</div>';
-                            html += '<span class="tree-icon">' + (ct.icon || '⭐') + '</span>';
-                            html += '<span class="tree-label">' + esc(c.name || '未命名') + '</span>';
-                            html += pinSvgForKey(cKey, cPinned);
-                            html += '</div>';
+                        if (frags.length > 0) {
+                            html += '<div class="tree-children' + (cOpen ? ' open' : '') + '" id="treeChildren_' + cKey + '">';
+                            // Build fragment child keys for pin-filtering
+                            var fragChildKeys = [];
+                            for (var fci = 0; fci < frags.length; fci++) {
+                                fragChildKeys.push(sidebarKey('fragment', sp.id, ci, fci));
+                            }
+                            var fCounts = countPinnedChildren(fragChildKeys);
 
-                            if (frags.length > 0) {
-                                html += '<div class="tree-children' + (cOpen ? ' open' : '') + '" id="treeChildren_' + cKey + '">';
-                                for (var fi = 0; fi < frags.length; fi++) {
-                                    var f = frags[fi];
-                                    var fKey = sidebarKey('fragment', sp.id, ci, fi);
-                                    var fPinned = !!sidebarPins[fKey];
-                                    var dotColor = f.done ? '#4ec9b0' : (f.assignee ? '#8299ff' : '#5a6480');
-                                    html += '<div class="tree-node">';
-                                    html += '<div class="tree-row' + (sidebarActiveKey === fKey ? ' active' : '') + '" id="treeRow_' + fKey + '" onclick="sidebarNavigate(\'fragment\',\'' + sp.id + '\',' + ci + ',' + fi + ')">';
-                                    html += '<div class="tree-chevron hidden"></div>';
-                                    html += '<span class="tree-icon" style="color:' + dotColor + ';">●</span>';
-                                    html += '<span class="tree-label">' + esc(f.name || ('碎片' + (fi+1))) + '</span>';
-                                    if (f.done) html += '<span style="font-size:0.55rem;color:#4ec9b0;">✓</span>';
-                                    html += pinSvgForKey(fKey, fPinned);
-                                    html += '</div></div>';
+                            for (var fi = 0; fi < frags.length; fi++) {
+                                var f = frags[fi];
+                                var fKey = sidebarKey('fragment', sp.id, ci, fi);
+                                // Pin-filter: skip if not visible
+                                if (!isChildVisible(cKey, fKey, fragChildKeys)) continue;
+                                var fPinned = !!sidebarPins[fKey];
+                                // Use member color for dot when assigned
+                                var dotColor = '#5a6480';
+                                if (f.done) {
+                                    // Done: use assignee color if available, else teal
+                                    if (f.assignee && window.getMemberColor) {
+                                        try { dotColor = window.getMemberColor(sp, f.assignee).glow; } catch(e) { dotColor = '#4ec9b0'; }
+                                    } else { dotColor = '#4ec9b0'; }
+                                } else if (f.assignee) {
+                                    if (window.getMemberColor) {
+                                        try { dotColor = window.getMemberColor(sp, f.assignee).glow; } catch(e) { dotColor = '#8299ff'; }
+                                    } else { dotColor = '#8299ff'; }
                                 }
-                                html += '</div>';
+                                html += '<div class="tree-node">';
+                                html += '<div class="tree-row' + (sidebarActiveKey === fKey ? ' active' : '') + '" id="treeRow_' + fKey + '" onclick="sidebarNavigate(\'fragment\',\'' + sp.id + '\',' + ci + ',' + fi + ')">';
+                                html += '<div class="tree-chevron hidden"></div>';
+                                html += '<span class="tree-icon" style="color:' + dotColor + ';">●</span>';
+                                html += '<span class="tree-label">' + esc(f.name || ('碎片' + (fi+1))) + '</span>';
+                                if (f.done) html += '<span style="font-size:0.55rem;color:' + dotColor + ';">✓</span>';
+                                html += pinSvgForKey(fKey, fPinned);
+                                html += '</div></div>';
+                            }
+                            // Show toggle if some fragments are hidden
+                            if (fCounts.pinned > 0 && fCounts.unpinned > 0) {
+                                var fShowAll = shouldShowAllChildren(cKey, fragChildKeys);
+                                html += '<div class="tree-show-all-toggle" onclick="toggleShowAll(\'' + cKey + '\',event)">' +
+                                    (fShowAll ? '▾ 收起' : '▸ 其他' + fCounts.unpinned + '项') + '</div>';
                             }
                             html += '</div>';
                         }
                         html += '</div>';
                     }
-                    html += '</div>'; // end creationbox
+
+                    // Show toggle if some creations are hidden
+                    if (cCounts.pinned > 0 && cCounts.unpinned > 0) {
+                        var cShowAll = shouldShowAllChildren(spKey, creationChildKeys);
+                        html += '<div class="tree-show-all-toggle" onclick="toggleShowAll(\'' + spKey + '\',event)">' +
+                            (cShowAll ? '▾ 收起' : '▸ 其他' + cCounts.unpinned + '项') + '</div>';
+                    }
 
                     html += '</div>'; // end space children
                 }
                 html += '</div>'; // end space node
             }
-            html += '</div></div>'; // end spaces group
-        }
 
-        if (spaces.length === 0 && isIndexPage()) {
-            // Don't show empty state if on index — spaces are in dreamspace
+            // Show toggle if some spaces are hidden
+            if (spCounts.pinned > 0 && spCounts.unpinned > 0) {
+                var spShowAll = shouldShowAllChildren(dsEntryKey, spaceChildKeys);
+                html += '<div class="tree-show-all-toggle" onclick="toggleShowAll(\'' + dsEntryKey + '\',event)">' +
+                    (spShowAll ? '▾ 收起' : '▸ 其他' + spCounts.unpinned + '项') + '</div>';
+            }
+
+            html += '</div>'; // end dreamspace children
         }
+        html += '</div>'; // end dreamspace node
 
         body.innerHTML = html;
     };
@@ -403,7 +488,7 @@
 
     function updatePagePinBtn() {
         var btn = document.getElementById('pagePinBtn');
-        if (!btn) return;
+        if (!btn) return; // page-pin-btn removed; pin still works via sidebar tree
         var key = getCurrentNavKey();
         if (key && sidebarPins[key]) {
             btn.classList.add('pinned');
