@@ -815,10 +815,6 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
   max-height: 0;
   opacity: 0;
 }
-/* A story paragraph placed before the topic cards still belongs to the full story. */
-.collapsed .story-extra-narrative {
-  display: none;
-}
 .collapsed .story-collapse-bar {
   display: none;
 }
@@ -5098,6 +5094,12 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
         <div class="narrative-para-cn"><p>我改变了对教育的看法——从<mark>学历资质</mark>至上到相信<mark>真正的热情</mark>以及<mark>启发和连接</mark>学生的能力更重要。长期目标是成为<mark>教育创新者</mark>——让教育<mark>个性化且赋能</mark>，帮助学生<mark>发现自己的独特优势</mark>，给他们<mark>方向感</mark>。这来自于<mark>好奇心和勇气的结合</mark>。</p></div>
       </div>
     </div>
+  <div class="narrative-para">
+        <div class="narrative-para-en"><p>One of the most emotionally intense experiences of my life happened when a close friend suddenly stopped responding to my messages. At first I assumed he was busy, but days turned into weeks, and <mark>the silence became deafening</mark>. What shocked me wasn't just the rejection—it was realizing that <mark>such a small act, merely not responding, could trigger genuine fear in me</mark>, someone who prides himself on being rational and stable. This sent me down a rabbit hole of research. I discovered that human relationships function like neural networks: we depend on <mark>consistent feedback loops to maintain connection</mark>, just as neurons require stable neurotransmitter release. When feedback breaks, the system panics—not because of logical threat, but because <mark>uncertainty itself is a stressor</mark>. I suddenly understood the wife ignored by her husband, the child isolated at school, the toddler left unattended by a busy mother. Society runs on reciprocal feedback at every level. <mark>Broken feedback loops create the same biological stress as physical danger</mark>, yet we have no vocabulary to name this pain because there's no "visible" perpetrator. This experience became the seed of my fascination with <mark>how communication systems shape human wellbeing</mark>.</p></div>
+        <div class="narrative-para-toggle" onclick="this.parentElement.classList.toggle('expanded')">中文翻译 <span class="toggle-icon">▶</span></div>
+        <div class="narrative-para-cn"><p>我人生中情绪最强烈的一次经历，是一个亲密的朋友突然不再回复我的消息。起初我以为他只是忙，但几天变成了几周，<mark>沉默变得震耳欲聋</mark>。震惊我的不只是被拒绝——而是意识到<mark>如此微小的行为，仅仅是不回应，就能在我这个自诩理性稳定的人身上触发真实的恐惧</mark>。这让我开始深入研究。我发现人际关系就像神经网络：我们依赖<mark>持续的反馈回路来维持连接</mark>，正如神经元需要稳定的神经递质释放。当反馈断裂，系统就会恐慌——不是因为逻辑上的威胁，而是因为<mark>不确定性本身就是一种压力源</mark>。我瞬间理解了被丈夫无视的妻子、在学校被孤立的孩子、在妈妈忙碌时无人理睬的幼儿。社会在每一个层面上都依赖互惠反馈。<mark>断裂的反馈回路产生的生物压力与物理危险相同</mark>，但我们没有词汇来命名这种痛苦，因为没有"可见"的施害者。这次经历成为我对<mark>沟通系统如何塑造人类福祉</mark>产生迷恋的种子。</p></div>
+      </div>
+
   <div class="story-collapse-bar">
     <button class="story-collapse-link" onclick="var b=this.closest('.overview-story-block')||this.closest('.story-collapse-bar').previousElementSibling;if(b)toggleStoryBlock(b);">
       <span>收起</span>
@@ -5782,21 +5784,17 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
         <div class="narrative-para-cn"><p>我还去了<mark>重庆</mark>——和成都<mark>性格完全不同</mark>。重庆建在山上，城市层层叠叠。你可能觉得自己走在一楼，低头一看<mark>其实在二十层楼高</mark>。夜晚灯光<mark>像发光的3D地图一样叠在一起</mark>。吃了<mark>这辈子最猛的火锅</mark>——重庆的让成都的看起来像微辣。成都平坦闲适，重庆垂直激烈，像<mark>同一枚文化硬币的两面</mark>。到处都是<mark>连锁店和千篇一律的玻璃楼</mark>，很多城市正在失去地方特色——但重庆<mark>不可能的地形逼出了</mark>同质化无法抹去的独特性。</p></div>
       </div>
     
+  </div>
+
   <div class="story-collapse-bar">
   <button class="story-collapse-link" onclick="toggleStoryContent('story1')">
     <span>收起</span>
     <span style="font-size:10px;">&#9650;</span>
   </button>
-</div>
-</div>
-<div id="story1-topics">
+</div><div id="story1-topics">
 
       <!-- Topic 1: Art -->
-            <div class="narrative-para story-extra-narrative">
-        <div class="narrative-para-en"><p>One of the most emotionally intense experiences of my life happened when a close friend suddenly stopped responding to my messages. At first I assumed he was busy, but days turned into weeks, and <mark>the silence became deafening</mark>. What shocked me wasn't just the rejection—it was realizing that <mark>such a small act, merely not responding, could trigger genuine fear in me</mark>, someone who prides himself on being rational and stable. This sent me down a rabbit hole of research. I discovered that human relationships function like neural networks: we depend on <mark>consistent feedback loops to maintain connection</mark>, just as neurons require stable neurotransmitter release. When feedback breaks, the system panics—not because of logical threat, but because <mark>uncertainty itself is a stressor</mark>. I suddenly understood the wife ignored by her husband, the child isolated at school, the toddler left unattended by a busy mother. Society runs on reciprocal feedback at every level. <mark>Broken feedback loops create the same biological stress as physical danger</mark>, yet we have no vocabulary to name this pain because there's no "visible" perpetrator. This experience became the seed of my fascination with <mark>how communication systems shape human wellbeing</mark>.</p></div>
-        <div class="narrative-para-toggle" onclick="this.parentElement.classList.toggle('expanded')">中文翻译 <span class="toggle-icon">▶</span></div>
-        <div class="narrative-para-cn"><p>我人生中情绪最强烈的一次经历，是一个亲密的朋友突然不再回复我的消息。起初我以为他只是忙，但几天变成了几周，<mark>沉默变得震耳欲聋</mark>。震惊我的不只是被拒绝——而是意识到<mark>如此微小的行为，仅仅是不回应，就能在我这个自诩理性稳定的人身上触发真实的恐惧</mark>。这让我开始深入研究。我发现人际关系就像神经网络：我们依赖<mark>持续的反馈回路来维持连接</mark>，正如神经元需要稳定的神经递质释放。当反馈断裂，系统就会恐慌——不是因为逻辑上的威胁，而是因为<mark>不确定性本身就是一种压力源</mark>。我瞬间理解了被丈夫无视的妻子、在学校被孤立的孩子、在妈妈忙碌时无人理睬的幼儿。社会在每一个层面上都依赖互惠反馈。<mark>断裂的反馈回路产生的生物压力与物理危险相同</mark>，但我们没有词汇来命名这种痛苦，因为没有"可见"的施害者。这次经历成为我对<mark>沟通系统如何塑造人类福祉</mark>产生迷恋的种子。</p></div>
-      </div>
+            
 <div class="topic-card" data-keywords="art painting sculpture gallery vr colosseum titanic 艺术 绘画 雕塑 美术馆">
         <div class="topic-header" onclick="toggleCard(this)">
           <div class="topic-title"><span class="topic-tag">Part 1</span>Art / 艺术</div>
@@ -6298,14 +6296,14 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
         </div>
     
     
+  </div>
+
   <div class="story-collapse-bar">
   <button class="story-collapse-link" onclick="toggleStoryContent('story2')">
     <span>收起</span>
     <span style="font-size:10px;">&#9650;</span>
   </button>
-</div>
-</div>
-<div id="story2-topics">
+</div><div id="story2-topics">
 
       <!-- Topic 1: Dream and Ambition -->
       <div class="topic-card" data-keywords="dream ambition childhood goal education master communication 梦想 志向 教育 硕士">
@@ -6930,14 +6928,14 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
         <div class="narrative-para-cn"><p>我没有车——成都的<mark>公共交通网络</mark>很发达，有地铁和公交，所以我靠公共交通出行。不仅<mark>更环保</mark>，还省去停车麻烦。和朋友坐车时，我喜欢<mark>坐副驾观察城市</mark>，这常常<mark>给我的创作带来灵感</mark>。高峰时段交通<mark>非常拥堵</mark>，所以我更愿意坐地铁。我去过叔叔在成都郊外的房子——很宽敞，有大花园和美丽的乡村景色。但<mark>极度偏僻</mark>让我意识到自己是需要<mark>城市便利和连接</mark>的人。网络<mark>极不稳定</mark>，对我的视频剪辑工作是致命问题。虽然<mark>短期拜访的宁静很清新</mark>，但我无法长期住在那里。另一方面，我去过最无聊的地方是<mark>政务大厅</mark>——去办护照续期——灰色墙壁、日光灯、一排排塑料椅，等了两小时办了不到十分钟。那里<mark>令人窒息地单调</mark>，没有商店或咖啡厅来打破单调。作为欣赏<mark>视觉刺激和创意空间</mark>的人，那栋楼纯粹的无生气让我难忘。</p></div>
       </div>
     
+  </div>
+
   <div class="story-collapse-bar">
   <button class="story-collapse-link" onclick="toggleStoryContent('story3')">
     <span>收起</span>
     <span style="font-size:10px;">&#9650;</span>
   </button>
-</div>
-</div>
-<div id="story3-topics">
+</div><div id="story3-topics">
       <!-- Topic: Home/Accommodation -->
       <div class="topic-card" data-keywords="home accommodation flat bedroom apartment 住房 公寓 卧室">
         <div class="topic-header" onclick="toggleCard(this)">
@@ -7676,14 +7674,14 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
         <div class="narrative-para-cn"><p>最近看到一个<mark>名人代言智能手机</mark>的广告——很炫很有说服力，但让我思考名人是否应该在代言的产品有问题时<mark>承担责任</mark>。<mark>影响力伴随着责任</mark>——名人的声誉就是产品的可信度。公司用名人是因为他们<mark>体现了令人向往的特质</mark>，品牌想将其与产品<mark>关联</mark>。这是<mark>情感关联</mark>而非理性评估。说到手机，有一种场合严禁使用——<mark>雅思考试</mark>。我在模考时亲历过：进考场前必须关机放到外面，发现手机<mark>立即取消资格</mark>。出乎意料的是我感到一种<mark>奇特的解放感</mark>——没有查看通知的诱惑，我进入了一种日常生活中很少有的<mark>深度专注</mark>。手机现在被设计成<mark>容易上瘾</mark>的——通知和社交反馈回路利用我们大脑的<mark>奖励系统</mark>。另外，我曾在成都一家酒吧参加过一次<mark>现场音乐演出</mark>，一点都不享受。乐队用<mark>震耳欲聋的音量</mark>演奏摇滚乐——低音在胸腔里震动，半小时后耳朵就耳鸣了。观众很吵，我提前离开了。这让我意识到我更喜欢通过耳机听音乐，可以<mark>自己控制音量和环境</mark>。现场音乐可以很棒，但前提是环境要适合我。</p></div>
       </div>
     
+  </div>
+
   <div class="story-collapse-bar">
   <button class="story-collapse-link" onclick="toggleStoryContent('story4')">
     <span>收起</span>
     <span style="font-size:10px;">&#9650;</span>
   </button>
-</div>
-</div>
-<div id="story4-topics">
+</div><div id="story4-topics">
 
       <!-- Topic: Music -->
       <div class="topic-card" data-keywords="indie pop lo-fi beats decompress headphones film soundtracks 音乐 播放列表">
@@ -8440,14 +8438,14 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
         <div class="narrative-para-cn"><p>想颁布<mark>全面的数字隐私保护法</mark>——专门针对教育数据。<mark>教育科技平台</mark>在收集未成年人数据前必须获得家长同意，公司在学生毕业时必须<mark>删除所有学生数据</mark>。技术发展速度超过立法——需要<mark>基于原则的监管</mark>。想做的短期海外工作是当<mark>媒体工作坊讲师</mark>——教<mark>弱势背景</mark>的青少年电影制作。这恰好位于我两个热情的<mark>交汇点</mark>：编导和教育。引起我注意的当地新闻是<mark>社区教育倡议</mark>——为<mark>外来务工人员家庭</mark>的孩子设立免费课后辅导。小时候痴迷画画——最爱画<mark>精心绘制的城市天际线</mark>。父亲让我<mark>讲述每栋建筑背后的故事</mark>。<mark>当孩子被给予空间和鼓励时，创造力才能真正绽放</mark>。心目中的完美工作是<mark>教育内容创作者</mark>——<mark>弥合媒体制作与教育之间的鸿沟</mark>。这两条路径是<mark>同一幅织锦中互补的两根线</mark>。我希望创作的内容能让<mark>优质教育触手可及</mark>。<mark>持续成长和创作自主权</mark>是令人满足的职业的关键。</p></div>
       </div>
     
+  </div>
+
   <div class="story-collapse-bar">
   <button class="story-collapse-link" onclick="toggleStoryContent('story5')">
     <span>收起</span>
     <span style="font-size:10px;">&#9650;</span>
   </button>
-</div>
-</div>
-<div id="story5-topics">
+</div><div id="story5-topics">
 
       <!-- Topic: Teachers -->
       <div class="topic-card" data-keywords="teacher favorite inspiring 教师最喜欢的 启发">
