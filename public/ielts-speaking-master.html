@@ -9894,8 +9894,6 @@ function toggleStoryContent(sectionId) {
   if (!section) return;
   var isCollapsed = section.classList.toggle('collapsed');
   var expandBar = section.querySelector('.story-expand-bar');
-  var topicArea = document.getElementById(sectionId + '-topics');
-  if (topicArea) topicArea.hidden = isCollapsed;
   if (expandBar) {
     expandBar.classList.toggle('expanded', !isCollapsed);
     var label = expandBar.querySelector('.story-expand-bar-text');
