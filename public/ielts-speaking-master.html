@@ -815,6 +815,10 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
   max-height: 0;
   opacity: 0;
 }
+/* A story paragraph placed before the topic cards still belongs to the full story. */
+.collapsed .story-extra-narrative {
+  display: none;
+}
 .collapsed .story-collapse-bar {
   display: none;
 }
@@ -5788,7 +5792,7 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
 <div id="story1-topics">
 
       <!-- Topic 1: Art -->
-            <div class="narrative-para">
+            <div class="narrative-para story-extra-narrative">
         <div class="narrative-para-en"><p>One of the most emotionally intense experiences of my life happened when a close friend suddenly stopped responding to my messages. At first I assumed he was busy, but days turned into weeks, and <mark>the silence became deafening</mark>. What shocked me wasn't just the rejection—it was realizing that <mark>such a small act, merely not responding, could trigger genuine fear in me</mark>, someone who prides himself on being rational and stable. This sent me down a rabbit hole of research. I discovered that human relationships function like neural networks: we depend on <mark>consistent feedback loops to maintain connection</mark>, just as neurons require stable neurotransmitter release. When feedback breaks, the system panics—not because of logical threat, but because <mark>uncertainty itself is a stressor</mark>. I suddenly understood the wife ignored by her husband, the child isolated at school, the toddler left unattended by a busy mother. Society runs on reciprocal feedback at every level. <mark>Broken feedback loops create the same biological stress as physical danger</mark>, yet we have no vocabulary to name this pain because there's no "visible" perpetrator. This experience became the seed of my fascination with <mark>how communication systems shape human wellbeing</mark>.</p></div>
         <div class="narrative-para-toggle" onclick="this.parentElement.classList.toggle('expanded')">中文翻译 <span class="toggle-icon">▶</span></div>
         <div class="narrative-para-cn"><p>我人生中情绪最强烈的一次经历，是一个亲密的朋友突然不再回复我的消息。起初我以为他只是忙，但几天变成了几周，<mark>沉默变得震耳欲聋</mark>。震惊我的不只是被拒绝——而是意识到<mark>如此微小的行为，仅仅是不回应，就能在我这个自诩理性稳定的人身上触发真实的恐惧</mark>。这让我开始深入研究。我发现人际关系就像神经网络：我们依赖<mark>持续的反馈回路来维持连接</mark>，正如神经元需要稳定的神经递质释放。当反馈断裂，系统就会恐慌——不是因为逻辑上的威胁，而是因为<mark>不确定性本身就是一种压力源</mark>。我瞬间理解了被丈夫无视的妻子、在学校被孤立的孩子、在妈妈忙碌时无人理睬的幼儿。社会在每一个层面上都依赖互惠反馈。<mark>断裂的反馈回路产生的生物压力与物理危险相同</mark>，但我们没有词汇来命名这种痛苦，因为没有"可见"的施害者。这次经历成为我对<mark>沟通系统如何塑造人类福祉</mark>产生迷恋的种子。</p></div>
