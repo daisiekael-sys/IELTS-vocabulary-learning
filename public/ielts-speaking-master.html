@@ -1765,6 +1765,124 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
   }
 }
 
+
+/* ===== Story Prototypes Section ===== */
+.prototype-section { max-width: 800px; }
+
+.proto-cat-header {
+  background: var(--bg-elevated);
+  padding: 14px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 24px 0 0 0;
+  border: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.proto-cat-header:hover { background: var(--bg-secondary); }
+
+.cat-toggle-icon {
+  font-size: 14px;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+.prototype-category.expanded .cat-toggle-icon { transform: rotate(90deg); }
+
+.cat-title-text { font-weight: 600; font-size: 18px; color: var(--text-primary); }
+.cat-count { font-size: 13px; color: var(--text-light); margin-left: auto; }
+
+.proto-cat-body {
+  display: none;
+  padding: 12px 0;
+}
+.prototype-category.expanded .proto-cat-body {
+  display: block;
+}
+
+.prototype-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.prototype-header {
+  padding: 12px 16px;
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.2s;
+}
+.prototype-header:hover { background: var(--bg-secondary); }
+
+.proto-toggle-icon {
+  font-size: 12px;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+.prototype-item.expanded .proto-toggle-icon { transform: rotate(90deg); }
+
+.prototype-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.proto-topics-tag {
+  font-size: 12px;
+  color: var(--text-light);
+  background: var(--bg-elevated);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.prototype-body {
+  padding: 0 16px 16px 16px;
+  display: none;
+}
+.prototype-item.expanded .prototype-body {
+  display: block;
+}
+
+.prototype-en {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+.prototype-en p { margin: 0; }
+
+.prototype-cn {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  padding: 12px 16px;
+  border-radius: 6px;
+  border-left: 3px solid var(--primary);
+}
+.prototype-cn p { margin: 0; }
+
+/* Default: CN always visible in prototype section */
+.prototype-cn { display: block !important; }
+.prototype-cn p { margin: 0; }
+
+.prototype-topics {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-light);
+}
+.pt-label { font-weight: 600; }
+
+/* Story banner for prototypes */
+#story-prototypes .story-banner h2::before { content: ""; }
+
 </style>
 </head>
 
@@ -1794,6 +1912,7 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
     <button class="nav-item" data-section="framework">规律框架</button>
     <button class="nav-item" data-section="vocab-phrases">词汇与语料</button>
     <button class="nav-item" data-section="story-overview">故事总览</button>
+    <button class="nav-item" data-section="story-prototypes">&#128220; 故事原型</button>
     <button class="nav-item" data-section="story1">故事一：成都周末</button>
     <button class="nav-item" data-section="story2">故事二：身边的人与事</button>
     <button class="nav-item" data-section="story3">故事三：从家到城市</button>
@@ -5206,6 +5325,757 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
 </div>
 </div>
 </div>
+</div>
+
+<!-- ==================== Story Prototypes ==================== -->
+<div class="section" id="story-prototypes">
+  <div class="reading-suggestion">
+    <span class="rs-icon">&#128161;</span>
+    <span>
+      <strong>使用说明：</strong>每个原型是一个独立的叙事单元，中英文双语并列，语块已用蓝色高亮。
+      <mark>时间少</mark>：通读原型，记住语块，考试时自由组合。
+      <mark>时间充裕</mark>：去故事区看完整 Part 1/2/3 问答。
+    </span>
+  </div>
+  
+  <div class="story-banner">
+    <h2>&#128220; 故事原型库</h2>
+    <p>所有故事被拆分为独立叙事单元，每个单元是一个最小可复用的"语块包"。</p>
+    <div class="coverage">
+      共 38 个独立原型，覆盖约 100 个雅思口语主题
+    </div>
+  </div>
+
+  <!-- Prototype Categories -->
+  <div class="prototype-section">
+
+    <div class="prototype-category" data-category="核心原型">
+      <h3 class="proto-cat-header" onclick="toggleCategory(this)">
+        <span class="cat-toggle-icon">&#9654;</span>
+        <span class="cat-title-text">&#11088; 核心原型（优先记忆）</span>
+        <span class="cat-count">(10个原型)</span>
+      </h3>
+      <div class="proto-cat-body">
+      <div class="prototype-item" id="proto-core-01">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">堂哥辞职学法律</span>
+          <span class="proto-topics-tag">克服困难成功的人</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I'd like to talk about my cousin, who is someone I deeply admire for his <mark>sheer determination</mark>. He used to work at a bank — a stable, well-paying job that most people would consider ideal. However, he always felt unfulfilled and secretly harbored a passion for law.<br><br>About five years ago, he made the bold decision to resign from the bank and devote himself entirely to preparing for the national judicial examination. This exam is notoriously difficult, with a <mark>pass rate of barely ten percent</mark>. He spent nearly two years studying on his own, often from dawn until midnight, without any formal classroom instruction. There were moments when he doubted himself, especially when close friends questioned whether he was making a reckless mistake.<br><br>But he <mark>persevered against all odds</mark> and passed the exam on his second attempt. Today, he's not only a licensed lawyer but also manages a team at a law firm. His journey taught me that success isn't about having the easiest path — it's about having the courage to pursue what truly matters to you, even when the odds are stacked against you.</p></div>
+          <div class="prototype-cn"><p>我想谈谈我的堂哥，他是我非常敬佩的人，因为他的纯粹毅力。他以前在银行工作——一份稳定、高薪的工作，大多数人都会觉得是理想选择。然而，他总觉得不满足，内心深处一直怀有对法律的热情。<br><br>大约五年前，他做出了一个大胆的决定：从银行辞职，全身心投入备战国家司法考试。这个考试以难度著称，通过率仅百分之十左右。他花了将近两年时间自学，经常从清晨学到深夜，没有任何正式的课堂指导。有时候他会自我怀疑，尤其是亲密的朋友质疑他是否在做一个鲁莽的错误决定时。<br><br>但他排除万难坚持了下来，第二次参加考试时通过了。如今，他不仅是一名执业律师，还在律所管理一个团队。他的经历让我明白，成功不在于走最轻松的路——而在于有勇气追求真正重要的事，即使困难重重。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>克服困难成功的人
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-core-02">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">贝壳形巧克力</span>
+          <span class="proto-topics-tag">Gifts / 礼物</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I cannot clearly remember the most recent gift, but one gift I remember well is <mark>a box of shell-shaped chocolates</mark> from my childhood. I later bought the same kind again, but <mark>it did not taste the same as it did when I was a child</mark>.</p></div>
+          <div class="prototype-cn"><p>我记不清最近一次收到的礼物，但很记得小时候收到过<mark>一盒贝壳形巧克力</mark>。后来我又买过同一种，但<mark>再也没有小时候吃到的味道</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Gifts / 礼物
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-core-03">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">半夜骑共享单车被狗追</span>
+          <span class="proto-topics-tag">自行车/摩托车/汽车旅行</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I'd like to talk about a <mark>night-time bike ride</mark> I took. I was <mark>riding a shared bike from Taikoo Li back to my school in the suburbs</mark>. It was already midnight, and the navigation app directed me through <mark>a long-abandoned residential area</mark>.<br><br>The streetlights were all off. <mark>The buildings had been empty for a long time</mark>. Halfway through, a <mark>fierce dog started chasing me, barking aggressively</mark>. There was not a single person around, only the occasional car passing by. <mark>Every time something passed, or when there was complete silence, I thought I was going to die</mark>.<br><br>I eventually made it back to school safely. After that experience, <mark>all I could think about was gratitude for living in a peaceful country</mark>. That night ride taught me more about fear and gratitude than any comfortable daytime trip ever could.</p></div>
+          <div class="prototype-cn"><p>我想说一次深夜骑行的经历。我当时<mark>从太古里骑共享单车回郊区的学校</mark>。已经半夜了，导航把我导进了<mark>一片荒废很久的住宅区</mark>。<br><br>路灯都不开。<mark>那些楼空了很久</mark>。半路突然有只狗追着我叫。周围一个人也没有，偶尔有车经过。<mark>每次有东西经过，或者完全没有任何东西经过的时候，我都以为自己要死了</mark>。<br><br>我拼命骑。最后终于回到了学校。<mark>到了那一刻，满脑子都是感恩和平国家</mark>。这次骑行让我记住的是那种原始的恐惧，以及安全到达后强烈的庆幸感。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>自行车/摩托车/汽车旅行
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-core-04">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">蔡徐坤Prada粉色三角香水广告</span>
+          <span class="proto-topics-tag">名人广告</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I'd like to talk about <mark>Cai Xukun's advertisement for Prada</mark>. It was for a <mark>pink triangle-shaped perfume</mark>, and honestly, <mark>I only found out about that perfume because of him</mark>.<br><br>I saw the ad on social media. The visual was striking — a bright pink bottle with a triangular design, and the celebrity endorsing it with that signature style. <mark>The celebrity effect was so strong that the product became instantly recognisable</mark>. Before seeing the ad, I had no idea this fragrance existed. After seeing it, I could immediately picture the bottle and associate it with the brand.<br><br>What made this ad memorable was how effectively it connected a celebrity's image to a product. It was not about the scent itself — it was about <mark>the star power making a product unforgettable</mark>. That said, I am aware that celebrity endorsements can be misleading, so I would still research independently before buying.</p></div>
+          <div class="prototype-cn"><p>我想说的是<mark>蔡徐坤的Prada广告</mark>。那是一款<mark>粉色三角形香水</mark>，说实话，<mark>我就是因为他才知道那款香水的</mark>。<br><br>我在社交媒体上看到了这条广告。画面很醒目——粉色三角形瓶身，加上名人以标志性风格代言。<mark>名人效应太强了，产品立刻变得辨识度极高</mark>。在看广告之前，我完全不知道这款香水的存在。看了之后，我立刻就能想象出瓶身并把它和品牌联系起来。<br><br>这条广告让人印象深刻的地方在于它如何有效地把名人形象和产品联系在一起。重点不是香味本身——而是<mark>明星光环让产品令人难忘</mark>。不过我也知道名人代言可能有误导性，所以买之前我还是会自己做研究。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>名人广告
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-core-05">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">Rapper朋友音乐会帮忙化妆</span>
+          <span class="proto-topics-tag">不享受的音乐活动</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I'd like to talk about a music event I attended. <mark>A rapper friend asked me to do his makeup</mark> for a concert he was organizing, with various guest performers.<br><br>I ended up <mark>doing makeup not just for him but for all the guest performers</mark>, so I was backstage helping out and watching the show. The music was loud rap, and honestly <mark>I'm not particularly fond of noisy rap</mark>. Plus, <mark>I had to stand the entire time, which was exhausting</mark>.<br><br>I have to say, <mark>I equally dislike any event that requires standing for a long time</mark>. It is not about the music — it is about physical discomfort. I was happy to help a friend, but I would not choose to attend that kind of event on my own.</p></div>
+          <div class="prototype-cn"><p>我想说一次音乐活动的经历。<mark>一个说唱的朋友托我去给他化妆</mark>，他自己开了场音乐会，还有各种嘉宾。<br><br>结果我<mark>不仅给他化了妆，还给其他嘉宾也都化了</mark>。所以我是在后台帮忙，然后顺便看演出。音乐是很大声的说唱，<mark>说实话我并不是特别喜欢聒噪的rap</mark>。而且<mark>全程都得站着，太累了</mark>。<br><br>我得说，<mark>我平等地不喜欢任何需要一直站着的活动</mark>。这不是音乐的问题——是身体不舒服。我很开心能帮朋友，但我不会自己选择去参加那种活动。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>不享受的音乐活动
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-core-06">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">没有发小</span>
+          <span class="proto-topics-tag">发小 / Childhood friend</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>To be honest, <mark>I do not really have a childhood friend</mark>. When I was young, <mark>I did not have many close friends</mark>. I would play with different groups of kids, but <mark>I kept moving between different circles</mark>, so I never stayed in one group long enough to form a lasting friendship.<br><br>It is not something I feel bad about — it is just how things were. <mark>I was always meeting new people and then naturally drifting apart</mark>. The pattern continued as I grew up, and I have become comfortable with it.<br><br>So if the topic asks about a lifelong friend, my honest answer is <mark>I do not have one, and that is okay</mark>. I value the friendships I have now, even if they started more recently.</p></div>
+          <div class="prototype-cn"><p>说实话，<mark>我没有发小</mark>。小时候<mark>我没什么好朋友</mark>，都是跟不同的人一起玩，然后<mark>不断地换圈子</mark>，从来没有长期待在同一个圈子并建立持久友谊的经历。<br><br>这并不是让我难过的事——只是情况如此。<mark>我总是在认识新的人然后自然疏远</mark>。这个模式一直延续到我长大，我已经习惯了。<br><br>所以如果题目问的是从小到大的朋友，我的真实回答是<mark>我没有，这也没关系</mark>。我珍惜现在的友谊，即使它们开始得比较晚。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>发小 / Childhood friend
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-core-07">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">给年轻语文老师建议</span>
+          <span class="proto-topics-tag">给别人建议 / Giving advice</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>A memorable occasion was when I gave advice to <mark>a young Chinese literature teacher</mark>. I felt that <mark>classes should be more engaging</mark>, especially subjects like literature — <mark>if the teacher just lectures in a monologue, students get tired</mark>. I suggested that the teacher could <mark>have students read aloud more often, or call on students to answer questions</mark>, so that everyone feels more involved. When students <mark>have more interaction, the classroom becomes more vivid</mark>. The teacher actually listened. In the next class there was much more interaction, and I could feel the atmosphere change. What I learned from this is that <mark>sometimes a small adjustment can completely change the atmosphere</mark>.</p></div>
+          <div class="prototype-cn"><p>我曾给<mark>一位年轻的语文老师</mark>提过改进课堂活动的建议。我觉得<mark>课程应该更有趣</mark>，尤其是语文这种课——<mark>如果只是默默地自说自话地讲课，同学们会感到疲惫</mark>。<br><br>我建议老师可以<mark>多让学生朗读，或者多挑同学回答问题</mark>，这样大家的参与感更强。当同学们<mark>有更多互动时，课堂会更生动</mark>。<br><br>老师真的听了这个建议。下一节课多了很多互动，我能感觉到气氛变了。我从中学到的是<mark>有时候一个小的调整就能完全改变氛围</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>给别人建议 / Giving advice
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-core-08">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">学医同学找工作</span>
+          <span class="proto-topics-tag">想从事医疗行业的人</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I'd like to talk about <mark>a classmate who studied medicine</mark>. She chose this path very seriously, but <mark>finding a job in medicine is actually quite difficult</mark> — the competition is incredibly fierce.<br><br>As for whether she wants to continue in this field or whether she can — <mark>it depends</mark>. The reality is that medical careers require years of additional training and specialization, and the job market is oversaturated in many areas.<br><br>What I admire about her is that she went into medicine with genuine dedication, not just for the prestige. She knew it would be hard, but <mark>the intensity of the competition was still a surprise</mark>. Whether she ends up practicing or pivots to a related field, I respect her commitment to healthcare.</p></div>
+          <div class="prototype-cn"><p>我想说的是<mark>一个学医的同学</mark>。她很认真地选择了这条路，但<mark>学医找工作其实并不容易</mark>，竞争太激烈了。<br><br>至于她最终能不能从事这行——<mark>it depends</mark>。就业市场很严峻，很多毕业生竞争有限的岗位。所以即使她努力学习拿到了学位，结果也不是确定的。<br><br>我觉得她的情况很有意思的一点是<mark>选择一条专业道路并不总能直接通向对应的职业</mark>。有时候你为之努力的领域比预想的更复杂，<mark>必须保持灵活</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>想从事医疗行业的人
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-core-09">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">姑姑家</span>
+          <span class="proto-topics-tag">喜欢拜访但不想住的家</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>The home I'd like to talk about is my aunt's house. I love visiting her because <mark>she is gentle and caring, almost like a mother to me</mark>. Whenever I visit, she makes me feel completely at home, and staying with her is genuinely happy.<br><br>However, I would not want to live there long-term. My aunt is <mark>incredibly kind and gives so much of herself to the family</mark>. She constantly takes on burdens for everyone, and over time I realised that <mark>even if I tried to share the load, it would not change the essential problem</mark>. Watching someone I love sacrifice so much, continuously and quietly, made me feel overwhelmed. I felt a kind of helplessness that made me want to step away rather than witness it every day.<br><br>So while I treasure every visit, <mark>I realised I am not someone who can watch a loved one give themselves away like that</mark> for the long term. It is not about the house itself — it is about the emotional weight of seeing a kind person pour herself out for others.</p></div>
+          <div class="prototype-cn"><p>我想说的是我姑姑的家。我很喜欢去拜访她，因为<mark>她很温柔、很会照顾人，像妈妈一样</mark>。每次去她都让我感觉像在自己家一样，住在一起真的很幸福。<br><br>但我不想长期住在那里。姑姑<mark>太善良了，为家庭付出了太多</mark>。她不断承受着各种重担，后来我意识到<mark>就算我分担也改变不了本质问题</mark>。看着自己爱的人如此不断地消耗自己、默默付出，让我感到很崩溃。那种无力感让我想离开，不愿意每天见证这样的场景。<br><br>所以我珍惜每次拜访，但<mark>我意识到自己没法长期看着亲人这样奉献自己</mark>。这不是房子的问题，而是看到善良的人不断为别人倾注自己的情感重量。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>喜欢拜访但不想住的家
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-core-10">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">做蛋糕</span>
+          <span class="proto-topics-tag">收到特殊蛋糕 / Special cake</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I haven't actually received a special cake, but I once <mark>made a special cake for my younger brother</mark>. This year, his summer holiday started quite late. <mark>On the day he came home from Shandong for his summer holiday</mark>, I bought the ingredients and made a Basque cheesecake for him.<br><br>It was my first time making one, but it came out surprisingly well. The top was dark and slightly burnt, while the middle was soft and creamy, almost like the ones sold in cake shops. My mother thought it was a little too sweet, but I liked it, and my brother was very grateful.<br><br>What made it special was that <mark>I made it myself to welcome him home</mark>, and it turned out perfectly on my first try.</p></div>
+          <div class="prototype-cn"><p>我其实没有收到过特殊蛋糕，但我曾经<mark>为弟弟做过一个特别的蛋糕</mark>。今年他的暑假放得比较晚。<mark>他放暑假从山东回家的当天</mark>，我买了食材，给他做了一个巴斯克蛋糕。<br><br>那是我第一次做这种蛋糕，但成品意外地非常成功。表面颜色深、略带焦香，中间柔软绵密，和蛋糕店卖的味道差不多。妈妈觉得有点太甜，但我很喜欢，弟弟也非常感谢我。<br><br>它特别的地方，是<mark>我亲手做它来欢迎弟弟回家</mark>，并且第一次尝试就做得很完美。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>收到特殊蛋糕 / Special cake
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    <div class="prototype-category" data-category="生活日常与环境">
+      <h3 class="proto-cat-header" onclick="toggleCategory(this)">
+        <span class="cat-toggle-icon">&#9654;</span>
+        <span class="cat-title-text">生活日常与环境</span>
+        <span class="cat-count">(15个原型)</span>
+      </h3>
+      <div class="proto-cat-body">
+      <div class="prototype-item" id="proto-001">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">成都周末/大学艺术生活</span>
+          <span class="proto-topics-tag">Art / History / Museum / Friend / A person you enjoy spending time with / Travel / City / Place to visit</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I'm <mark>really into</mark> art, especially painting and sculpture. For me, painting is fascinating because you can see someone's <mark>inner world</mark> through their lines and colors—everyone's palette is <mark>completely different</mark>. I used to visit the Chengdu Art Museum on weekends; it's become my <mark>go-to place</mark> for unwinding. Last time, I tried three VR experiences, including one <mark>set in</mark> the Roman Colosseum and another on the Titanic. It was incredibly <mark>immersive</mark>. Sculpture, for me, <mark>carries the weight of history</mark>—it reminds me that incredibly skilled people actually existed in those eras. <mark>What I love most</mark> is how museums bring history to life. As a kid, history felt like just <mark>memorizing dates and names</mark>, but growing up I realized it's about real people and their stories, which <mark>changed everything</mark>.</p></div>
+          <div class="prototype-cn"><p>我很<mark>喜欢</mark>艺术，尤其是绘画和雕塑。绘画迷人的地方在于你能透过线条和色彩看到一个人的<mark>内心世界</mark>——每个人的调色板都<mark>完全不同</mark>。我大学时周末常去成都美术馆，它已经成了我放松的<mark>首选去处</mark>。上次体验了三个VR项目，包括<mark>设定在</mark>罗马斗兽场和泰坦尼克号的。沉浸感极强。雕塑对我来说<mark>承载着历史的重量</mark>——它提醒我那些时代确实存在过技艺非凡的人。<mark>我最喜欢的</mark>是博物馆让历史活起来的方式。小时候觉得历史就是<mark>背日期和人名</mark>，长大后意识到历史是关于真实的人和他们的故事，这<mark>改变了一切</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Art / History / Museum / Friend / A person you enjoy spending time with / Travel / City / Place to visit
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-002">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">跟着绿灯散步</span>
+          <span class="proto-topics-tag">Walking</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>When I felt stressed in my first two years at university, I would sometimes walk for two or three hours. I would simply <mark>follow the green lights</mark> and see where they took me. After a while, <mark>the traffic noise fades into a soft background hum</mark>, and the walk helps me <mark>clear my head after a long day</mark>. I do not need a destination; <mark>walking gives my thoughts room to settle</mark>.</p></div>
+          <div class="prototype-cn"><p>大学前两年压力很大时，我有时会一口气走两三个小时。我就<mark>跟着绿灯走</mark>，看看它会把我带到哪里。走了一会儿，<mark>车流声会淡成柔和的背景嗡鸣</mark>，散步能帮我<mark>在漫长的一天后清空脑子</mark>。我不需要目的地；<mark>走路会让思绪慢慢安定下来</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Walking
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-003">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">低花费一天/公园休息</span>
+          <span class="proto-topics-tag">Walking / Parks / Quiet Place / Low-cost day / Art / History / Museum / Food / Favorite food</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>My favorite low-cost day is equally simple. I walk for a long time, then <mark>sit in a park surrounded by plants</mark>. If the weather is nice, I may even <mark>doze off for a while in the park</mark>. It costs nothing, but I feel rested afterwards. <mark>The best part is the quiet time outdoors</mark>, not saving money.</p></div>
+          <div class="prototype-cn"><p>我最喜欢的低花费一天也很简单：走很久，再<mark>坐在被植物包围的公园里</mark>。天气好时，我甚至会<mark>在公园里打个盹</mark>。完全不花钱，但之后会觉得很放松。<mark>最好的部分是那段安静的户外时光</mark>，而不是省下了多少钱。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Walking / Parks / Quiet Place / Low-cost day / Art / History / Museum / Food / Favorite food
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-004">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">黄河/河流体验</span>
+          <span class="proto-topics-tag">River / Important river / Friend / A person you enjoy spending time with / Travel / City / Place to visit</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>One important river I have visited is <mark>the Yellow River</mark>. It has supported Chinese civilization, farming, and daily life for a very long time. What I remember personally is the clean wet sand: <mark>if I pressed it hard, it became firm, but if I touched it gently, it felt soft</mark>. That made the river feel like a real place rather than only a name from history books.</p></div>
+          <div class="prototype-cn"><p>我去过的一条重要河流是<mark>黄河</mark>。它长期支持着中华文明、农业和日常生活。我个人记得最清楚的是干净的湿沙：<mark>用力按时会变硬，轻轻摸时又很软</mark>。这让黄河对我而言不只是历史书里的名字，而是一个真实去过的地方。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>River / Important river / Friend / A person you enjoy spending time with / Travel / City / Place to visit
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-005">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">One park I particularly like is Tianfu Art Park</ma...</span>
+          <span class="proto-topics-tag">Walking / Parks / Quiet Place / Low-cost day / Art / History / Museum / Travel / City / Place to visit / Space / Stars / Science</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>One park I particularly like is <mark>Tianfu Art Park</mark>. It has lakes, green open spaces, and art buildings, so people can <mark>walk around the lakes, rest on the grass, take photos, and visit exhibitions</mark>. I like that nature, architecture, and art exist in the same place without needing separate stories.</p></div>
+          <div class="prototype-cn"><p>我特别喜欢的一个公园是<mark>天府艺术公园</mark>。那里有湖、开阔绿地和美术馆建筑，人们可以<mark>沿湖散步、在草地休息、拍照和看展</mark>。自然、建筑和艺术都在同一个地方，因此不需要为这些题目再背几套故事。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Walking / Parks / Quiet Place / Low-cost day / Art / History / Museum / Travel / City / Place to visit / Space / Stars / Science
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-006">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">I like many kinds of food</span>
+          <span class="proto-topics-tag">Food / Favorite food</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I like many kinds of food. One strong memory is <mark>shrimp balls covered in a tasty sauce</mark> at a University of Sheffield event in the Ritz-Carlton. I also enjoy food from other cultures, especially Thai food. I avoid food that is <mark>too oily or extremely spicy</mark>, because heavy flavours can cover the taste of the ingredients.</p></div>
+          <div class="prototype-cn"><p>我喜欢很多种食物。一段鲜明记忆是在丽思卡尔顿参加谢菲尔德大学活动时，吃到<mark>裹着美味酱汁的虾球</mark>。我也喜欢其他文化的食物，尤其是泰餐。我不喜欢<mark>过于油腻或特别辣的食物</mark>，因为太重的味道会盖住食材本身。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Food / Favorite food
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-007">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">I once took <mark>a family trip to Fuzhou</mark>, a coast...</span>
+          <span class="proto-topics-tag">Food / Favorite food / Friend / A person you enjoy spending time with / Travel / City / Place to visit</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I once took <mark>a family trip to Fuzhou</mark>, a coastal city in southern China. As someone from the dry north, the humid air, green mountains and sea <mark>felt completely new to me</mark>. My favorite photo shows <mark>clouds resting halfway up the mountains</mark>, <mark>with the sea behind them</mark>. We also had <mark>fresh seafood by the sea</mark>. That trip made me want to see more places where mountains meet the coast.</p></div>
+          <div class="prototype-cn"><p>我去过<mark>福州的家庭旅行</mark>，它是中国南方的一座沿海城市。作为在干燥北方长大的人，湿润的空气、绿色的山和大海都<mark>让我觉得很新鲜</mark>。我最喜欢的一张照片里，<mark>云停在半山腰</mark>，<mark>身后就是大海</mark>。我们还吃了<mark>在海边吃到的新鲜海鲜</mark>。那次旅行让我想去看更多山海相连的地方。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Food / Favorite food / Friend / A person you enjoy spending time with / Travel / City / Place to visit
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-008">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">跨文化外出/带外国志愿者逛小吃</span>
+          <span class="proto-topics-tag">Walking / Food / Favorite food</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I once organized <mark>a small cross-cultural outing</mark> for four foreign volunteers. We walked through nearby streets, tried fried shrimp and other snacks, and talked about local food and culture. It was simple, but <mark>everyone enjoyed the food and felt included</mark>. Mr Liu later helped me settle the group expenses, and the four volunteers came over to shake his hand and thank him.</p></div>
+          <div class="prototype-cn"><p>我曾为四位外国志愿者组织过<mark>一次小型跨文化外出</mark>。我们在附近街上逛，吃炸虾等小吃，也聊当地食物和文化。活动很简单，但<mark>大家都吃得开心，也有参与感</mark>。后来刘老师帮我结清集体费用，四位志愿者还主动过来和他握手道谢。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Walking / Food / Favorite food
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-009">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">The most memorable film I have watched recently is ...</span>
+          <span class="proto-topics-tag">Art / History / Museum / Food / Favorite food / Friend / A person you enjoy spending time with / Websites / Apps / Technology / Films / TV / Cinema</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>The most memorable film I have watched recently is <mark>“Welcome to Dragon Restaurant”</mark>. It follows a Chinese man who helps run a restaurant in a small country in the Middle East. At first, <mark>he sees himself as an outsider to the war</mark>. The restaurant survives partly because of help from a local friend and an American soldier, but both of them are later killed. When an officer asks him, <mark>“Do you still remember that this war has nothing to do with you?”</mark>, he can no longer pretend to be only a spectator.<br><br>What shocked me most was that <mark>every small chance of hope is destroyed by violence</mark>. Even a child is misled into thinking that becoming a human bomb is heroic. The film does not give the audience an easy happy ending. Instead, it makes us feel that <mark>no one is completely outside a human tragedy</mark>.</p></div>
+          <div class="prototype-cn"><p>最近最让我记得住的电影是<mark>《欢迎来龙餐馆》</mark>。它讲的是一个中国人在中东一个小国参与经营餐馆。起初，<mark>他觉得自己只是战争之外的人</mark>。餐馆能维持，一部分靠一位当地朋友和一名美国士兵的帮助，但两人后来都死了。当一位军官问他：<mark>“你还记得你和这场战争没有关系吗？”</mark>时，他再也不能假装自己只是看客。<br><br>最震撼我的是，<mark>每一点可能的希望都会被暴力毁掉</mark>。甚至有一个孩子被蒙蔽，以为成为人肉炸弹是英雄行为。电影没有给观众一个轻松的大团圆，而是让我们感到，<mark>没有人能完全置身于人类的苦难之外</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Art / History / Museum / Food / Favorite food / Friend / A person you enjoy spending time with / Websites / Apps / Technology / Films / TV / Cinema
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-010">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">My long-term dream is to build a platform that help...</span>
+          <span class="proto-topics-tag">Art / History / Museum</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>My long-term dream is to <mark>build a platform that helps people turn ideas into reality</mark>. People could find suitable partners, collaborate and receive support from a wider network. My idea of perfect work is to keep improving that platform and <mark>work every day for a dream I genuinely believe in</mark>.</p></div>
+          <div class="prototype-cn"><p>我的长期梦想是<mark>搭建一个帮助人们把想法真正变成现实的平台</mark>。人们可以找到合适的伙伴、展开协作，并获得更大网络的支持。我心目中的完美工作，就是不断改进这个平台，<mark>每天为自己真正相信的梦想工作</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Art / History / Museum
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-011">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">During my university years, I was fascinated by how Cheng...</span>
+          <span class="proto-topics-tag">Art / History / Museum / Films / TV / Cinema / Travel / City / Place to visit</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>During my university years, I was fascinated by how Chengdu's architecture is a <mark>mix of traditional and modern architecture</mark>—each building <mark>reflects the city's history</mark> and has its own <mark>character and stories</mark>. The <mark>landmark tower</mark> at IFS <mark>perfectly captures Chengdu's spirit</mark>. The Contemporary Art Gallery is a <mark>sleek glass-and-steel structure</mark> that <mark>cleverly blends modern aesthetics</mark>—it <mark>interacts with natural light</mark> and has an <mark>industrial yet refined aesthetic</mark>, even equipped with <mark>rainwater harvesting and solar panels</mark>. Taikoo Li is a <mark>beautifully designed open-air complex</mark> with <mark>narrow alleyways and open courtyards</mark>, an <mark>indie film bookstore</mark>. Modern design <mark>maximizes land use efficiency</mark> and serves as <mark>symbols of economic progress</mark>, but buildings with <mark>cultural and historical significance</mark> are what truly <mark>preserves heritage while accommodating growth</mark>.</p></div>
+          <div class="prototype-cn"><p>成都的建筑是<mark>传统与现代的混合</mark>——每栋建筑<mark>反映着城市的历史</mark>，有自己的<mark>性格和故事</mark>。IFS的<mark>地标塔</mark><mark>完美捕捉了成都的精神</mark>。当代艺术馆是<mark>玻璃钢结构</mark>，<mark>巧妙融合了现代美学</mark>——<mark>与自然光互动</mark>，有<mark>工业却精致的审美</mark>，还配了<mark>雨水收集和太阳能板</mark>。太古里是<mark>设计精美的开放式综合体</mark>——<mark>窄巷和开放庭院</mark>、<mark>独立书店</mark>。现代设计<mark>最大化土地利用效率</mark>，是<mark>经济进步的象征</mark>，但有<mark>文化和历史意义</mark>的建筑才真正<mark>在城市发展中保留遗产</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Art / History / Museum / Films / TV / Cinema / Travel / City / Place to visit
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-012">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">跟着绿灯散步</span>
+          <span class="proto-topics-tag">Walking / Parks / Quiet Place / Low-cost day / Transport / Public transport / Websites / Apps / Technology</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>My main hobby is <mark>walking without a fixed destination</mark>. It began in childhood, when I discovered that going outside could <mark>help me calm down and slowly feel better</mark> during unhappy moments. Since then, I have enjoyed walking whether I am upset or already happy. I may follow the green lights, sit in a park, or pass through a busy area. Hobbies help us <mark>decompress</mark> and remember that <mark>life is not only about being productive all the time</mark>.</p></div>
+          <div class="prototype-cn"><p>我最主要的爱好是<mark>没有固定目的地地散步</mark>。这个习惯始于小时候：在一些不开心的时刻，我发现到室外走走能<mark>让我恢复平静，心情也慢慢变好</mark>。从那以后，无论难过还是本来就很开心，我都喜欢散步。我可能跟着绿灯走、在公园坐一会儿，或者穿过热闹的街区。爱好帮助我们<mark>减压</mark>，也提醒我们<mark>生活并不只是时刻保持高效</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Walking / Parks / Quiet Place / Low-cost day / Transport / Public transport / Websites / Apps / Technology
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-013">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">I have recently graduated after four years at university ...</span>
+          <span class="proto-topics-tag">Art / History / Museum / English learning / IELTS / Long-term goal</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I have recently graduated after four years at university in Chengdu, and I am now <mark>preparing for IELTS</mark> while staying in Hangzhou. My long-term dream is to <mark>build a platform that helps people turn ideas into reality</mark>. People could find suitable partners, collaborate, and receive support from a wider network. My perfect work would be to keep developing that platform and <mark>work for a dream I genuinely believe in</mark>.</p></div>
+          <div class="prototype-cn"><p>我刚刚结束在成都四年的大学生活，现在暂住杭州<mark>准备雅思</mark>。我的长期梦想是<mark>搭建一个帮助人们把想法真正变成现实的平台</mark>。人们可以在上面找到合适的伙伴、展开协作，并获得更大网络的支持。我幻想中的完美工作，就是不断建设这个平台，<mark>每天为自己真正相信的梦想工作</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Art / History / Museum / English learning / IELTS / Long-term goal
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-014">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">My imagined platform is also how I picture my perfect wor...</span>
+          <span class="proto-topics-tag">Art / History / Museum / English learning / IELTS / Long-term goal</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>My imagined platform is also how I picture my perfect work. It would help people <mark>find the right partners and turn their ideas into reality</mark> through collaboration and a wider support network. Building it would require me to understand people, connect useful resources and <mark>keep learning while solving real problems</mark>. I can begin with small projects and gradually learn what truly helps cooperation.</p></div>
+          <div class="prototype-cn"><p>我幻想中的平台，也是我心目中完美工作的样子。它通过协作和更大的支持网络，帮助人们<mark>找到合适的伙伴，把想法真正变成现实</mark>。建设它需要我理解人、连接有用资源，并<mark>在解决真实问题的过程中不断学习</mark>。我可以先从小项目开始，逐渐了解什么真的能帮助人们合作。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Art / History / Museum / English learning / IELTS / Long-term goal
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-015">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">I have never worked abroad because I have only just gradu...</span>
+          <span class="proto-topics-tag">Art / History / Museum / English learning / IELTS / Long-term goal / Space / Stars / Science</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I have never worked abroad because I have only just graduated. If I had the chance, I would try <mark>a short project in an English-speaking environment</mark> to experience real international cooperation. For a new environmental law, I would support stronger protection for natural sites such as Baima Fairy Cave, where litter can damage formations that took a very long time to develop. The child who makes me think of drawing is a girl in <mark>Littlest Pet Shop</mark>; she once made me ask for canvases, but <mark>the fear of spoiling a clean canvas stopped me before I started</mark>.</p></div>
+          <div class="prototype-cn"><p>我没有海外工作过，因为才刚毕业。如果有机会，我愿意尝试<mark>英语环境中的短期项目</mark>，体验真实的国际合作。对于新环保法律，我会支持加强保护白马仙洞这样的自然景点，因为垃圾会破坏经过漫长时间形成的自然结构。让我想到画画的孩子，是<mark>《至Q宠物屋》</mark>里的一个女孩；她曾让我向妈妈要画布，但<mark>害怕破坏干净画布，让我还没开始就停下了</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Art / History / Museum / English learning / IELTS / Long-term goal / Space / Stars / Science
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    <div class="prototype-category" data-category="身边的人与事">
+      <h3 class="proto-cat-header" onclick="toggleCategory(this)">
+        <span class="cat-toggle-icon">&#9654;</span>
+        <span class="cat-title-text">身边的人与事</span>
+        <span class="cat-count">(9个原型)</span>
+      </h3>
+      <div class="proto-cat-body">
+      <div class="prototype-item" id="proto-016">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">I am currently staying in a hotel in Hangzhou</span>
+          <span class="proto-topics-tag">Walking / Food / Favorite food / Music / Singing / Headphones</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I am currently staying in a hotel in Hangzhou. From the window, I can see <mark>an ordinary street and several buildings</mark>, with cars and people passing by. I have not lived there long enough to notice long-term changes, so I mainly see <mark>small daily changes in traffic and weather</mark>.</p></div>
+          <div class="prototype-cn"><p>我目前住在杭州的一家旅店。从窗外能看到<mark>一条普通街道和几栋楼</mark>，车辆和行人会经过。我住的时间还不够长，看不出长期变化，因此主要看到<mark>车流和天气每天的小变化</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Walking / Food / Favorite food / Music / Singing / Headphones
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-017">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">朋友Anti/艺术系朋友</span>
+          <span class="proto-topics-tag">Art / History / Museum / Food / Favorite food / Friend / A person you enjoy spending time with / English learning / IELTS / Long-term goal</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>One friend I really enjoy spending time with is Anti. We met <mark>at an English tutoring class</mark>, and we <mark>got along almost immediately</mark>. She studies art and design, so she has a very creative eye. She often <mark>hums while she is drawing</mark>, and she can <mark>turn a simple idea into something beautiful</mark>. She is also better at planning than I am. When I want to go out instead of studying, she says, “Fine, but <mark>let's come back in thirty minutes and finish the next thing</mark>.”</p></div>
+          <div class="prototype-cn"><p>我很喜欢和朋友 Anti 一起待着。我们<mark>在英语补习班认识</mark>，而且<mark>几乎马上就合得来</mark>。她学艺术和设计，所以很有创意。她常常<mark>一边画画一边哼歌</mark>，还能<mark>把一个简单的想法变成好看的作品</mark>。她也比我擅长规划。我想出去玩、不想学习时，她会说：“可以，但<mark>三十分钟后回来把下一件事完成</mark>。”</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Art / History / Museum / Food / Favorite food / Friend / A person you enjoy spending time with / English learning / IELTS / Long-term goal
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-018">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">给弟弟做蛋糕</span>
+          <span class="proto-topics-tag">Food / Favorite food</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>One childhood memory is a <mark>traffic jam</mark> that lasted nearly two hours. <mark>What made it unforgettable was</mark> that we got out and went to a nearby KFC, which felt like a strange adventure to me as a child. Another food memory is a Basque cheesecake I made <mark>on the day my younger brother came home from Shandong for his summer holiday</mark>. It was my first time making one, and it turned out very well. <mark>I made it myself to welcome him home</mark>.</p></div>
+          <div class="prototype-cn"><p>童年记忆里有一次<mark>堵车</mark>，持续了将近两个小时。<mark>让它难忘的是</mark>我们下车去了附近的肯德基，对小时候的我来说像一场奇怪的冒险。另一段食物记忆，是<mark>弟弟放暑假从山东回家的当天</mark>，我给他做了巴斯克蛋糕。那是我第一次做这种蛋糕，成品却很好。我<mark>亲手做它来欢迎弟弟回家</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Food / Favorite food
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-019">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">Rapper朋友音乐会</span>
+          <span class="proto-topics-tag">Parks / Quiet Place / Low-cost day / Food / Favorite food / Websites / Apps / Technology / Travel / City / Place to visit</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I became more serious about the environment after visiting <mark>Baima Fairy Cave in Shanxi</mark>. It is a natural cave with rock formations that <mark>took thousands of years to form</mark>. Even though it was hot outside, I needed a jacket inside. The cave was beautiful, but I saw <mark>plastic bottles and food wrappers among the rocks</mark>. It made me think that <mark>small everyday choices can protect a place or damage it</mark>. My grandmother has taught me the same thing: she reuses bags and <mark>uses rice-washing water to water her plants</mark>.</p></div>
+          <div class="prototype-cn"><p>去过<mark>山西白马仙洞</mark>后，我开始更认真地看待环境问题。那里是天然洞穴，岩石<mark>形成了几千年</mark>。外面很热，洞里却要穿外套。洞穴很美，但我看到<mark>塑料瓶和食品包装散落在岩石之间</mark>。这让我觉得，<mark>日常的小选择既能保护一个地方，也能伤害它</mark>。我奶奶也一直这样教我：她重复使用袋子，还会<mark>用淘米水浇植物</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Parks / Quiet Place / Low-cost day / Food / Favorite food / Websites / Apps / Technology / Travel / City / Place to visit
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-020">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">My grandmother is also someone who protects nature<...</span>
+          <span class="proto-topics-tag">Parks / Quiet Place / Low-cost day / Food / Favorite food / Friend / A person you enjoy spending time with</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>My grandmother is also someone who <mark>protects nature</mark>—she's been running a vegetable plot for nearly fifteen years, <mark>living in harmony with nature</mark>. She composts kitchen waste and uses no chemical pesticides. What moved me most is how she <mark>extends her care to the small creatures</mark> around her—leaving shallow dishes of water for stray cats and birds in summer. She always reminds me: <mark>nature doesn't need our management — it needs our respect</mark>. Individual actions <mark>create the cultural foundation</mark> for broader change.</p></div>
+          <div class="prototype-cn"><p>奶奶也是一个<mark>爱护自然</mark>的人——她经营菜地近十五年，<mark>与自然和谐共处</mark>。她把厨余垃圾堆肥，不用化学农药。最让我感动的是她<mark>把关爱延伸到周围的小动物</mark>身上——夏天放浅碟子给流浪猫和鸟类饮水。她总是提醒我：<mark>自然不需要我们的管理——它需要的是我们的尊重</mark>。个人行为为更大范围的变革<mark>奠定了文化基础</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Parks / Quiet Place / Low-cost day / Food / Favorite food / Friend / A person you enjoy spending time with
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-021">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">I learned a painful shopping lesson at boarding school</span>
+          <span class="proto-topics-tag">Friend / A person you enjoy spending time with / English learning / IELTS / Long-term goal</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I learned a painful shopping lesson at boarding school. I asked a classmate to buy some snacks for me, but she chose the expensive versions and the total came to 150 yuan. My weekly allowance was only about 100 yuan, so I had to call my dad, feeling embarrassed. Since then, I have learned to <mark>be very specific when I ask someone to buy something for me</mark>.</p></div>
+          <div class="prototype-cn"><p>我在寄宿学校学到过一次很痛的购物教训。我让一个同学帮我买零食，但她选了很贵的版本，总价150元，而我一周的零花钱只有100元左右。我只能尴尬地打电话给爸爸。那以后我学会了，<mark>请别人帮忙买东西时一定要说得很具体</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Friend / A person you enjoy spending time with / English learning / IELTS / Long-term goal
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-022">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">One evening at boarding school, the electricity suddenly ...</span>
+          <span class="proto-topics-tag">Daily routine / Morning / Evening / Websites / Apps / Technology / Travel / City / Place to visit</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>One evening at boarding school, the electricity suddenly went out. We were excited because we thought the evening class would be cancelled. Then the teacher came in with candles. In the end, the light was too dim, so the school sent us back to the dorm early. <mark>We tried hard not to look too pleased</mark>, but everyone was secretly happy.</p></div>
+          <div class="prototype-cn"><p>寄宿学校有一天晚上突然停电。我们很高兴，以为晚自习取消了。然后老师带着蜡烛走进来。最后光线太暗，学校怕伤眼睛，就让我们提前回宿舍。<mark>我们拼命不让自己看起来太开心</mark>，但大家心里都在高兴。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Daily routine / Morning / Evening / Websites / Apps / Technology / Travel / City / Place to visit
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-023">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">The recent film I remember best is Welcome to the D...</span>
+          <span class="proto-topics-tag">Food / Favorite food / Friend / A person you enjoy spending time with / Websites / Apps / Technology / Films / TV / Cinema</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>The recent film I remember best is <mark>Welcome to the Dragon Restaurant</mark>. It follows Chinese people who initially believe a war in a small country has nothing to do with them. After friends from both sides die, that distance disappears. The film repeatedly lets a little hope appear and then shows how easily war destroys it. It made me feel that <mark>there are no truly lucky moments in war</mark> and that ordinary observers are <mark>not separate from human suffering</mark>.</p></div>
+          <div class="prototype-cn"><p>我最近最能记住的电影是<mark>《欢迎来龙餐馆》</mark>。故事里的中国人起初认为，小国家里的战争与自己无关；但来自战争双方的朋友相继死去后，这种旁观距离消失了。电影一次次让一点希望出现，又让人看到战争多么轻易地将它摧毁。它让我感到，<mark>战争中没有真正幸运的时刻</mark>，普通旁观者也<mark>无法与人类的苦难完全分开</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Food / Favorite food / Friend / A person you enjoy spending time with / Websites / Apps / Technology / Films / TV / Cinema
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-024">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">朋友Anti/艺术系朋友</span>
+          <span class="proto-topics-tag">Friend / A person you enjoy spending time with / Music / Singing / Headphones</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>Anti is a friend I met at a language class. We <mark>got along almost immediately</mark>, and we often laugh at the same small details because we have <mark>a shared sense of humor</mark>. Another important person in my family is my cousin. He left a bank job, studied law by himself and succeeded on his second attempt. His experience shows that people can <mark>change the direction of their lives</mark> through persistence.</p></div>
+          <div class="prototype-cn"><p>Anti 是我在语言培训班认识的朋友。我们<mark>几乎马上就合得来</mark>，也常常因为注意到同样的小细节而一起笑，因为我们有<mark>相近的笑点</mark>。家里另一个重要的人是我表哥。他离开银行工作，自学法律，并在第二次考试中成功。他的经历说明，只要坚持，人可以<mark>改变自己的人生方向</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Friend / A person you enjoy spending time with / Music / Singing / Headphones
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    <div class="prototype-category" data-category="数字时代与科技">
+      <h3 class="proto-cat-header" onclick="toggleCategory(this)">
+        <span class="cat-toggle-icon">&#9654;</span>
+        <span class="cat-title-text">数字时代与科技</span>
+        <span class="cat-count">(3个原型)</span>
+      </h3>
+      <div class="proto-cat-body">
+      <div class="prototype-item" id="proto-025">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">自制雅思网站</span>
+          <span class="proto-topics-tag">Friend / A person you enjoy spending time with / English learning / IELTS / Long-term goal / Websites / Apps / Technology / Films / TV / Cinema / Clothes / Clothing</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I use <mark>WeChat and Xiaohongshu</mark> daily—keeping in touch with friends, checking recommendations, and following IELTS accounts. But I try not to <mark>scroll mindlessly</mark> for hours. I watch videos on <mark>Bilibili</mark> and practice IELTS with <mark>BBC Learning English</mark>. Recently, with AI’s help, I made <mark>my own IELTS study website</mark>. Its functions and layout fit the way I study, so I use it a lot while preparing. For apps and websites, <mark>it is not really an either-or choice</mark>: a website can be added to a phone’s home screen and opened just like an app. Apps are often handier because phones are portable and the design fits a small screen. I do not wear a watch because <mark>I dislike anything tight around my wrist</mark>. I usually check the exact time on a screen, so to me a watch is <mark>more of an accessory than a tool</mark>. I type a lot because typing is a main way to express myself online. When ideas arrive quickly, I can <mark>cut, paste, and reorder my sentences</mark> until they make sense. I hardly handwrite now, though it may help with <mark>a second round of memory</mark>.</p></div>
+          <div class="prototype-cn"><p>每天用<mark>微信和小红书</mark>——和朋友保持联系、查推荐、关注雅思账号。但尽量不<mark>无脑刷</mark>几个小时。在<mark>B站</mark>看视频，用<mark>BBC Learning English</mark>练雅思。最近，在 AI 的帮助下，我做了<mark>自己的雅思学习网站</mark>。功能和排列方式更贴合我的学习方式，所以备考时我经常使用。至于 App 和网站，<mark>并不真的是二选一</mark>：网站也能加到手机主屏幕上，像 App 一样随时打开。App 常常更方便，是因为手机便携、设计也适合小屏幕。我不戴手表，是因为<mark>不喜欢手腕上有紧的东西</mark>。我通常看屏幕上已经显示好的准确时间，所以对我来说手表<mark>更像装饰，而不是工具</mark>。我经常打字，因为打字是网络时代重要的表达方式。想法来得快时，我可以<mark>剪切、粘贴并调整句子顺序</mark>，直到表达清楚。现在我几乎不手写，不过手写可能有助于<mark>第二次记忆</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Friend / A person you enjoy spending time with / English learning / IELTS / Long-term goal / Websites / Apps / Technology / Films / TV / Cinema / Clothes / Clothing
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-026">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">Star Walk 2/天文观测</span>
+          <span class="proto-topics-tag">Walking / Websites / Apps / Technology / Space / Stars / Science</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>Science interests me most when I can <mark>see an idea clearly</mark>. That is why I like <mark>Star Walk 2</mark>. I can point my phone at the sky and identify stars or planets above me. It makes space feel <mark>less distant and easier to understand</mark>. The same app also answers questions about apps, science, outer space and stars, so I only need to remember one real example.</p></div>
+          <div class="prototype-cn"><p>当我能<mark>清楚地看见一个概念</mark>时，科学最能吸引我。这就是我喜欢 <mark>Star Walk 2</mark> 的原因。把手机对准天空，就能辨认头顶的星星或行星。它让外太空显得<mark>没那么遥远，也更容易理解</mark>。同一个真实例子可以回答 App、科学、外太空和星星，不需要再背四套故事。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Walking / Websites / Apps / Technology / Space / Stars / Science
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-027">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">耳机音乐/音乐品味</span>
+          <span class="proto-topics-tag">Transport / Public transport / Websites / Apps / Technology / Music / Singing / Headphones / Space / Stars / Science</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I choose music <mark>according to the state I am in</mark>. I may listen to K-pop when I want more energy, but now I choose gentle music such as lo-fi more often because I need <mark>calm space to think or rest</mark>. I am quiet in public and normally <mark>listen with headphones</mark>. When I am alone, I may <mark>hum softly once in a while</mark>, but I do not really sing.</p></div>
+          <div class="prototype-cn"><p>我会<mark>根据当下的状态选择音乐</mark>。想要更多能量时可能听 K-pop，不过现在更多会选 lo-fi 这类温和的音乐，因为我需要<mark>安静下来思考或休息</mark>。我在公共场合很安静，通常会<mark>戴耳机听</mark>。一个人时偶尔会<mark>轻轻哼一下</mark>，但并不是真的唱歌。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Transport / Public transport / Websites / Apps / Technology / Music / Singing / Headphones / Space / Stars / Science
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    <div class="prototype-category" data-category="成长之路与选择">
+      <h3 class="proto-cat-header" onclick="toggleCategory(this)">
+        <span class="cat-toggle-icon">&#9654;</span>
+        <span class="cat-title-text">成长之路与选择</span>
+        <span class="cat-count">(7个原型)</span>
+      </h3>
+      <div class="proto-cat-body">
+      <div class="prototype-item" id="proto-028">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">雅思备考/英语学习动机</span>
+          <span class="proto-topics-tag">Art / History / Museum / Food / Favorite food / English learning / IELTS / Long-term goal / Music / Singing / Headphones / Space / Stars / Science</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>While preparing for IELTS, I started <mark>breaking articles into useful phrase chunks</mark> instead of memorizing isolated words. I treat the chunks like Lego pieces and combine them when I speak. While using AI, I also noticed the power of <mark>meaningful context and repeated exposure</mark>: some words became familiar almost without trying. The strongest reason to learn is <mark>the desire to express yourself</mark> in a field or relationship that truly matters to you.</p></div>
+          <div class="prototype-cn"><p>备考雅思时，我不再背零散单词，而是开始<mark>把文章拆成实用的完整语块</mark>。我把它们当作乐高积木，开口时再进行组合。使用 AI 的过程中，我也感受到<mark>有意义的语境和反复接触</mark>的力量：有些词几乎不用刻意背就熟悉了。最强的学习动力，是在真正在意的领域或关系里产生<mark>表达自己的渴望</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Art / History / Museum / Food / Favorite food / English learning / IELTS / Long-term goal / Music / Singing / Headphones / Space / Stars / Science
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-029">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">At the moment, I am staying in a small hotel in Han...</span>
+          <span class="proto-topics-tag">Walking / English learning / IELTS / Long-term goal / Transport / Public transport / Travel / City / Place to visit</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>At the moment, I am <mark>staying in a small hotel in Hangzhou</mark> while preparing for IELTS. The window looks onto <mark>an ordinary street and several buildings</mark>. I have only recently arrived, so I am still getting to know the city and the area. For now, I mainly value the convenient transport and daily services around me.</p></div>
+          <div class="prototype-cn"><p>目前我在杭州备考雅思，<mark>暂时住在一家小旅店</mark>。窗外是<mark>普通的街道和几栋楼</mark>。我刚来不久，还在逐渐认识这座城市和周边区域。目前我主要看重附近交通和日常服务的便利。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Walking / English learning / IELTS / Long-term goal / Transport / Public transport / Travel / City / Place to visit
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-030">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">家庭作息/不用闹钟</span>
+          <span class="proto-topics-tag">English learning / IELTS / Long-term goal / Daily routine / Morning / Evening</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>My routine is flexible: I <mark>sleep when I naturally feel tired and wake up without an alarm</mark>. Recently, I have focused mainly on IELTS. I care about cleanliness, but <mark>I do not care much about strict order</mark>. Clean objects can move and settle naturally, because new combinations sometimes give me ideas. However, <mark>I deal with dirt and rubbish quickly</mark>. When I cook, I often group the ingredients I find and <mark>decide what to make by instinct</mark>.</p></div>
+          <div class="prototype-cn"><p>我的作息很灵活：<mark>困意自然出现时睡觉，然后不用闹钟自然醒</mark>。最近主要专注于雅思。我在意干净，但<mark>不太在意严格秩序</mark>。干净的物品可以自然流转和放置，因为新的组合有时会给我灵感；不过<mark>脏东西和垃圾会及时处理</mark>。做饭时，我常把遇到的食材凭感觉分组，再<mark>凭直觉决定怎么做</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>English learning / IELTS / Long-term goal / Daily routine / Morning / Evening
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-031">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">公共交通偏好</span>
+          <span class="proto-topics-tag">Food / Favorite food / English learning / IELTS / Long-term goal / Transport / Public transport</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I once bought a <mark>snack order</mark>. The clerk recommended a <mark>higher-end model</mark>, and I decided to <mark>stretch my budget</mark> to nearly 6,000 yuan. <mark>Investing in quality pays off</mark>—it significantly improved my video projects. The local news was the <mark>opening of a new subway line</mark>—elderly residents had been <mark>advocating for better transport links</mark> for over a decade. The <mark>practical impact</mark> resonates with me—it also helps <mark>reduce carbon emissions</mark>. During Spring Festival, my family has <mark>traditional Sichuan hotpot</mark>. What makes it special is <mark>the ritual of gathering around the table</mark>. The numbing-spicy flavor is something I <mark>strongly associate with home</mark>. I'm learning to <mark>recreate a taste of home</mark> overseas. Food is a <mark>powerful cultural symbol</mark> that <mark>reinforces identity</mark>.</p></div>
+          <div class="prototype-cn"><p>我有一次买零食超出了预算。我让同学帮我买零食，但她选了很贵的版本，总价150元，而我一周的零花钱只有100元左右。我只能<mark>打电话给爸爸解释</mark>。那以后我学会了，请别人帮忙买东西时一定要说得很具体。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Food / Favorite food / English learning / IELTS / Long-term goal / Transport / Public transport
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-032">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">When I was a child, I stumbled upon a book called &quot;...</span>
+          <span class="proto-topics-tag">Food / Favorite food</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>When I was a child, I stumbled upon a book called <mark>"Illustrated Economics"</mark> in my parents' bookshelf. I didn't even know what economics meant back then, but it <mark>completely rewired how I see the world</mark>. The book taught me that economics isn't about calculating limited resources; it's a discipline of <mark>imagination</mark>. This concept of <mark>"having versus having more"</mark> rather than "having versus having nothing" <mark>raised my baseline for how I use time and energy</mark>. Before that framework, every moment felt like a draining choice between doing something and doing nothing. But once I understood opportunity cost, each moment became a choice between <mark>creating value and creating even more value</mark>—both options lead to growth, and either way, I win. It was like <mark>upgrading the operating system of my decision-making</mark> at age eight. My grandmother is <mark>passionate about growing vegetables</mark> on her balcony—tomatoes, green onions, and <mark>fresh herbs like cilantro</mark>. It <mark>keeps her physically active</mark>. What she loves most is <mark>the satisfaction of nurturing something from seed to harvest</mark>—<mark>a sense of self-sufficiency</mark>. The process itself is <mark>therapeutic and stress-relieving</mark>.</p></div>
+          <div class="prototype-cn"><p>小时候我在父母书架上偶然发现了一本叫<mark>《图解经济学》</mark>的书。那时候我甚至不知道经济学是什么意思，但它<mark>彻底重构了我看世界的方式</mark>。这本书告诉我经济学不是计算有限资源，而是<mark>想象力</mark>的学科。<mark>"有与有更多"</mark>而非"有与没有"的概念，<mark>提高了我使用时间和精力的基准线</mark>。在那个框架之前，每一刻都像在做某事和什么都不做之间的消耗性选择。但一旦理解了机会成本，每一刻都变成了在<mark>创造价值和创造更多价值</mark>之间的选择——两条路都通向成长，不管怎样我都赢。这就像在我八岁时<mark>升级了决策的操作系统</mark>。我奶奶<mark>热衷于种菜</mark>——番茄、小葱和<mark>香菜等新鲜香草</mark>。这让她<mark>保持身体活跃</mark>。她最爱的是<mark>从种子到收获的培育满足感</mark>——<mark>自给自足的满足感</mark>。过程本身也<mark>疗愈和解压</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Food / Favorite food
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-033">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">雅思备考/英语学习动机</span>
+          <span class="proto-topics-tag">Art / History / Museum / English learning / IELTS / Long-term goal / Websites / Apps / Technology / Music / Singing / Headphones</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>After graduation, I decided to spend this period focusing on IELTS and building my own learning website. The site lets me arrange materials in a way that suits me, especially by turning sentences into <mark>longer reusable phrase chunks</mark>. They work <mark>like Lego pieces</mark>: I can combine familiar parts instead of searching for every word separately.</p></div>
+          <div class="prototype-cn"><p>毕业后，我决定先把这段时间用于备考雅思，并制作自己的学习网站。网站可以按照更适合我的方式排列材料，尤其是把句子整理成<mark>更长、可重复使用的语块</mark>。它们<mark>像乐高积木一样</mark>：我可以组合熟悉的部分，而不用每次都逐个寻找词汇。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Art / History / Museum / English learning / IELTS / Long-term goal / Websites / Apps / Technology / Music / Singing / Headphones
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-034">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">家庭作息/不用闹钟</span>
+          <span class="proto-topics-tag">Art / History / Museum / Food / Favorite food / English learning / IELTS / Long-term goal / Daily routine / Morning / Evening / Websites / Apps / Technology / Space / Stars / Science</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>I do not force myself into a fixed sleep schedule. I sleep when tired and prefer to wake naturally, although I enjoy the feeling of an early start when it happens by itself. Recently, I eat whatever simple combination is available and then work on IELTS. My favourite time is evening, when <mark>I can focus without much interruption</mark>.</p></div>
+          <div class="prototype-cn"><p>我不会强迫自己遵守固定睡眠时间。困了就睡，更喜欢自然醒；如果自然早醒，我也很喜欢早起的感觉。最近醒来后会吃些随意组合的简单食物，然后准备雅思。我最喜欢傍晚，那时<mark>可以少受打扰地专注</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Art / History / Museum / Food / Favorite food / English learning / IELTS / Long-term goal / Daily routine / Morning / Evening / Websites / Apps / Technology / Space / Stars / Science
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    <div class="prototype-category" data-category="其他">
+      <h3 class="proto-cat-header" onclick="toggleCategory(this)">
+        <span class="cat-toggle-icon">&#9654;</span>
+        <span class="cat-title-text">其他</span>
+        <span class="cat-count">(4个原型)</span>
+      </h3>
+      <div class="proto-cat-body">
+      <div class="prototype-item" id="proto-035">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">One book that influenced me is Illustrated Economic...</span>
+          <span class="proto-topics-tag">雅思口语通用</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>One book that influenced me is <mark>Illustrated Economics</mark>. I found it on my parents' bookshelf when I was young. The pictures made difficult ideas easier to follow, and the book introduced me to opportunity cost. It showed me that reading can <mark>give me a new way to understand everyday choices</mark>, even when I do not understand every page at first.</p></div>
+          <div class="prototype-cn"><p>一本影响过我的书是<mark>《图解经济学》</mark>。小时候我在父母的书架上发现了它，图画让困难概念更容易理解，这本书也让我第一次接触机会成本。它让我看到，即使一开始没有读懂每一页，阅读仍能<mark>给我一种理解日常选择的新方式</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>雅思口语通用
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-036">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">衣服/服装风格</span>
+          <span class="proto-topics-tag">Clothes / Clothing</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>My clothes have not changed much because my mother has usually made the final decision. She cares mainly about comfort, while I hope to have <mark>more freedom to choose what I like</mark> after I earn my own money. As a compromise, we normally choose <mark>safe, comfortable casual clothes</mark> together. We prefer physical shops because trying clothes on once is easier than dealing with online returns.</p></div>
+          <div class="prototype-cn"><p>我的穿衣风格没有太大变化，因为过去通常由妈妈作最终决定。她主要关注舒适，而我希望以后自己赚钱后能<mark>更自由地选择喜欢的衣服</mark>。作为妥协，我们一般共同选择<mark>安全、舒适的休闲款</mark>。我们更喜欢实体店，因为一次试好比处理网购退换更省事。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>Clothes / Clothing
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-037">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">When I was a child, I found a book called Illustrat...</span>
+          <span class="proto-topics-tag">雅思口语通用</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>When I was a child, I found a book called <mark>Illustrated Economics</mark>. It used pictures and simple examples, so ideas that sounded difficult became much easier to understand. It helped me see that choices are often not between having something and having nothing, but between <mark>one useful option and another useful option</mark>. That book had <mark>an important influence on how I make decisions</mark>.</p></div>
+          <div class="prototype-cn"><p>小时候我看到过一本<mark>《图解经济学》</mark>。它用图画和简单例子解释概念，所以原本听起来很难的内容变得容易理解。它让我看到，很多选择并不是“拥有”和“一无所有”之间的选择，而是<mark>一个有用选项和另一个有用选项</mark>之间的选择。这本书<mark>对我的决策方式产生了重要影响</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>雅思口语通用
+          </div>
+        </div>
+      </div>
+      <div class="prototype-item" id="proto-038">
+        <div class="prototype-header" onclick="togglePrototype(this)">
+          <span class="proto-toggle-icon">&#9654;</span>
+          <span class="prototype-title">跨文化外出/带外国志愿者逛小吃</span>
+          <span class="proto-topics-tag">雅思口语通用</span>
+        </div>
+        <div class="prototype-body">
+          <div class="prototype-en"><p>During a volunteer programme at a rural school, I invited four foreign volunteers to go into town. We tried fried shrimp and other snacks, and I showed them some local culture. Afterwards, Mr Liu <mark>helped me settle the group expenses</mark>. I told the volunteers he had paid for us, and all four came over to shake his hand and thank him. His practical help <mark>made the activity easier for everyone</mark>.</p></div>
+          <div class="prototype-cn"><p>在一次乡村学校志愿活动中，我邀请四位外国志愿者一起去街上。我们吃了炸虾等小吃，我也带他们了解了一些当地文化。结束后，刘老师<mark>帮我结清了集体费用</mark>。我告诉志愿者们是他为大家付了钱，四个人都主动过来和他握手道谢。他实际而及时的帮助<mark>让整个活动对所有人都更顺利</mark>。</p></div>
+          <div class="prototype-topics">
+            <span class="pt-label">可覆盖主题：</span>雅思口语通用
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="section" id="story1">
@@ -9642,6 +10512,22 @@ document.querySelectorAll('.tab-btn').forEach(function(btn) {
       p.classList.toggle('active', p.id === tabId);
     });
   });
+});
+
+
+// ===== Story Prototype Toggle Functions =====
+function toggleCategory(header) {
+  var cat = header.parentElement;
+  cat.classList.toggle('expanded');
+}
+function togglePrototype(header) {
+  var item = header.parentElement;
+  item.classList.toggle('expanded');
+}
+// Expand first category by default
+document.addEventListener('DOMContentLoaded', function() {
+  var firstCat = document.querySelector('.prototype-category');
+  if (firstCat) firstCat.classList.add('expanded');
 });
 
 </script>
