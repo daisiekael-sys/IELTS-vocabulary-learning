@@ -10116,6 +10116,12 @@ function toggleStoryBlock(block) {
       var text = btn.querySelector('.toggle-text');
       if (text) text.textContent = isExpanded ? '收起故事' : '打开完整故事';
     }
+    // When expanding the story block, auto-open all CN translations
+    if (isExpanded) {
+      block.querySelectorAll('.narrative-para').forEach(function(p) {
+        p.classList.add('expanded');
+      });
+    }
   }
 }
 
@@ -10141,6 +10147,10 @@ function expandAllStories() {
       var text = btn.querySelector('.toggle-text');
       if (text) text.textContent = '收起故事';
     }
+    // Auto-open all CN translations
+    block.querySelectorAll('.narrative-para').forEach(function(p) {
+      p.classList.add('expanded');
+    });
   });
 }
 
@@ -10252,6 +10262,12 @@ function toggleStoryContent(sectionId) {
     expandBar.classList.toggle('expanded', !isCollapsed);
     var label = expandBar.querySelector('.story-expand-bar-text');
     if (label) label.textContent = isCollapsed ? '打开完整故事' : '收起完整故事';
+  }
+  // When expanding the story, auto-open all CN translations
+  if (!isCollapsed) {
+    section.querySelectorAll('.narrative-para').forEach(function(p) {
+      p.classList.add('expanded');
+    });
   }
 }
 
