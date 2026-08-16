@@ -2106,6 +2106,67 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
   .memory-status { width: 100%; }
 }
 
+/* ===== Phrase Bank: fixed bilingual word list, never collapsible ===== */
+#phrase-bank .phrase-group {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  margin: 0 0 24px;
+}
+#phrase-bank .phrase-group-title {
+  cursor: default;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--primary-light);
+  border-radius: 0;
+  padding: 14px 0 8px;
+}
+#phrase-bank .phrase-group-title:hover { background: transparent; }
+#phrase-bank .phrase-group-title .cat-toggle-icon { display: none; }
+#phrase-bank .phrase-group-body {
+  display: block !important;
+  padding: 10px 0 0;
+}
+#phrase-bank .phrase-table,
+#phrase-bank .phrase-table tbody { display: block; width: 100%; }
+#phrase-bank .phrase-table thead { display: none; }
+#phrase-bank .phrase-table tbody tr {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin: 8px 0;
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+#phrase-bank .phrase-table tbody td {
+  min-width: 0;
+  padding: 10px 13px;
+  border: 0;
+  font-size: 14px;
+  line-height: 1.65;
+}
+#phrase-bank .phrase-table tbody td:first-child {
+  width: auto;
+  border-right: 1px solid var(--border);
+  color: var(--text);
+}
+#phrase-bank .phrase-table tbody td::before {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .6px;
+}
+#phrase-bank .phrase-table tbody td:first-child::before { content: 'ENGLISH'; }
+#phrase-bank .phrase-table tbody td:nth-child(2)::before { content: '中文'; }
+@media (max-width: 640px) {
+  #phrase-bank .phrase-table tbody tr { grid-template-columns: 1fr; }
+  #phrase-bank .phrase-table tbody td:first-child { border-right: 0; border-bottom: 1px solid var(--border); }
+}
+
 </style>
 </head>
 
@@ -11315,6 +11376,11 @@ function addStoryPositionLabels() {
 }
 
 function installBilingualMemoryControls() {
+  document.querySelectorAll('#phrase-bank .phrase-group, #phrase-bank .phrase-group-title').forEach(function(node) {
+    if (node.classList.contains('phrase-group')) node.classList.add('expanded');
+    if (node.classList.contains('phrase-group-title')) { node.removeAttribute('onclick'); node.setAttribute('aria-expanded', 'true'); }
+  });
+
   document.querySelectorAll('.narrative-para').forEach(function(para) {
     var en = para.querySelector('.narrative-para-en'); var cn = para.querySelector('.narrative-para-cn');
     if (en && cn) createMemoryToolbar(para, en, pairMemoryConfig(para, en));
