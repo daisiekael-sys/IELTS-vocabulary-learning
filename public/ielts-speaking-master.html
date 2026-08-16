@@ -477,13 +477,34 @@ body {
   font-size: 14px; color: var(--text);
   margin-bottom: 8px; font-style: italic;
 }
+.qa-bilingual {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
 .qa-answer {
+  flex: 1;
+  min-width: 280px;
   font-size: 15px; color: var(--text);
-  line-height: 1.8; margin-bottom: 6px;
+  line-height: 1.8;
+  padding: 14px 16px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
 }
 .qa-translation {
+  flex: 1;
+  min-width: 280px;
   font-size: 13px; color: var(--text-light); line-height: 1.7;
+  padding: 14px 16px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
 }
+/* Hide states for QA bilingual */
+.qa-bilingual.en-hidden .qa-answer { display: none; }
+.qa-bilingual.cn-hidden .qa-translation { display: none; }
 
 /* ===== Cue Card ===== */
 .cue-card {
@@ -1905,6 +1926,10 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
 .prototype-body {
   padding: 0 16px 16px 16px;
   display: none;
+  /* parent-child indent */
+  margin-left: 16px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
 }
 .prototype-item.expanded .prototype-body {
   display: block;
@@ -1914,7 +1939,12 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
   font-size: 15px;
   line-height: 1.8;
   color: var(--text-primary);
-  margin-bottom: 12px;
+  flex: 1;
+  min-width: 280px;
+  padding: 14px 16px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
 }
 .prototype-en p { margin: 0; }
 
@@ -1922,16 +1952,58 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
   font-size: 14px;
   line-height: 1.8;
   color: var(--text-secondary);
-  background: var(--bg-elevated);
-  padding: 12px 16px;
-  border-radius: 6px;
-  border-left: 3px solid var(--primary);
+  flex: 1;
+  min-width: 280px;
+  padding: 14px 16px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
 }
 .prototype-cn p { margin: 0; }
 
+/* Dual-column layout for prototype bilingual content */
+.prototype-bilingual {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.prototype-bilingual.en-hidden .prototype-en { display: none; }
+.prototype-bilingual.cn-hidden .prototype-cn { display: none; }
+
+/* Language toggle controls (shared with narrative-para) */
+.prototype-controls {
+  width: 100%;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+  order: -1;
+}
+.prototype-controls .lang-toggle {
+  font-size: 11px;
+  padding: 3px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.prototype-controls .lang-toggle:hover {
+  background: var(--hover);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.prototype-controls .lang-toggle.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
 /* Default: CN always visible in prototype section */
-.prototype-cn { display: block !important; }
-.prototype-cn p { margin: 0; }
+.prototype-cn { display: block; }
 
 .prototype-topics {
   margin-top: 10px;
@@ -11058,6 +11130,7 @@ document.addEventListener('DOMContentLoaded', syncStoryLayers);
 
 // ===== Narrative Language Toggle Injection =====
 function injectNarrativeLangControls() {
+  // 1. Story overview: .narrative-para
   document.querySelectorAll('.narrative-para').forEach(function(para) {
     if (para.querySelector('.narrative-para-controls')) return;
     var en = para.querySelector('.narrative-para-en');
@@ -11070,18 +11143,62 @@ function injectNarrativeLangControls() {
       '<span class="lang-toggle active" data-lang="cn" onclick="toggleLang(this)" title="显示中文">中</span>';
     para.insertBefore(controls, para.firstChild);
   });
+
+  // 2. Story prototypes: .prototype-body
+  document.querySelectorAll('.prototype-body').forEach(function(body) {
+    if (body.querySelector('.prototype-controls')) return;
+    var en = body.querySelector('.prototype-en');
+    var cn = body.querySelector('.prototype-cn');
+    if (!en || !cn) return;
+    // Wrap en and cn in a bilingual container
+    var wrapper = document.createElement('div');
+    wrapper.className = 'prototype-bilingual';
+    en.parentNode.insertBefore(wrapper, en);
+    wrapper.appendChild(en);
+    wrapper.appendChild(cn);
+    // Insert controls before the wrapper
+    var controls = document.createElement('div');
+    controls.className = 'prototype-controls';
+    controls.innerHTML =
+      '<span class="lang-toggle active" data-lang="en" onclick="toggleLang(this)" title="显示英文">EN</span>' +
+      '<span class="lang-toggle active" data-lang="cn" onclick="toggleLang(this)" title="显示中文">中</span>';
+    wrapper.parentNode.insertBefore(controls, wrapper);
+  });
+
+  // 3. Topic cards: .qa-block
+  document.querySelectorAll('.qa-block').forEach(function(block) {
+    if (block.querySelector('.narrative-para-controls')) return;
+    var en = block.querySelector('.qa-answer');
+    var cn = block.querySelector('.qa-translation');
+    if (!en || !cn) return;
+    // Wrap answer and translation in a bilingual container
+    var wrapper = document.createElement('div');
+    wrapper.className = 'qa-bilingual';
+    en.parentNode.insertBefore(wrapper, en);
+    wrapper.appendChild(en);
+    wrapper.appendChild(cn);
+    // Insert controls before the wrapper
+    var controls = document.createElement('div');
+    controls.className = 'narrative-para-controls';
+    controls.innerHTML =
+      '<span class="lang-toggle active" data-lang="en" onclick="toggleLang(this)" title="显示英文">EN</span>' +
+      '<span class="lang-toggle active" data-lang="cn" onclick="toggleLang(this)" title="显示中文">中</span>';
+    wrapper.parentNode.insertBefore(controls, wrapper);
+  });
 }
+
 function toggleLang(btn) {
-  var para = btn.closest('.narrative-para');
-  if (!para) return;
+  var container = btn.closest('.narrative-para, .prototype-bilingual, .qa-bilingual');
+  if (!container) return;
   var lang = btn.getAttribute('data-lang');
   var isActive = btn.classList.toggle('active');
   if (lang === 'en') {
-    para.classList.toggle('en-hidden', !isActive);
+    container.classList.toggle('en-hidden', !isActive);
   } else if (lang === 'cn') {
-    para.classList.toggle('cn-hidden', !isActive);
+    container.classList.toggle('cn-hidden', !isActive);
   }
 }
+
 // Run after syncStoryLayers populates content
 document.addEventListener('DOMContentLoaded', function() {
   // Delay to ensure syncStoryLayers has populated content first
