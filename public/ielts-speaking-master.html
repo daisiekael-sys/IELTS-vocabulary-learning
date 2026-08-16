@@ -2035,6 +2035,138 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
   .phrase-group-title { font-size: 14px; padding: 12px 14px; }
 }
 
+/* ===== Camera / Recall Memory Mode =====
+   One shared visual grammar for stories, prototypes, Q&A answers and phrase tables. */
+.memory-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0 0 8px;
+}
+.memory-action {
+  appearance: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: var(--bg);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: all .18s ease;
+}
+.memory-action:hover, .memory-action:focus-visible {
+  border-color: var(--primary);
+  color: var(--primary);
+  outline: none;
+}
+.memory-action.is-playing { background: var(--primary); border-color: var(--primary); color: #fff; }
+.memory-action.is-hidden { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
+.memory-status { font-size: 11px; color: var(--success); min-height: 18px; }
+.memory-position {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 7px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+.prototype-memory-cue {
+  margin: 0 0 8px;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+.narrative-para, .prototype-bilingual, .qa-bilingual { position: relative; }
+.narrative-para.en-hidden .narrative-para-en,
+.prototype-bilingual.en-hidden .prototype-en,
+.qa-bilingual.en-hidden .qa-answer { display: none; }
+.narrative-para.cn-hidden .narrative-para-cn,
+.prototype-bilingual.cn-hidden .prototype-cn,
+.qa-bilingual.cn-hidden .qa-translation { display: none; }
+.phrase-table.memory-en-hidden th:first-child,
+.phrase-table.memory-en-hidden td:first-child,
+.phrase-table.memory-cn-hidden th:nth-child(2),
+.phrase-table.memory-cn-hidden td:nth-child(2) { visibility: hidden; }
+.phrase-table.memory-en-hidden th:first-child::after,
+.phrase-table.memory-cn-hidden th:nth-child(2)::after {
+  content: '已隐藏：请复述';
+  visibility: visible;
+  color: var(--text-light);
+  font-size: 11px;
+}
+@media (max-width: 768px) {
+  .memory-toolbar { gap: 5px; }
+  .memory-action { padding: 4px 8px; }
+  .memory-status { width: 100%; }
+}
+
+/* ===== Phrase Bank: fixed bilingual word list, never collapsible ===== */
+#phrase-bank .phrase-group {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  margin: 0 0 24px;
+}
+#phrase-bank .phrase-group-title {
+  cursor: default;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--primary-light);
+  border-radius: 0;
+  padding: 14px 0 8px;
+}
+#phrase-bank .phrase-group-title:hover { background: transparent; }
+#phrase-bank .phrase-group-title .cat-toggle-icon { display: none; }
+#phrase-bank .phrase-group-body {
+  display: block !important;
+  padding: 10px 0 0;
+}
+#phrase-bank .phrase-table,
+#phrase-bank .phrase-table tbody { display: block; width: 100%; }
+#phrase-bank .phrase-table thead { display: none; }
+#phrase-bank .phrase-table tbody tr {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin: 8px 0;
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+#phrase-bank .phrase-table tbody td {
+  min-width: 0;
+  padding: 10px 13px;
+  border: 0;
+  font-size: 14px;
+  line-height: 1.65;
+}
+#phrase-bank .phrase-table tbody td:first-child {
+  width: auto;
+  border-right: 1px solid var(--border);
+  color: var(--text);
+}
+#phrase-bank .phrase-table tbody td::before {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .6px;
+}
+#phrase-bank .phrase-table tbody td:first-child::before { content: 'ENGLISH'; }
+#phrase-bank .phrase-table tbody td:nth-child(2)::before { content: '中文'; }
+@media (max-width: 640px) {
+  #phrase-bank .phrase-table tbody tr { grid-template-columns: 1fr; }
+  #phrase-bank .phrase-table tbody td:first-child { border-right: 0; border-bottom: 1px solid var(--border); }
+}
+
 </style>
 </head>
 
@@ -11128,81 +11260,164 @@ function syncStoryLayers() {
 
 document.addEventListener('DOMContentLoaded', syncStoryLayers);
 
-// ===== Narrative Language Toggle Injection =====
-function injectNarrativeLangControls() {
-  // 1. Story overview: .narrative-para
-  document.querySelectorAll('.narrative-para').forEach(function(para) {
-    if (para.querySelector('.narrative-para-controls')) return;
-    var en = para.querySelector('.narrative-para-en');
-    var cn = para.querySelector('.narrative-para-cn');
-    if (!en || !cn) return;
-    var controls = document.createElement('div');
-    controls.className = 'narrative-para-controls';
-    controls.innerHTML =
-      '<span class="lang-toggle active" data-lang="en" onclick="toggleLang(this)" title="显示英文">EN</span>' +
-      '<span class="lang-toggle active" data-lang="cn" onclick="toggleLang(this)" title="显示中文">中</span>';
-    para.insertBefore(controls, para.firstChild);
-  });
+// ===== Camera / Recall Memory Controls =====
+// All bilingual story material gets the same controls. The two sides remain in
+// their original positions; hiding a side leaves a recall prompt rather than
+// reflowing the answer into a different layout.
+var memoryRecall = { utterance: null, button: null, timer: null };
 
-  // 2. Story prototypes: .prototype-body
-  document.querySelectorAll('.prototype-body').forEach(function(body) {
-    if (body.querySelector('.prototype-controls')) return;
-    var en = body.querySelector('.prototype-en');
-    var cn = body.querySelector('.prototype-cn');
-    if (!en || !cn) return;
-    // Wrap en and cn in a bilingual container
-    var wrapper = document.createElement('div');
-    wrapper.className = 'prototype-bilingual';
-    en.parentNode.insertBefore(wrapper, en);
-    wrapper.appendChild(en);
-    wrapper.appendChild(cn);
-    // Insert controls before the wrapper
-    var controls = document.createElement('div');
-    controls.className = 'prototype-controls';
-    controls.innerHTML =
-      '<span class="lang-toggle active" data-lang="en" onclick="toggleLang(this)" title="显示英文">EN</span>' +
-      '<span class="lang-toggle active" data-lang="cn" onclick="toggleLang(this)" title="显示中文">中</span>';
-    wrapper.parentNode.insertBefore(controls, wrapper);
-  });
-
-  // 3. Topic cards: .qa-block
-  document.querySelectorAll('.qa-block').forEach(function(block) {
-    if (block.querySelector('.narrative-para-controls')) return;
-    var en = block.querySelector('.qa-answer');
-    var cn = block.querySelector('.qa-translation');
-    if (!en || !cn) return;
-    // Wrap answer and translation in a bilingual container
-    var wrapper = document.createElement('div');
-    wrapper.className = 'qa-bilingual';
-    en.parentNode.insertBefore(wrapper, en);
-    wrapper.appendChild(en);
-    wrapper.appendChild(cn);
-    // Insert controls before the wrapper
-    var controls = document.createElement('div');
-    controls.className = 'narrative-para-controls';
-    controls.innerHTML =
-      '<span class="lang-toggle active" data-lang="en" onclick="toggleLang(this)" title="显示英文">EN</span>' +
-      '<span class="lang-toggle active" data-lang="cn" onclick="toggleLang(this)" title="显示中文">中</span>';
-    wrapper.parentNode.insertBefore(controls, wrapper);
-  });
-}
-
-function toggleLang(btn) {
-  var container = btn.closest('.narrative-para, .prototype-bilingual, .qa-bilingual');
-  if (!container) return;
-  var lang = btn.getAttribute('data-lang');
-  var isActive = btn.classList.toggle('active');
-  if (lang === 'en') {
-    container.classList.toggle('en-hidden', !isActive);
-  } else if (lang === 'cn') {
-    container.classList.toggle('cn-hidden', !isActive);
+function clearMemoryTimer() {
+  if (memoryRecall.timer) {
+    clearInterval(memoryRecall.timer);
+    memoryRecall.timer = null;
   }
 }
 
-// Run after syncStoryLayers populates content
+function stopMemorySpeech() {
+  clearMemoryTimer();
+  if (memoryRecall.button) {
+    memoryRecall.button.textContent = '播放英文';
+    memoryRecall.button.classList.remove('is-playing');
+  }
+  memoryRecall.utterance = null;
+  memoryRecall.button = null;
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
+function setMemoryButton(button, lang, hidden) {
+  button.textContent = hidden ? (lang === 'en' ? '恢复英文' : '恢复中文') : (lang === 'en' ? '隐藏英文' : '隐藏中文');
+  button.classList.toggle('is-hidden', hidden);
+}
+
+function createMemoryToolbar(host, insertBefore, config) {
+  if (host.querySelector('.memory-toolbar')) return;
+  var toolbar = document.createElement('div');
+  toolbar.className = 'memory-toolbar';
+  toolbar.setAttribute('aria-label', '镜像记忆与听后复述控制');
+
+  var listen = document.createElement('button');
+  listen.type = 'button'; listen.className = 'memory-action'; listen.textContent = '播放英文';
+  listen.title = '第一次播放；第二次暂停；第三次继续。播放完成后自动隐藏英文。';
+
+  var enButton = document.createElement('button');
+  enButton.type = 'button'; enButton.className = 'memory-action'; setMemoryButton(enButton, 'en', false);
+  var cnButton = document.createElement('button');
+  cnButton.type = 'button'; cnButton.className = 'memory-action'; setMemoryButton(cnButton, 'cn', false);
+  var status = document.createElement('span'); status.className = 'memory-status'; status.setAttribute('aria-live', 'polite');
+  toolbar.appendChild(listen); toolbar.appendChild(enButton); toolbar.appendChild(cnButton); toolbar.appendChild(status);
+  host.insertBefore(toolbar, insertBefore);
+
+  enButton.addEventListener('click', function() {
+    var hidden = !config.isHidden('en');
+    config.setHidden('en', hidden); setMemoryButton(enButton, 'en', hidden);
+  });
+  cnButton.addEventListener('click', function() {
+    var hidden = !config.isHidden('cn');
+    config.setHidden('cn', hidden); setMemoryButton(cnButton, 'cn', hidden);
+  });
+  listen.addEventListener('click', function() {
+    if (!('speechSynthesis' in window)) { status.textContent = '此浏览器不支持朗读，请自行读完后复述。'; return; }
+    if (memoryRecall.button === listen && memoryRecall.utterance && (window.speechSynthesis.speaking || window.speechSynthesis.paused)) {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume(); listen.textContent = '暂停英文'; status.textContent = '继续播放…';
+      } else {
+        window.speechSynthesis.pause(); listen.textContent = '继续播放英文'; status.textContent = '已暂停；再按一次继续。';
+      }
+      return;
+    }
+    stopMemorySpeech();
+    var text = config.getEnglishText();
+    if (!text) { status.textContent = '没有可播放的英文。'; return; }
+    var utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US'; utterance.rate = 0.86;
+    memoryRecall.utterance = utterance; memoryRecall.button = listen;
+    listen.textContent = '暂停英文'; listen.classList.add('is-playing'); status.textContent = '正在播放…';
+    utterance.onend = function() {
+      if (memoryRecall.utterance !== utterance) return;
+      memoryRecall.utterance = null; memoryRecall.button = null;
+      listen.textContent = '播放英文'; listen.classList.remove('is-playing');
+      config.setHidden('en', true); setMemoryButton(enButton, 'en', true);
+      var seconds = 10; status.textContent = '听完。' + seconds + ' 秒内复述…';
+      clearMemoryTimer();
+      memoryRecall.timer = setInterval(function() {
+        seconds -= 1;
+        status.textContent = seconds > 0 ? '听完。' + seconds + ' 秒内复述…' : '时间到：恢复英文核对。';
+        if (seconds <= 0) clearMemoryTimer();
+      }, 1000);
+    };
+    utterance.onerror = function() {
+      if (memoryRecall.utterance !== utterance) return;
+      memoryRecall.utterance = null; memoryRecall.button = null;
+      listen.textContent = '播放英文'; listen.classList.remove('is-playing');
+      status.textContent = '朗读未能启动，请自行读完后复述。';
+    };
+    window.speechSynthesis.speak(utterance);
+  });
+}
+
+function pairMemoryConfig(pair, englishNode) {
+  return {
+    isHidden: function(lang) { return pair.classList.contains(lang === 'en' ? 'en-hidden' : 'cn-hidden'); },
+    setHidden: function(lang, hidden) { pair.classList.toggle(lang === 'en' ? 'en-hidden' : 'cn-hidden', hidden); },
+    getEnglishText: function() { return englishNode.textContent.replace(/\s+/g, ' ').trim(); }
+  };
+}
+
+function addStoryPositionLabels() {
+  document.querySelectorAll('.story-content-area, .story-narrative').forEach(function(area) {
+    var frames = Array.prototype.slice.call(area.querySelectorAll('.narrative-para'));
+    frames.forEach(function(para, index) {
+      if (para.querySelector('.memory-position')) return;
+      var label = index === 0 ? '① 画面定位：先看见地点或人物' : index === frames.length - 1 ? '④ 感受收尾：说结果、感受或收获' : index === 1 ? '② 背景交代：时间、原因或关系' : '③ 行动细节：发生什么、听见什么、做了什么';
+      var chip = document.createElement('div'); chip.className = 'memory-position'; chip.textContent = label;
+      para.insertBefore(chip, para.firstChild);
+    });
+  });
+}
+
+function installBilingualMemoryControls() {
+  document.querySelectorAll('#phrase-bank .phrase-group, #phrase-bank .phrase-group-title').forEach(function(node) {
+    if (node.classList.contains('phrase-group')) node.classList.add('expanded');
+    if (node.classList.contains('phrase-group-title')) { node.removeAttribute('onclick'); node.setAttribute('aria-expanded', 'true'); }
+  });
+
+  document.querySelectorAll('.narrative-para').forEach(function(para) {
+    var en = para.querySelector('.narrative-para-en'); var cn = para.querySelector('.narrative-para-cn');
+    if (en && cn) createMemoryToolbar(para, en, pairMemoryConfig(para, en));
+  });
+
+  document.querySelectorAll('.prototype-body').forEach(function(body) {
+    var en = body.querySelector('.prototype-en'); var cn = body.querySelector('.prototype-cn');
+    if (!en || !cn) return;
+    var cue = body.querySelector('.prototype-memory-cue');
+    if (!cue) { cue = document.createElement('div'); cue.className = 'prototype-memory-cue'; cue.textContent = '镜头顺序：地点/人物 → 发生什么 → 一个感官细节 → 感受或结果'; body.insertBefore(cue, body.firstChild); }
+    var pair = body.querySelector('.prototype-bilingual');
+    if (!pair) { pair = document.createElement('div'); pair.className = 'prototype-bilingual'; en.parentNode.insertBefore(pair, en); pair.appendChild(en); pair.appendChild(cn); }
+    createMemoryToolbar(body, pair, pairMemoryConfig(pair, en));
+  });
+
+  document.querySelectorAll('.qa-block').forEach(function(block) {
+    var en = block.querySelector('.qa-answer'); var cn = block.querySelector('.qa-translation');
+    if (!en || !cn) return;
+    var pair = block.querySelector('.qa-bilingual');
+    if (!pair) { pair = document.createElement('div'); pair.className = 'qa-bilingual'; en.parentNode.insertBefore(pair, en); pair.appendChild(en); pair.appendChild(cn); }
+    createMemoryToolbar(block, pair, pairMemoryConfig(pair, en));
+  });
+
+  document.querySelectorAll('.phrase-group-body').forEach(function(body) {
+    var table = body.querySelector('.phrase-table');
+    if (!table || body.querySelector('.memory-toolbar')) return;
+    createMemoryToolbar(body, table, {
+      isHidden: function(lang) { return table.classList.contains(lang === 'en' ? 'memory-en-hidden' : 'memory-cn-hidden'); },
+      setHidden: function(lang, hidden) { table.classList.toggle(lang === 'en' ? 'memory-en-hidden' : 'memory-cn-hidden', hidden); },
+      getEnglishText: function() { return Array.prototype.slice.call(table.querySelectorAll('tbody td:first-child')).map(function(cell) { return cell.textContent.trim(); }).join('. '); }
+    });
+  });
+}
+
+// Run after syncStoryLayers has rebuilt the overview stories from the canonical pages.
 document.addEventListener('DOMContentLoaded', function() {
-  // Delay to ensure syncStoryLayers has populated content first
-  setTimeout(injectNarrativeLangControls, 500);
+  setTimeout(function() { addStoryPositionLabels(); installBilingualMemoryControls(); }, 500);
 });
 
 // ===== Tab Switching =====
