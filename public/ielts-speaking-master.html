@@ -365,28 +365,69 @@ body {
 }
 .narrative-para {
   margin-bottom: 16px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 .narrative-para-en {
+  flex: 1;
+  min-width: 280px;
   font-size: 15px; color: var(--text);
-  line-height: 2.1; margin-bottom: 6px;
+  line-height: 2.1;
+  padding: 14px 16px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
 }
-.narrative-para-toggle {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 12px; color: var(--primary); cursor: pointer;
-  user-select: none; padding: 2px 8px; border-radius: 4px;
-  transition: background 0.2s;
-}
-.narrative-para-toggle:hover { background: var(--hover); }
-.narrative-para-toggle .toggle-icon {
-  font-size: 10px; transition: transform 0.3s;
-  display: inline-block;
-}
-.narrative-para.expanded .toggle-icon { transform: rotate(90deg); }
 .narrative-para-cn {
-  display: none; font-size: 13px; color: var(--text-light);
-  line-height: 1.9; padding-top: 8px; margin-top: 4px;
-  border-top: 1px dashed var(--border);
+  flex: 1;
+  min-width: 280px;
+  font-size: 13px; color: var(--text-light);
+  line-height: 1.9;
+  padding: 14px 16px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  display: block;
+  transition: all 0.3s ease;
 }
+/* Hide states */
+.narrative-para.en-hidden .narrative-para-en { display: none; }
+.narrative-para.cn-hidden .narrative-para-cn { display: none; }
+/* Language toggle controls */
+.narrative-para-controls {
+  width: 100%;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+  order: -1;
+}
+.narrative-para-controls .lang-toggle {
+  font-size: 11px;
+  padding: 3px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.narrative-para-controls .lang-toggle:hover {
+  background: var(--hover);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.narrative-para-controls .lang-toggle.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+/* Remove old toggle button */
+.narrative-para-toggle { display: none; }
+.narrative-para.expanded .toggle-icon { display: none; }
 .narrative-para.expanded .narrative-para-cn { display: block; }
 
 /* ===== Topic Cards ===== */
@@ -758,19 +799,29 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
   transition: transform 0.2s;
   font-size: 11px;
 }
-.story-expand-toggle.expanded .toggle-arrow {
+.story-expand-toggle:not(.collapsed) .toggle-arrow {
   transform: rotate(90deg);
 }
-/* Story content wrapper - hidden by default */
+/* Story content wrapper - expanded by default */
 .story-content-wrapper {
+  max-height: 100000px;
+  overflow: visible;
+  opacity: 1;
+  transition: max-height 0.5s ease, opacity 0.3s ease;
+  margin-top: 0;
+}
+.story-content-wrapper.collapsed {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin-top: 0;
+}
+/* For story-narrative fallback (story-block-1 style) */
+.story-narrative.collapsed {
   max-height: 0;
   overflow: hidden;
   opacity: 0;
   transition: max-height 0.5s ease, opacity 0.3s ease;
-}
-.story-content-wrapper.expanded {
-  max-height: 100000px;
-  opacity: 1;
 }
 /* Bottom collapse link - small and minimal */
 .story-collapse-link {
@@ -1325,6 +1376,8 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
 .part-list{list-style:none;padding:0;margin:0;}
 .part-list li{padding:4px 0;font-size:13px;color:var(--text-secondary);line-height:1.6;}
 .overview-story-block{margin:32px 0;padding-bottom:24px;border-bottom:1px solid var(--border);}
+.overview-story-block .story-content-wrapper,
+.overview-story-block .story-narrative{margin-left:16px;padding-left:12px;border-left:2px solid var(--border);}
 .keyword-analysis{background:var(--bg-subtle);border-radius:var(--radius);padding:20px;margin-top:20px;}
 .kw-title{font-size:15px;font-weight:700;margin-bottom:16px;color:var(--text);}
 .kw-topics-row{display:flex;gap:24px;margin-bottom:16px;flex-wrap:wrap;}
@@ -5682,7 +5735,7 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
       <div class="coverage">覆盖 14 个主题（Part 1: 8 · Part 2&3: 6）</div>
     
     <button class="story-expand-toggle" onclick="toggleStoryBlock(this.closest('.overview-story-block'));">
-      <span class="toggle-text">打开完整故事</span>
+      <span class="toggle-text">收起故事</span>
       <span class="toggle-arrow">&#9654;</span>
     </button>
 </div>
@@ -5843,7 +5896,7 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
       <div class="coverage">覆盖 23 个主题（Part 1: 12 · Part 2&3: 11）</div>
     
     <button class="story-expand-toggle" onclick="toggleStoryBlock(this.closest('.overview-story-block'));">
-      <span class="toggle-text">打开完整故事</span>
+      <span class="toggle-text">收起故事</span>
       <span class="toggle-arrow">&#9654;</span>
     </button>
 </div>
@@ -5881,7 +5934,7 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
       <div class="coverage">覆盖 23 个主题（Part 1: 10 · Part 2&3: 13）</div>
     
     <button class="story-expand-toggle" onclick="toggleStoryBlock(this.closest('.overview-story-block'));">
-      <span class="toggle-text">打开完整故事</span>
+      <span class="toggle-text">收起故事</span>
       <span class="toggle-arrow">&#9654;</span>
     </button>
 </div>
@@ -5919,7 +5972,7 @@ tr:hover td, .data-table tr:hover td { background: var(--hover); }
       <div class="coverage">覆盖 27 个主题（Part 1: 8 · Part 2&3: 19）</div>
     
     <button class="story-expand-toggle" onclick="toggleStoryBlock(this.closest('.overview-story-block'));">
-      <span class="toggle-text">打开完整故事</span>
+      <span class="toggle-text">收起故事</span>
       <span class="toggle-arrow">&#9654;</span>
     </button>
 </div>
@@ -10590,20 +10643,21 @@ function toggleStoryBlock(block) {
   var btn = block.querySelector('.story-expand-toggle');
   var target = wrapper || narrative;
   if (target) {
-    var isExpanded = target.classList.toggle('expanded');
+    // Default is expanded, so toggle 'collapsed' class
+    var isCollapsed = target.classList.toggle('collapsed');
     if (!wrapper && narrative) {
-      narrative.style.maxHeight = isExpanded ? '100000px' : '0';
-      narrative.style.opacity = isExpanded ? '1' : '0';
+      narrative.style.maxHeight = isCollapsed ? '0' : '100000px';
+      narrative.style.opacity = isCollapsed ? '0' : '1';
       narrative.style.overflow = 'hidden';
       narrative.style.transition = 'max-height 0.5s ease, opacity 0.3s ease';
     }
     if (btn) {
-      btn.classList.toggle('expanded', isExpanded);
+      btn.classList.toggle('collapsed', isCollapsed);
       var text = btn.querySelector('.toggle-text');
-      if (text) text.textContent = isExpanded ? '收起故事' : '打开完整故事';
+      if (text) text.textContent = isCollapsed ? '打开完整故事' : '收起故事';
     }
-    // When expanding the story block, auto-open all CN translations
-    if (isExpanded) {
+    // When expanding (uncollapsing), auto-open all CN translations
+    if (!isCollapsed) {
       block.querySelectorAll('.narrative-para').forEach(function(p) {
         p.classList.add('expanded');
       });
@@ -10615,9 +10669,9 @@ function collapseAllStories() {
   document.querySelectorAll('.overview-story-block').forEach(function(block) {
     var wrapper = block.querySelector('.story-content-wrapper');
     var btn = block.querySelector('.story-expand-toggle');
-    if (wrapper) wrapper.classList.remove('expanded');
+    if (wrapper) wrapper.classList.add('collapsed');
     if (btn) {
-      btn.classList.remove('expanded');
+      btn.classList.add('collapsed');
       var text = btn.querySelector('.toggle-text');
       if (text) text.textContent = '打开完整故事';
     }
@@ -10627,9 +10681,9 @@ function expandAllStories() {
   document.querySelectorAll('.overview-story-block').forEach(function(block) {
     var wrapper = block.querySelector('.story-content-wrapper');
     var btn = block.querySelector('.story-expand-toggle');
-    if (wrapper) wrapper.classList.add('expanded');
+    if (wrapper) wrapper.classList.remove('collapsed');
     if (btn) {
-      btn.classList.add('expanded');
+      btn.classList.remove('collapsed');
       var text = btn.querySelector('.toggle-text');
       if (text) text.textContent = '收起故事';
     }
@@ -11001,6 +11055,38 @@ function syncStoryLayers() {
 }
 
 document.addEventListener('DOMContentLoaded', syncStoryLayers);
+
+// ===== Narrative Language Toggle Injection =====
+function injectNarrativeLangControls() {
+  document.querySelectorAll('.narrative-para').forEach(function(para) {
+    if (para.querySelector('.narrative-para-controls')) return;
+    var en = para.querySelector('.narrative-para-en');
+    var cn = para.querySelector('.narrative-para-cn');
+    if (!en || !cn) return;
+    var controls = document.createElement('div');
+    controls.className = 'narrative-para-controls';
+    controls.innerHTML =
+      '<span class="lang-toggle active" data-lang="en" onclick="toggleLang(this)" title="显示英文">EN</span>' +
+      '<span class="lang-toggle active" data-lang="cn" onclick="toggleLang(this)" title="显示中文">中</span>';
+    para.insertBefore(controls, para.firstChild);
+  });
+}
+function toggleLang(btn) {
+  var para = btn.closest('.narrative-para');
+  if (!para) return;
+  var lang = btn.getAttribute('data-lang');
+  var isActive = btn.classList.toggle('active');
+  if (lang === 'en') {
+    para.classList.toggle('en-hidden', !isActive);
+  } else if (lang === 'cn') {
+    para.classList.toggle('cn-hidden', !isActive);
+  }
+}
+// Run after syncStoryLayers populates content
+document.addEventListener('DOMContentLoaded', function() {
+  // Delay to ensure syncStoryLayers has populated content first
+  setTimeout(injectNarrativeLangControls, 500);
+});
 
 // ===== Tab Switching =====
 document.querySelectorAll('.tab-btn').forEach(function(btn) {
